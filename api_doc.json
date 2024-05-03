@@ -1,0 +1,59 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "REST API SPBE KOTA MADIUN",
+    "version": "1.0"
+  },
+  "servers": [{ "url": "http://localhost:6000" }],
+  "paths": {
+    "/v1/referensi_arsitektur": {
+      "get": {
+        "tags": ["Referensi User API"],
+        "description": "List Referensi User",
+        "responses": {
+          "200": {
+            "description": "Success get all referensi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "array"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "number"
+                          },
+                          "nama_referensi": {
+                            "type": "string"
+                          },
+                          "kode_referensi": {
+                            "type": "string"
+                          },
+                          "level_referesi": {
+                            "type": "integer"
+                          },
+                          "jenis_referensi": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
