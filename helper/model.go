@@ -10,8 +10,17 @@ func ToReferensiArsitekturResponse(referensiarsitektur domain.ReferensiArsitektu
 		Id: referensiarsitektur.IdReferensi,
 		Kode_referensi: referensiarsitektur.Kode_referensi,
 		Nama_referensi: referensiarsitektur.Nama_referensi,
+		Level_referensi: referensiarsitektur.Level_referensi,
 		Jenis_referensi: referensiarsitektur.Jenis_referensi,
 		Created_at: referensiarsitektur.Created_at,
 		Updated_at: referensiarsitektur.Updated_at,
 	}
+}
+
+func ToReferenceResponses(reference []domain.ReferensiArsitektur) []web.ReferensiArsitekturResponse {
+	var referenceResponses []web.ReferensiArsitekturResponse
+	for _, referensiarsitektur := range reference {
+		referenceResponses = append(referenceResponses, ToReferensiArsitekturResponse(referensiarsitektur))
+	}
+	return referenceResponses
 }

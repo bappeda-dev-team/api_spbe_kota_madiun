@@ -4,9 +4,9 @@ import "time"
 
 type ReferensiArsitekturUpdateRequest struct {
 	Id 				int
-	Kode_referensi  string
-	Nama_referensi  string
-	Level_referensi string
-	Jenis_referensi string
-	Updated_at      time.Time
+	Kode_referensi  string `validate:"required"`
+	Nama_referensi  string `validate:"required"`
+	Level_referensi	int    `validate:"required"`
+	Jenis_referensi string `validate:"required"`
+	Updated_at      time.Time 
 }

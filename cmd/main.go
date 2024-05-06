@@ -1,36 +1,45 @@
 package main
 
 import (
-	"encoding/json"
-	"log"
+	"api_spbe_kota_madiun/app"
+	"api_spbe_kota_madiun/controller"
+	"api_spbe_kota_madiun/helper"
+	"api_spbe_kota_madiun/repository"
+	"api_spbe_kota_madiun/service"
+	"fmt"
 	"net/http"
+
+	"github.com/go-playground/validator"
+	"github.com/rs/cors"
 )
 
 func main() {
-	addr := ":3001"
-	mux := http.NewServeMux()
 
-	mux.HandleFunc("/",
-		func(w http.ResponseWriter, r *http.Request) {
-			enc := json.NewEncoder(w)
-			w.Header().
-				Set("Content-Type",
-					"application/json; charset=utf-8")
+	db := app.GetConnection()
+	validate :=validator.New()
 
-			resp := Resp{
-				Message: "SPBE KOTA MADIUN",
-			}
+	referensiarsitekturRepository := repository.NewReferensiArsitekturRepository()
+	referesiarsitekturService := service.NewReferensiArsitekturService(referensiarsitekturRepository, db, validate)
+	referensiarsitekturController := controller.NewReferensiarstitekturController(referesiarsitekturService)
+	router := app.NewRouter(referensiarsitekturController)
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PATCH", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		AllowCredentials: true,
+	})
+	
+	handler := c.Handler(router)
 
-			if err := enc.Encode(resp); err != nil {
-				panic(err)
-			}
-		})
+	server := http.Server{
+		Addr:    "localhost:8080",
+		Handler: handler,
+		
+	}
 
-	log.Printf("listening on %s\n", addr)
+	fmt.Println("running", server.Addr)
 
-	log.Fatal(http.ListenAndServe(addr, mux))
-}
+	err := server.ListenAndServe()
+	helper.PanicIfError(err)
 
-type Resp struct {
-	Message string `json:"message"`
 }
