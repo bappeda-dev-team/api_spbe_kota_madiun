@@ -5,17 +5,29 @@ API pemetaan data arsitektur SPBE
 
 ### Kebutuhan
 - Go versi 1.22
+- MySQL
+- [golang-migrate](https://github.com/golang-migrate/migrate)
+- [Make untuk OS Windows](https://gnuwin32.sourceforge.net/packages/make.htm)
 
 ### Cara install
-- .....
+- buat database bernama db_spbe
+- install golang-migrate (khusus macos / linux)
 
-## Target perilisan
+``` sh
+make install-migrate
+```
 
-### versi 0 (1 hari)
-- [ ] pembuatan dokumentasi
-- [ ] API sederhana menampilkan respon ("SPBE KOTA MADIUN")
-- [ ] unit tes
-- [ ] menjalankan di server
+- migrasi database
 
-### versi 1 (3 hari)
-- [ ] ....
+``` sh
+make db-migrate
+```
+
+### Run server
+
+``` sh
+make run
+```
+untuk menghentikan server, tekan Ctrl + c
+contoh request ada di folder 'example'
+
