@@ -30,6 +30,6 @@ func TestDatabase(t *testing.T) {
 	db.SetMaxIdleConns(100)
 	db.SetConnMaxIdleTime(5 * time.Minute)
 	db.SetConnMaxLifetime(60 * time.Minute)
-	
+
 	defer db.Close()
 }

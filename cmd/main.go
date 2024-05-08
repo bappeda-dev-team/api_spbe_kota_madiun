@@ -16,7 +16,7 @@ import (
 func main() {
 
 	db := app.GetConnection()
-	validate :=validator.New()
+	validate := validator.New()
 
 	referensiarsitekturRepository := repository.NewReferensiArsitekturRepository()
 	referesiarsitekturService := service.NewReferensiArsitekturService(referensiarsitekturRepository, db, validate)
@@ -28,13 +28,12 @@ func main() {
 		AllowedHeaders:   []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		AllowCredentials: true,
 	})
-	
+
 	handler := c.Handler(router)
 
 	server := http.Server{
 		Addr:    "localhost:8080",
 		Handler: handler,
-		
 	}
 
 	fmt.Println("running", server.Addr)

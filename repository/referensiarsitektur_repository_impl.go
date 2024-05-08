@@ -18,7 +18,7 @@ func NewReferensiArsitekturRepository() ReferensiArsitekturRepository {
 	return &ReferensiArsitekturRepositoryImpl{}
 }
 
-func (repository *ReferensiArsitekturRepositoryImpl) Insert(ctx context.Context, tx *sql.Tx, referensiarsitektur domain.ReferensiArsitektur)domain.ReferensiArsitektur {
+func (repository *ReferensiArsitekturRepositoryImpl) Insert(ctx context.Context, tx *sql.Tx, referensiarsitektur domain.ReferensiArsitektur) domain.ReferensiArsitektur {
 	currentTime := time.Now()
 	referensiarsitektur.Created_at = currentTime
 	referensiarsitektur.Updated_at = currentTime
@@ -34,41 +34,41 @@ func (repository *ReferensiArsitekturRepositoryImpl) Insert(ctx context.Context,
 	return referensiarsitektur
 }
 
-func (repository *ReferensiArsitekturRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, referensiarsitektur domain.ReferensiArsitektur)domain.ReferensiArsitektur{
+func (repository *ReferensiArsitekturRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, referensiarsitektur domain.ReferensiArsitektur) domain.ReferensiArsitektur {
 	currentTime := time.Now()
 	referensiarsitektur.Updated_at = currentTime
 
 	script := "update referensi_arsitekturs SET kode_referensi = ?, nama_referensi = ?, level_referensi = ?, jenis_referensi = ?, updated_at = ? where id_referensi = ?"
-	_, err := tx.ExecContext(ctx, script, referensiarsitektur.Kode_referensi, referensiarsitektur.Nama_referensi, referensiarsitektur.Level_referensi, referensiarsitektur.Jenis_referensi,referensiarsitektur.Updated_at, referensiarsitektur.IdReferensi)
+	_, err := tx.ExecContext(ctx, script, referensiarsitektur.Kode_referensi, referensiarsitektur.Nama_referensi, referensiarsitektur.Level_referensi, referensiarsitektur.Jenis_referensi, referensiarsitektur.Updated_at, referensiarsitektur.IdReferensi)
 	helper.PanicIfError(err)
 
 	return referensiarsitektur
 }
 
-func (repository *ReferensiArsitekturRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, referensiarsitektur domain.ReferensiArsitektur){
+func (repository *ReferensiArsitekturRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, referensiarsitektur domain.ReferensiArsitektur) {
 	script := "delete from referensi_arsitekturs where id_referensi =?"
 	_, err := tx.ExecContext(ctx, script, referensiarsitektur.IdReferensi)
 	helper.PanicIfError(err)
 
 }
 
-func(repository *ReferensiArsitekturRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.ReferensiArsitektur{
+func (repository *ReferensiArsitekturRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.ReferensiArsitektur {
 	script := "select id_referensi,kode_referensi,nama_referensi,level_referensi,jenis_referensi,created_at,updated_at from referensi_arsitekturs"
 	rows, err := tx.QueryContext(ctx, script)
 	helper.PanicIfError(err)
 	defer rows.Close()
-	
+
 	var reference []domain.ReferensiArsitektur
 	for rows.Next() {
 		referensi := domain.ReferensiArsitektur{}
-		err := rows.Scan(&referensi.IdReferensi, &referensi.Kode_referensi, &referensi.Nama_referensi, &referensi.Level_referensi, &referensi.Jenis_referensi,&referensi.Created_at,&referensi.Updated_at)
+		err := rows.Scan(&referensi.IdReferensi, &referensi.Kode_referensi, &referensi.Nama_referensi, &referensi.Level_referensi, &referensi.Jenis_referensi, &referensi.Created_at, &referensi.Updated_at)
 		helper.PanicIfError(err)
 		reference = append(reference, referensi)
 	}
 	return reference
 }
 
-func(repository *ReferensiArsitekturRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, referensiarsitekturId int) (domain.ReferensiArsitektur, error){
+func (repository *ReferensiArsitekturRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, referensiarsitekturId int) (domain.ReferensiArsitektur, error) {
 	script := "select id_referensi, kode_referensi, nama_referensi, level_referensi, jenis_referensi, created_at, updated_at from referensi_arsitekturs where id_referensi = ?"
 	rows, err := tx.QueryContext(ctx, script, referensiarsitekturId)
 	helper.PanicIfError(err)

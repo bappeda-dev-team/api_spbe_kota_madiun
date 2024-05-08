@@ -3,7 +3,7 @@ package web
 import "time"
 
 type ReferensiArsitekturResponse struct {
-	Id int
+	Id              int
 	Kode_referensi  string
 	Nama_referensi  string
 	Level_referensi int
