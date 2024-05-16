@@ -22,12 +22,27 @@ make install-migrate
 ``` sh
 make db-migrate
 ```
+- install golang-migrate (khusus windows)
+open cmd dan ketikkan:
+``` sh
+go install -tags 'mysql' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+```
 
 ### Run server
-
+- running untuk macos
 ``` sh
 make run
 ```
+- running untuk windows
+masuk ke directory cmd
+``` sh
+cd cmd
+```
+ketikkan perintah:
+``` sh
+go run main.go
+```
+
 untuk menghentikan server, tekan Ctrl + c
 contoh request ada di folder 'example'
 
