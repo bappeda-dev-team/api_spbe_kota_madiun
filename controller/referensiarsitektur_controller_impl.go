@@ -27,7 +27,7 @@ func (controller *ReferensiArsitekturControllerImpl) Insert(writer http.Response
 	referensiarsitekturResponse := controller.ReferensiArsitekturService.Insert(request.Context(), referensiarsitekturInsertRequest)
 	webResponse := web.WebResponse{
 		Code: 200,
-		Status: "OK",
+		Status: "Success create referensi arsitektur",
 		Data: referensiarsitekturResponse,
 	}
 
@@ -48,7 +48,7 @@ func (controller *ReferensiArsitekturControllerImpl) Update(writer http.Response
 
 	webResponse := web.WebResponse{
 		Code: 200,
-		Status: "OK",
+		Status: "Success update referensi arsitektur",
 		Data: referensiarsitekturResponse,
 	}
 
@@ -65,7 +65,7 @@ func (controller *ReferensiArsitekturControllerImpl) Delete(writer http.Response
 
 	webResponse := web.WebResponse{
 		Code: 200,
-		Status: "OK",
+		Status: "Success delete referensi arsitektur",
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)
@@ -76,9 +76,43 @@ func (controller *ReferensiArsitekturControllerImpl) FindAll(writer http.Respons
 
 	webResponse := web.WebResponse{
 		Code: 200,
-		Status: "OK",
+		Status: "Success get all referensi arsitektur",
 		Data: referensiarsitekturResponse,
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)
+}
+
+func (controller *ReferensiArsitekturControllerImpl) FindByKodeReferensi(writer http.ResponseWriter, request *http.Request, params httprouter.Params){
+
+	kodeReferensi := params.ByName("kodeReferensi")
+
+	referensiarsitekturResponse, err := controller.ReferensiArsitekturService.GetDataHierarchy(request.Context(),kodeReferensi)
+	if err != nil {
+		if err.Error() == "data not found" {
+			webResponse := web.WebResponse{
+				Code:   http.StatusNotFound,
+				Status: "NOT FOUND",
+				Data:   "Data not found",
+			}
+			helper.WriteToResponseBody(writer, webResponse)
+		} else {
+			webResponse := web.WebResponse{
+				Code:   http.StatusInternalServerError,
+				Status: "INTERNAL SERVER ERROR",
+				Data:   err.Error(),
+			}
+			helper.WriteToResponseBody(writer, webResponse)
+		}
+		return
+	}
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "Success get code referensi arsitektur",
+		Data:   referensiarsitekturResponse,
+	}
+	helper.WriteToResponseBody(writer, webResponse)
+
+
 }

@@ -14,6 +14,7 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.POST("/v1/createreferensiarsitektur", referensiarsitekturController.Insert)
 	router.PUT("/v1/updatereferensiarsitektur/:referensiarsitekturId", referensiarsitekturController.Update)
 	router.DELETE("/v1/deletereferensiarsitektur/:referensiarsitekturId", referensiarsitekturController.Delete)
+	router.GET("/v1/referensiarsitektur/:kodeReferensi", referensiarsitekturController.FindByKodeReferensi)
 
 	router.PanicHandler = exception.ErrorHandler
 

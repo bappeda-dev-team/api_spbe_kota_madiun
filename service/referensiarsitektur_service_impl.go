@@ -7,8 +7,11 @@ import (
 	"api_spbe_kota_madiun/repository"
 	"context"
 	"database/sql"
+	"errors"
+	"log"
+	"time"
 
-	"github.com/go-playground/validator"
+	"github.com/go-playground/validator/v10"
 )
 
 type ReferensiArsitekturServiceImpl struct {
@@ -33,12 +36,15 @@ func(service *ReferensiArsitekturServiceImpl) Insert(ctx context.Context, reques
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
+	currentTime := time.Now()
+
 	referensiarsitektur := domain.ReferensiArsitektur{
 		Kode_referensi: request.Kode_referensi,
 		Nama_referensi: request.Nama_referensi,
 		Level_referensi: request.Level_referensi,
 		Jenis_referensi: request.Jenis_referensi,
-		Created_at: request.Created_at,
+		Created_at: currentTime,
+
 	}
 	
 	referensiarsitektur = service.ReferensiArsitekturRepository.Insert(ctx, tx, referensiarsitektur)
@@ -85,4 +91,41 @@ func(service *ReferensiArsitekturServiceImpl)FindAll(ctx context.Context)[]web.R
 
 	reference := service.ReferensiArsitekturRepository.FindAll(ctx,tx)
 	return helper.ToReferenceResponses(reference)
+}
+
+func (service *ReferensiArsitekturServiceImpl)GetDataHierarchy(ctx context.Context, kodeReferensi string) ([]web.ReferensiArsitekturResponse, error){
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	referensiList, err :=  service.ReferensiArsitekturRepository.FindByKodeRef(ctx, tx, kodeReferensi)
+	if err != nil {
+		if err.Error() == "data not found" {
+			log.Println("Service: Data not found for kodeReferensi:", kodeReferensi)
+			return nil, err
+		}
+		return nil, err
+	}
+
+	if len(referensiList) == 0 {
+		log.Println("Service: Data not found for kodeReferensi:", kodeReferensi)
+		return nil, errors.New("data not found")
+	}
+	
+	var responseList []web.ReferensiArsitekturResponse
+	for _, referensi := range referensiList {
+		response := web.ReferensiArsitekturResponse{
+			Id: referensi.IdReferensi,
+			Kode_referensi:  referensi.Kode_referensi,
+			Nama_referensi:  referensi.Nama_referensi,
+			Level_referensi: referensi.Level_referensi,
+			Jenis_referensi: referensi.Jenis_referensi,
+			Created_at: referensi.Created_at,
+			Updated_at: referensi.Updated_at,
+		}
+		responseList = append(responseList, response)
+	}
+
+	return responseList, nil
+
 }

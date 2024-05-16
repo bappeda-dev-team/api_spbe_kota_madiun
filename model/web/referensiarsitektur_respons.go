@@ -4,10 +4,10 @@ import "time"
 
 type ReferensiArsitekturResponse struct {
 	Id int
-	Kode_referensi  string
-	Nama_referensi  string
-	Level_referensi int
-	Jenis_referensi string
-	Created_at      time.Time
-	Updated_at      time.Time
+	Kode_referensi  string `json:"kode_referensi"`
+	Nama_referensi  string `json:"nama_referensi"`
+	Level_referensi int 	`json:"level_referensi"`
+	Jenis_referensi string	`json:"jenis_referensi"`
+	Created_at      time.Time `json:"created_at"`
+	Updated_at      time.Time `json:"updated_at"`
 }

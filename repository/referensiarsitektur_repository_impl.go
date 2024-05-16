@@ -84,49 +84,52 @@ func(repository *ReferensiArsitekturRepositoryImpl) FindById(ctx context.Context
 	}
 }
 
-func (repository *ReferensiArsitekturRepositoryImpl) FindByKodeRef(ctx context.Context, tx *sql.Tx, kodeReferensi string) *helper.TreeNode {
-	var rows *sql.Rows
-	var err error
-	if tx != nil {
-		rows, err = tx.QueryContext(ctx, "SELECT kode_referensi FROM referensi_arsitekturs WHERE kode_referensi LIKE ?", kodeReferensi+"%")
-	} else {
-		rows, err = tx.QueryContext(ctx, "SELECT kode_referensi FROM referensi_arsitekturs WHERE kode_referensi LIKE ?", kodeReferensi+"%")
+func (repository *ReferensiArsitekturRepositoryImpl) FindByKodeRef(ctx context.Context, tx *sql.Tx, kodeReferensi string) ([]domain.ReferensiArsitektur, error) {
+	var exists bool
+	err := tx.QueryRowContext(ctx, "select exists(select 1 from referensi_arsitekturs where kode_referensi = ?)", kodeReferensi).Scan(&exists)
+	helper.PanicIfError(err)
+
+	if !exists {
+		log.Println("Data not found for kodeReferensi:", kodeReferensi)
+		return nil, errors.New("data not found")
 	}
+
+	kodeBody := strings.Split(kodeReferensi, ".")
+	var placeholders []string
+
+	for i := range kodeBody {
+		placeholders = append(placeholders, strings.Join(kodeBody[:i+1], "."))
+	}
+
+	script := "select id_referensi, kode_referensi, nama_referensi, level_referensi, jenis_referensi, created_at, updated_at from referensi_arsitekturs where kode_referensi in ("
+	for i := range placeholders {
+		if i > 0 {
+			script += ", "
+		}
+		script += "?"
+	}
+	script += ") order by level_referensi asc"
+
+	rows, err := tx.QueryContext(ctx, script, helper.ConvertStringsToInterfaces(placeholders)...)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	defer rows.Close()
 
-	root := helper.NewTreeNode(kodeReferensi)
-
+	var referensiList []domain.ReferensiArsitektur
 	for rows.Next() {
-		var kodeReferensi string
-		if err := rows.Scan(&kodeReferensi); err != nil {
-			log.Fatal(err)
+		referensi := domain.ReferensiArsitektur{}
+		err := rows.Scan(&referensi.IdReferensi, &referensi.Kode_referensi, &referensi.Nama_referensi, &referensi.Level_referensi, &referensi.Jenis_referensi, &referensi.Created_at, &referensi.Updated_at)
+		if err != nil {
+			return nil, err
 		}
-
-		parts := strings.Split(kodeReferensi, ".")
-
-		currNode := root
-
-		for _, part := range parts {
-			var foundChild *helper.TreeNode
-			for _, child := range currNode.Children {
-				if child.KodeReferensi == part {
-					foundChild = child
-					break
-				}
-			}
-
-			if foundChild == nil {
-				newChild := helper.NewTreeNode(part)
-				currNode.AddChild(newChild)
-				currNode = newChild
-			} else {
-				currNode = foundChild
-			}
-		}
+		referensiList = append(referensiList, referensi)
 	}
 
-	return root
+	if len(referensiList) == 0 {
+		log.Println("No hierarchical data found for kodeReferensi:", kodeReferensi)
+		return nil, errors.New("data not found")
+	}
+
+	return referensiList, nil
 }
