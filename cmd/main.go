@@ -21,7 +21,12 @@ func main() {
 	referensiarsitekturRepository := repository.NewReferensiArsitekturRepository()
 	referesiarsitekturService := service.NewReferensiArsitekturService(referensiarsitekturRepository, db, validate)
 	referensiarsitekturController := controller.NewReferensiarstitekturController(referesiarsitekturService)
-	router := app.NewRouter(referensiarsitekturController)
+
+	prosesbisnisRepository := repository.NewProsesBisnisRepository()
+	prosesbisnisService  := service.NewProsesBisnisService(prosesbisnisRepository, db)
+	prosesbisnisController := controller.NewProsesBisnisController(prosesbisnisService)
+
+	router := app.NewRouter(referensiarsitekturController, prosesbisnisController)
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},

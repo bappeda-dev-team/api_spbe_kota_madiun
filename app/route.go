@@ -6,8 +6,12 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 )
+type RouteController struct{
+	
+}
 
-func NewRouter(referensiarsitekturController controller.ReferensiArsitekturController) *httprouter.Router{
+func NewRouter(referensiarsitekturController controller.ReferensiArsitekturController, 
+	prosesbisnisController controller.ProsesBisnisController) *httprouter.Router{
 	router := httprouter.New()
 
 	router.GET("/v1/referensiarsitektur", referensiarsitekturController.FindAll)
@@ -16,6 +20,9 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.DELETE("/v1/deletereferensiarsitektur/:referensiarsitekturId", referensiarsitekturController.Delete)
 	router.GET("/v1/referensiarsitektur/:kodeReferensi", referensiarsitekturController.FindByKodeReferensi)
 	router.GET("/v1/referensiarsitekturbyid/:referensiarsitekturId", referensiarsitekturController.FindById)
+	
+
+	router.GET("/v1/prosesbisnisall", prosesbisnisController.FindAll)
 
 	router.PanicHandler = exception.ErrorHandler
 

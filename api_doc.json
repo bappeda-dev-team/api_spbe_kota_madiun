@@ -10,7 +10,7 @@
     "/v1/referensiarsitektur": {
       "get": {
         "tags": ["Referensi Arsitektur API"],
-        "description": "List Referensi User",
+        "description": "List All Proses Bisnis",
         "summary": "List Referensi Arsitektur",
         "responses": {
           "200": {
@@ -251,6 +251,39 @@
           }
         }
       }
+    },
+    "/v1/prosesbisnis": {
+      "get": {
+        "tags": ["Proses Bisnis API"],
+        "description": "List All Proses Bisnis",
+        "summary": "List All Proses Bisni",
+        "responses": {
+          "200": {
+            "description": "Success get all proses bisnis",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "array"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/referensiarsitektur"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -294,6 +327,47 @@
             "type": "integer"
           },
           "jenis_referensi": {
+            "type": "string"
+          }
+        }
+      },
+      "prosesbisnis": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "nama_proses_bisnis": {
+            "type": "string"
+          },
+          "sasaran_kota": {
+            "type": "string"
+          },
+          "kode_proses_bisnis": {
+            "type": "string"
+          },
+          "kode_opd": {
+            "type": "string"
+          },
+          "bidang_urusan": {
+            "type": "string"
+          },
+          "rad_level_1": {
+            "type": "string"
+          },
+          "rad_level_2": {
+            "type": "string"
+          },
+          "rad_level_3": {
+            "type": "string"
+          },
+          "rad_level_4": {
+            "type": "string"
+          },
+          "rad_level_5": {
+            "type": "string"
+          },
+          "rad_level_6": {
             "type": "string"
           }
         }
