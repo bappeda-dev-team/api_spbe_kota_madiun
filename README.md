@@ -17,7 +17,9 @@ API pemetaan data arsitektur SPBE
 make install-migrate
 ```
 - install golang-migrate (khusus windows
-``` go install -tags ‘mysql’ github.com/golang-migrate/migrate/v4/cmd/migrate@latest ```
+``` sh
+go install -tags ‘mysql’ github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+```
 - migrasi database make os
 
 ``` sh
