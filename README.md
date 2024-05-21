@@ -16,7 +16,7 @@ API pemetaan data arsitektur SPBE
 ``` sh
 make install-migrate
 ```
-- install golang-migrate (khusus windows)
+- install golang-migrate di cmd (khusus windows)
 ``` sh
 go install -tags 'mysql' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 ```
@@ -26,6 +26,7 @@ go install -tags 'mysql' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 make db-migrate
 ```
 - migrasi database windows
+- buka terminal ketikkan perintah berikut:
 ``` sh
 migrate -path db/migrations -database "mysql://root@tcp(localhost:3306)/db_spbe" up
 ```
