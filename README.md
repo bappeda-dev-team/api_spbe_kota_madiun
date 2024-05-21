@@ -18,7 +18,7 @@ make install-migrate
 ```
 - install golang-migrate (khusus windows)
 ``` sh
-go install -tags ‘mysql’ github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+go install -tags 'mysql' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 ```
 - migrasi database make os
 
