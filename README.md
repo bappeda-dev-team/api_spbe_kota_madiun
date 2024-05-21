@@ -25,7 +25,7 @@ go install -tags ‘mysql’ github.com/golang-migrate/migrate/v4/cmd/migrate@la
 ``` sh
 make db-migrate
 ```
--migrasi database windows
+- migrasi database windows
 ``` sh
 migrate -path db/migrations -database "mysql://root@tcp(localhost:3306)/db_spbe" up
 ```
