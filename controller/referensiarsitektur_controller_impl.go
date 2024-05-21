@@ -116,3 +116,19 @@ func (controller *ReferensiArsitekturControllerImpl) FindByKodeReferensi(writer 
 
 
 }
+
+func (controller *ReferensiArsitekturControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params){
+	referensiarsitekturId := params.ByName("referensiarsitekturId")
+	id, err := strconv.Atoi(referensiarsitekturId)
+	helper.PanicIfError(err)
+
+	referensiarsitekturResponse := controller.ReferensiArsitekturService.FindById(request.Context(),id)
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "Succes get code referensi arsitektur by id",
+		Data:   referensiarsitekturResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}

@@ -11,4 +11,6 @@ type ReferensiArsitekturService interface {
 	Delete(ctx context.Context, referensiarsitekturId int)
 	FindAll(ctx context.Context)[]web.ReferensiArsitekturResponse
 	GetDataHierarchy(ctx context.Context, kodeReferensi string) ([]web.ReferensiArsitekturResponse, error)
+	FindById(ctx context.Context, referensiarsitekturId int) web.ReferensiArsitekturResponse
 }
+

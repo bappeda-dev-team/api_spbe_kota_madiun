@@ -77,6 +77,43 @@
         }
       }
     },
+    "/v1/referensiarsitekturbyid/{referensiarsitekturId}": {
+      "get": {
+        "tags": ["Referensi Arsitektur API"],
+        "description": "Get referensi arsitektur by code referensi arsitektur",
+        "summary": "Get referensi arsitektur by code referensi arsitektur",
+        "parameters": [
+          {
+            "name": "referensiarsitekturId",
+            "in": "path",
+            "description": "Id Referensi Arsitektur"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success get id referensi arsitektur",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/referensiarsitektur"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/createreferensiarsitektur": {
       "post": {
         "tags": ["Referensi Arsitektur API"],

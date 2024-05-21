@@ -1,6 +1,7 @@
 package service
 
 import (
+	"api_spbe_kota_madiun/exception"
 	"api_spbe_kota_madiun/helper"
 	"api_spbe_kota_madiun/model/domain"
 	"api_spbe_kota_madiun/model/web"
@@ -128,4 +129,17 @@ func (service *ReferensiArsitekturServiceImpl)GetDataHierarchy(ctx context.Conte
 
 	return responseList, nil
 
+}
+
+func (service *ReferensiArsitekturServiceImpl) FindById(ctx context.Context, referensiarsitekturId int) web.ReferensiArsitekturResponse {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	referensiarsitektur, err := service.ReferensiArsitekturRepository.FindById(ctx, tx, referensiarsitekturId)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
+
+	return helper.ToReferensiArsitekturResponse(referensiarsitektur)
 }
