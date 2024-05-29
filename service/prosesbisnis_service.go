@@ -6,5 +6,5 @@ import (
 )
 
 type ProsesBisnisService interface {
-	FindAll(ctx context.Context) []web.ProsesBinsisRespons
+	GetProsesBisnis(ctx context.Context) ([]web.ProsesBisnisRespons, error)
 }

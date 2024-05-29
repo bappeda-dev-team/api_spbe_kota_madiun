@@ -23,8 +23,8 @@ func (repository *ReferensiArsitekturRepositoryImpl) Insert(ctx context.Context,
 	referensiarsitektur.Created_at = currentTime
 	referensiarsitektur.Updated_at = currentTime
 
-	script := "insert into referensi_arsitekturs(kode_referensi,nama_referensi,level_referensi,jenis_referensi,created_at,updated_at) values (?, ?, ?, ?, ?, ?)"
-	result, err := tx.ExecContext(ctx, script, referensiarsitektur.Kode_referensi, referensiarsitektur.Nama_referensi, referensiarsitektur.Level_referensi, referensiarsitektur.Jenis_referensi, referensiarsitektur.Created_at, referensiarsitektur.Updated_at)
+	script := "insert into referensi_arsitekturs(kode_referensi,nama_referensi,level_referensi,jenis_referensi,created_at,updated_at,tahun) values (?, ?, ?, ?, ?, ?, ?)"
+	result, err := tx.ExecContext(ctx, script, referensiarsitektur.Kode_referensi, referensiarsitektur.Nama_referensi, referensiarsitektur.Level_referensi, referensiarsitektur.Jenis_referensi, referensiarsitektur.Created_at, referensiarsitektur.Updated_at, referensiarsitektur.Tahun)
 	helper.PanicIfError(err)
 
 	id, err := result.LastInsertId()
@@ -38,22 +38,22 @@ func (repository *ReferensiArsitekturRepositoryImpl) Update(ctx context.Context,
 	currentTime := time.Now()
 	referensiarsitektur.Updated_at = currentTime
 
-	script := "update referensi_arsitekturs SET kode_referensi = ?, nama_referensi = ?, level_referensi = ?, jenis_referensi = ?, updated_at = ? where id_referensi = ?"
-	_, err := tx.ExecContext(ctx, script, referensiarsitektur.Kode_referensi, referensiarsitektur.Nama_referensi, referensiarsitektur.Level_referensi, referensiarsitektur.Jenis_referensi,referensiarsitektur.Updated_at, referensiarsitektur.IdReferensi)
+	script := "update referensi_arsitekturs SET kode_referensi = ?, nama_referensi = ?, level_referensi = ?, jenis_referensi = ?, updated_at = ?, tahun = ? where id = ?"
+	_, err := tx.ExecContext(ctx, script, referensiarsitektur.Kode_referensi, referensiarsitektur.Nama_referensi, referensiarsitektur.Level_referensi, referensiarsitektur.Jenis_referensi,referensiarsitektur.Updated_at, referensiarsitektur.Tahun,referensiarsitektur.IdReferensi)
 	helper.PanicIfError(err)
 
 	return referensiarsitektur
 }
 
 func (repository *ReferensiArsitekturRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, referensiarsitektur domain.ReferensiArsitektur){
-	script := "delete from referensi_arsitekturs where id_referensi =?"
+	script := "delete from referensi_arsitekturs where id =?"
 	_, err := tx.ExecContext(ctx, script, referensiarsitektur.IdReferensi)
 	helper.PanicIfError(err)
 
 }
 
 func(repository *ReferensiArsitekturRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.ReferensiArsitektur{
-	script := "select id_referensi,kode_referensi,nama_referensi,level_referensi,jenis_referensi,created_at,updated_at from referensi_arsitekturs"
+	script := "select id,kode_referensi,nama_referensi,level_referensi,jenis_referensi,created_at,updated_at,tahun from referensi_arsitekturs"
 	rows, err := tx.QueryContext(ctx, script)
 	helper.PanicIfError(err)
 	defer rows.Close()
@@ -61,7 +61,7 @@ func(repository *ReferensiArsitekturRepositoryImpl) FindAll(ctx context.Context,
 	var reference []domain.ReferensiArsitektur
 	for rows.Next() {
 		referensi := domain.ReferensiArsitektur{}
-		err := rows.Scan(&referensi.IdReferensi, &referensi.Kode_referensi, &referensi.Nama_referensi, &referensi.Level_referensi, &referensi.Jenis_referensi,&referensi.Created_at,&referensi.Updated_at)
+		err := rows.Scan(&referensi.IdReferensi, &referensi.Kode_referensi, &referensi.Nama_referensi, &referensi.Level_referensi, &referensi.Jenis_referensi,&referensi.Created_at,&referensi.Updated_at,&referensi.Tahun)
 		helper.PanicIfError(err)
 		reference = append(reference, referensi)
 	}
@@ -69,14 +69,14 @@ func(repository *ReferensiArsitekturRepositoryImpl) FindAll(ctx context.Context,
 }
 
 func(repository *ReferensiArsitekturRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, referensiarsitekturId int) (domain.ReferensiArsitektur, error){
-	script := "select id_referensi, kode_referensi, nama_referensi, level_referensi, jenis_referensi, created_at, updated_at from referensi_arsitekturs where id_referensi = ?"
+	script := "select id, kode_referensi, nama_referensi, level_referensi, jenis_referensi, created_at, updated_at, tahun from referensi_arsitekturs where id = ?"
 	rows, err := tx.QueryContext(ctx, script, referensiarsitekturId)
 	helper.PanicIfError(err)
 	defer rows.Close()
 
 	referensiarsitektur := domain.ReferensiArsitektur{}
 	if rows.Next() {
-		err := rows.Scan(&referensiarsitektur.IdReferensi, &referensiarsitektur.Kode_referensi, &referensiarsitektur.Nama_referensi, &referensiarsitektur.Level_referensi, &referensiarsitektur.Jenis_referensi, &referensiarsitektur.Created_at, &referensiarsitektur.Updated_at)
+		err := rows.Scan(&referensiarsitektur.IdReferensi, &referensiarsitektur.Kode_referensi, &referensiarsitektur.Nama_referensi, &referensiarsitektur.Level_referensi, &referensiarsitektur.Jenis_referensi, &referensiarsitektur.Created_at, &referensiarsitektur.Updated_at, &referensiarsitektur.Tahun)
 		helper.PanicIfError(err)
 		return referensiarsitektur, nil
 	} else {
@@ -101,7 +101,7 @@ func (repository *ReferensiArsitekturRepositoryImpl) FindByKodeRef(ctx context.C
 		placeholders = append(placeholders, strings.Join(kodeBody[:i+1], "."))
 	}
 
-	script := "select id_referensi, kode_referensi, nama_referensi, level_referensi, jenis_referensi, created_at, updated_at from referensi_arsitekturs where kode_referensi in ("
+	script := "select id, kode_referensi, nama_referensi, level_referensi, jenis_referensi, created_at, updated_at, tahun from referensi_arsitekturs where kode_referensi in ("
 	for i := range placeholders {
 		if i > 0 {
 			script += ", "
@@ -119,7 +119,7 @@ func (repository *ReferensiArsitekturRepositoryImpl) FindByKodeRef(ctx context.C
 	var referensiList []domain.ReferensiArsitektur
 	for rows.Next() {
 		referensi := domain.ReferensiArsitektur{}
-		err := rows.Scan(&referensi.IdReferensi, &referensi.Kode_referensi, &referensi.Nama_referensi, &referensi.Level_referensi, &referensi.Jenis_referensi, &referensi.Created_at, &referensi.Updated_at)
+		err := rows.Scan(&referensi.IdReferensi, &referensi.Kode_referensi, &referensi.Nama_referensi, &referensi.Level_referensi, &referensi.Jenis_referensi, &referensi.Created_at, &referensi.Updated_at, &referensi.Tahun)
 		if err != nil {
 			return nil, err
 		}

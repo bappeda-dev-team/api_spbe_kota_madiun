@@ -80,8 +80,8 @@
     "/v1/referensiarsitekturbyid/{referensiarsitekturId}": {
       "get": {
         "tags": ["Referensi Arsitektur API"],
-        "description": "Get referensi arsitektur by code referensi arsitektur",
-        "summary": "Get referensi arsitektur by code referensi arsitektur",
+        "description": "Get referensi arsitektur by id referensi arsitektur",
+        "summary": "Get referensi arsitektur by id referensi arsitektur",
         "parameters": [
           {
             "name": "referensiarsitekturId",
@@ -136,6 +136,9 @@
                   },
                   "jenis_referensi": {
                     "type": "string"
+                  },
+                  "tahun": {
+                    "type": "integer"
                   }
                 }
               }
@@ -302,13 +305,17 @@
           },
           "jenis_referensi": {
             "type": "string"
+          },
+          "tahun": {
+            "type": "integer"
           }
         },
         "required": [
           "kode_referensi",
           "nama_referensi",
           "level_referensi",
-          "jenis_referensi"
+          "jenis_referensi",
+          "tahun"
         ]
       },
       "referensiarsitektur": {
@@ -328,6 +335,9 @@
           },
           "jenis_referensi": {
             "type": "string"
+          },
+          "tahun": {
+            "type": "integer"
           }
         }
       },

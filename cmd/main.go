@@ -23,7 +23,7 @@ func main() {
 	referensiarsitekturController := controller.NewReferensiarstitekturController(referesiarsitekturService)
 
 	prosesbisnisRepository := repository.NewProsesBisnisRepository()
-	prosesbisnisService  := service.NewProsesBisnisService(prosesbisnisRepository, db)
+	prosesbisnisService  := service.NewProsesBisnisService(referensiarsitekturRepository, prosesbisnisRepository, db)
 	prosesbisnisController := controller.NewProsesBisnisController(prosesbisnisService)
 
 	router := app.NewRouter(referensiarsitekturController, prosesbisnisController)

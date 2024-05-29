@@ -29,14 +29,23 @@ func NewProsesBisnisController(prosbisService service.ProsesBisnisService)Proses
 	}
 }
 
-func (controller *ProsesBisnisControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params){
-	referensiarsitekturResponse := controller.ProseBisnisService.FindAll(request.Context())
+func (controller *ProsesBisnisControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+    prosesBisnisResponse, err := controller.ProseBisnisService.GetProsesBisnis(request.Context())
+    if err != nil {
+        webResponse := web.WebResponse{
+            Code:   500,
+            Status: "Internal Server Error",
+            Data:   nil,
+        }
+        helper.WriteToResponseBody(writer, webResponse)
+        return
+    }
 
-	webResponse := web.WebResponse{
-		Code: 200,
-		Status: "Success get all referensi arsitektur",
-		Data: referensiarsitekturResponse,
-	}
+    webResponse := web.WebResponse{
+        Code:   200,
+        Status: "Success get all proses bisnis",
+        Data:   prosesBisnisResponse,
+    }
 
-	helper.WriteToResponseBody(writer, webResponse)
+    helper.WriteToResponseBody(writer, webResponse)
 }

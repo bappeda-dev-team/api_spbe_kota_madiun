@@ -25,26 +25,27 @@ func ToReferenceResponses(reference []domain.ReferensiArsitektur) []web.Referens
 	return referenceResponses
 }
 
-func ToProsesBisnisResponse(prosesbisnis domain.ProsesBisnis)web.ProsesBinsisRespons{
-	return web.ProsesBinsisRespons{
-		Id: prosesbisnis.Id,
-		Nama_proses_bisnis: prosesbisnis.Nama_proses_bisnis,
-		Sasaran_kota: prosesbisnis.Sasaran_kota,
-		Kode_proses_bisnis: prosesbisnis.Kode_proses_bisnis,
-		Kode_opd: prosesbisnis.Kode_opd,
-		Bidang_urusan: prosesbisnis.Bidang_urusan,
-		Rad_level_1: prosesbisnis.Rad_level_1,
-		Rad_level_2: prosesbisnis.Rad_level_2,
-		Rad_level_3: prosesbisnis.Rad_level_3,
-		Rad_level_4: prosesbisnis.Rad_level_4,
-		Rad_level_5: prosesbisnis.Rad_level_5,
-		Rad_level_6: prosesbisnis.Rad_level_6,
-	}
-}
-func ToProsesBisnisResponses(prosbis []domain.ProsesBisnis) []web.ProsesBinsisRespons {
-	var prosbisResponse []web.ProsesBinsisRespons
-	for _, prosesbisnis := range prosbis {
-		prosbisResponse = append(prosbisResponse, ToProsesBisnisResponse(prosesbisnis))
-	}
-	return prosbisResponse
-}
+// func ToProsesBisnisResponse(prosesbisnis domain.ProsesBisnis)web.ProsesBinsisRespons{
+// 	return web.ProsesBinsisRespons{
+// 		Id: prosesbisnis.Id,
+// 		// Nama_proses_bisnis: prosesbisnis.Nama_proses_bisnis,
+// 		// Sasaran_kota: prosesbisnis.Sasaran_kota,
+// 		// Kode_proses_bisnis: prosesbisnis.Kode_proses_bisnis,
+// 		// Kode_opd: prosesbisnis.Kode_opd,
+// 		// Bidang_urusan: prosesbisnis.Bidang_urusan,
+// 		// Rab_level_1: prosesbisnis.Rab_level_1,
+// 		// Rab_level_2: prosesbisnis.Rab_level_2,
+// 		// Rab_level_3: prosesbisnis.Rab_level_3,
+// 		// Rab_level_4: prosesbisnis.Rab_level_4,
+// 		// Rab_level_5: prosesbisnis.Rab_level_5,
+// 		// Rab_level_6: prosesbisnis.Rab_level_6,
+// 	}
+// }
+
+// func ToProsesBisnisResponses(prosbis []domain.ProsesBisnis) []web.ProsesBinsisRespons {
+// 	var prosbisResponse []web.ProsesBinsisRespons
+// 	for _, prosesbisnis := range prosbis {
+// 		prosbisResponse = append(prosbisResponse, ToProsesBisnisResponse(prosesbisnis))
+// 	}
+// 	return prosbisResponse
+// }

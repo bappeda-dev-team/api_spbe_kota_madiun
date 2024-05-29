@@ -45,6 +45,7 @@ func(service *ReferensiArsitekturServiceImpl) Insert(ctx context.Context, reques
 		Level_referensi: request.Level_referensi,
 		Jenis_referensi: request.Jenis_referensi,
 		Created_at: currentTime,
+		Tahun : request.Tahun,
 
 	}
 	
@@ -68,6 +69,7 @@ func(service *ReferensiArsitekturServiceImpl)Update(ctx context.Context, request
 	referensiarsitektur.Level_referensi= request.Level_referensi
 	referensiarsitektur.Jenis_referensi= request.Jenis_referensi
 	referensiarsitektur.Updated_at= request.Updated_at
+	referensiarsitektur.Tahun = request.Tahun
 	
 	referensiarsitektur = service.ReferensiArsitekturRepository.Update(ctx, tx, referensiarsitektur)
 	return helper.ToReferensiArsitekturResponse(referensiarsitektur)
@@ -123,6 +125,7 @@ func (service *ReferensiArsitekturServiceImpl)GetDataHierarchy(ctx context.Conte
 			Jenis_referensi: referensi.Jenis_referensi,
 			Created_at: referensi.Created_at,
 			Updated_at: referensi.Updated_at,
+			Tahun : referensi.Tahun,
 		}
 		responseList = append(responseList, response)
 	}
