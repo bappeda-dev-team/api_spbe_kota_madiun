@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-playground/validator"
+	"github.com/go-playground/validator/v10"
 	"github.com/rs/cors"
 )
 
@@ -21,10 +21,15 @@ func main() {
 	referensiarsitekturRepository := repository.NewReferensiArsitekturRepository()
 	referesiarsitekturService := service.NewReferensiArsitekturService(referensiarsitekturRepository, db, validate)
 	referensiarsitekturController := controller.NewReferensiarstitekturController(referesiarsitekturService)
-	router := app.NewRouter(referensiarsitekturController)
+
+	prosesbisnisRepository := repository.NewProsesBisnisRepository()
+	prosesbisnisService  := service.NewProsesBisnisService(referensiarsitekturRepository, prosesbisnisRepository, db, validate)
+	prosesbisnisController := controller.NewProsesBisnisController(prosesbisnisService)
+
+	router := app.NewRouter(referensiarsitekturController, prosesbisnisController)
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
-		AllowedMethods:   []string{"GET", "POST", "PATCH", "DELETE", "OPTIONS"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
 		AllowedHeaders:   []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		AllowCredentials: true,
 	})

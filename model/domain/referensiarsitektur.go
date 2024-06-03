@@ -9,5 +9,6 @@ type ReferensiArsitektur struct {
 	Level_referensi int
 	Jenis_referensi string
 	Created_at      time.Time
-	Updated_at      time.Time
+	Updated_at 		time.Time
+	Tahun 			int
 }

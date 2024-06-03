@@ -2,14 +2,16 @@
   "openapi": "3.0.2",
   "info": {
     "title": "REST API SPBE KOTA MADIUN",
+    "description": "API spec for REST API SPBE KOTA MADIUN",
     "version": "1.0"
   },
-  "servers": [{ "url": "http://localhost:6000" }],
+  "servers": [{ "url": "http://localhost:8080" }],
   "paths": {
-    "/v1/referensi_arsitektur": {
+    "/v1/referensiarsitektur": {
       "get": {
-        "tags": ["Referensi User API"],
-        "description": "List Referensi User",
+        "tags": ["Referensi Arsitektur API"],
+        "description": "List All Proses Bisnis",
+        "summary": "List Referensi Arsitektur",
         "responses": {
           "200": {
             "description": "Success get all referensi",
@@ -27,30 +29,359 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "number"
-                          },
-                          "nama_referensi": {
-                            "type": "string"
-                          },
-                          "kode_referensi": {
-                            "type": "string"
-                          },
-                          "level_referesi": {
-                            "type": "integer"
-                          },
-                          "jenis_referensi": {
-                            "type": "string"
-                          }
-                        }
+                        "$ref": "#/components/schemas/referensiarsitektur"
                       }
                     }
                   }
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/v1/referensiarsitektur/{kodeReferensi}": {
+      "get": {
+        "tags": ["Referensi Arsitektur API"],
+        "description": "Get referensi arsitektur by code referensi arsitektur",
+        "summary": "Get referensi arsitektur by code referensi arsitektur",
+        "parameters": [
+          {
+            "name": "kodeReferensi",
+            "in": "path",
+            "description": "Code Referensi Arsitektur"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success get code referensi arsitektur",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/referensiarsitektur"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/referensiarsitekturbyid/{referensiarsitekturId}": {
+      "get": {
+        "tags": ["Referensi Arsitektur API"],
+        "description": "Get referensi arsitektur by id referensi arsitektur",
+        "summary": "Get referensi arsitektur by id referensi arsitektur",
+        "parameters": [
+          {
+            "name": "referensiarsitekturId",
+            "in": "path",
+            "description": "Id Referensi Arsitektur"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success get id referensi arsitektur",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/referensiarsitektur"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/createreferensiarsitektur": {
+      "post": {
+        "tags": ["Referensi Arsitektur API"],
+        "description": "Create Referensi Arsitektur",
+        "summary": "Create Referensi Arsitektur",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nama_referensi": {
+                    "type": "string"
+                  },
+                  "kode_referensi": {
+                    "type": "string"
+                  },
+                  "level_referensi": {
+                    "type": "integer"
+                  },
+                  "jenis_referensi": {
+                    "type": "string"
+                  },
+                  "tahun": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success create referensi arsitektur",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/referensiarsitektur"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/updatereferensiarsitektur/{referensiarsitekturId}": {
+      "put": {
+        "tags": ["Referensi Arsitektur API"],
+        "description": "Update referensi arsitektur by id",
+        "summary": "Update referensi arsitektur by id",
+        "parameters": [
+          {
+            "name": "referensiarsitekturId",
+            "required": true,
+            "in": "path",
+            "description": "Referensi Arsitektur Id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrUpdateReference"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success update referensi arsitektur",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/referensiarsitektur"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/deletereferensiarsitektur/{referensiarsitekturId}": {
+      "delete": {
+        "tags": ["Referensi Arsitektur API"],
+        "description": "Delete referensi arsitektur by id",
+        "summary": "Delete referensi arsitektur by id",
+        "parameters": [
+          {
+            "name": "referensiarsitekturId",
+            "in": "path",
+            "description": "Referensi Arsitektur Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success delete referensi arsitektur",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/prosesbisnis/{kodeOPD}/{tahun}": {
+      "get": {
+        "tags": ["Proses Bisnis API"],
+        "description": "List All Proses Bisnis",
+        "summary": "List Proses Bisnis By kode opd and year",
+        "responses": {
+          "200": {
+            "description": "Success get all proses bisnis",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "array"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/prosesbisnis"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateOrUpdateReference": {
+        "type": "object",
+        "properties": {
+          "nama_referensi": {
+            "type": "string"
+          },
+          "kode_referensi": {
+            "type": "string"
+          },
+          "level_referesi": {
+            "type": "integer"
+          },
+          "jenis_referensi": {
+            "type": "string"
+          },
+          "tahun": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "kode_referensi",
+          "nama_referensi",
+          "level_referensi",
+          "jenis_referensi",
+          "tahun"
+        ]
+      },
+      "referensiarsitektur": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "nama_referensi": {
+            "type": "string"
+          },
+          "kode_referensi": {
+            "type": "string"
+          },
+          "level_referesi": {
+            "type": "integer"
+          },
+          "jenis_referensi": {
+            "type": "string"
+          },
+          "tahun": {
+            "type": "integer"
+          }
+        }
+      },
+      "prosesbisnis": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "nama_proses_bisnis": {
+            "type": "string"
+          },
+          "sasaran_kota": {
+            "type": "string"
+          },
+          "kode_proses_bisnis": {
+            "type": "string"
+          },
+          "kode_opd": {
+            "type": "string"
+          },
+          "bidang_urusan": {
+            "type": "string"
+          },
+          "rad_level_1_id": {
+            "type": "integer"
+          },
+          "rad_level_2_id": {
+            "type": "integer"
+          },
+          "rad_level_3_id": {
+            "type": "integer"
+          },
+          "rad_level_4_id": {
+            "type": "integer"
+          },
+          "rad_level_5_id": {
+            "type": "integer"
+          },
+          "rad_level_6_id": {
+            "type": "integer"
+          },
+          "tahun": {
+            "type": "integer"
           }
         }
       }

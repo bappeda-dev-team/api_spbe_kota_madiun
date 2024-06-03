@@ -17,3 +17,14 @@ func WriteToResponseBody(writer http.ResponseWriter, response interface{}) {
 	err := encoder.Encode(response)
 	PanicIfError(err)
 }
+
+func WriteErrorResponse(w http.ResponseWriter, err error) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusInternalServerError)
+	response := map[string]string{
+		"error": err.Error(),
+	}
+	encoder := json.NewEncoder(w)
+	err = encoder.Encode(response)
+	PanicIfError(err)
+}

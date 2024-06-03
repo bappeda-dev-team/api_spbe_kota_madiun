@@ -24,3 +24,33 @@ func ToReferenceResponses(reference []domain.ReferensiArsitektur) []web.Referens
 	}
 	return referenceResponses
 }
+
+func ToProsesBisnisResponse(prosesbisnis domain.ProsesBisnis)web.ProsesBisnisRespons{
+	return web.ProsesBisnisRespons{
+		ID: prosesbisnis.ID,
+		KodeOPD: prosesbisnis.KodeOPD,
+		NamaProsesBisnis: prosesbisnis.NamaProsesBisnis,
+		SasaranKota: prosesbisnis.SasaranKota,
+		KodeProsesBisnis: prosesbisnis.KodeProsesBisnis,
+		BidangUrusan: prosesbisnis.BidangUrusan,
+		RabLevel1: web.ReferensiArsitekturResponse{
+			Id: prosesbisnis.RabLevel1ID,
+		},
+		RabLevel2: web.ReferensiArsitekturResponse{
+			Id: prosesbisnis.RabLevel2ID,
+		},
+		RabLevel3: web.ReferensiArsitekturResponse{
+			Id: prosesbisnis.RabLevel3ID,
+		},
+		Tahun: prosesbisnis.Tahun,
+	}
+}
+
+
+// func ToProsesBisnisResponses(prosbis []domain.ProsesBisnis) []web.ProsesBinsisRespons {
+// 	var prosbisResponse []web.ProsesBinsisRespons
+// 	for _, prosesbisnis := range prosbis {
+// 		prosbisResponse = append(prosbisResponse, ToProsesBisnisResponse(prosesbisnis))
+// 	}
+// 	return prosbisResponse
+// }
