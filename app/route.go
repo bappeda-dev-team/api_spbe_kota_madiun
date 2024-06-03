@@ -12,6 +12,7 @@ type RouteController struct{
 
 func NewRouter(referensiarsitekturController controller.ReferensiArsitekturController, 
 	prosesbisnisController controller.ProsesBisnisController) *httprouter.Router{
+
 	router := httprouter.New()
 
 	//referensi arsitektur router
@@ -33,7 +34,6 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.DELETE("/v1/deleteprosesbisnis/:prosesbisnisId", prosesbisnisController.Delete)
 
 	router.PanicHandler = exception.ErrorHandler
-
 
 	return router
 }

@@ -1,0 +1,17 @@
+:host = http://localhost:8000
+:base = :host/v1
+# referensi arsitektur
+GET http://localhost:8080/v1/referensiarsitektur
+
+# insert data
+POST http://localhost:8080/v1/createreferensiarsitektur
+Content-Type: application/json
+
+{
+        "Kode_referensi": "xx_xx",
+        "Nama_referensi": ":base",
+        "Level_referensi": 1,
+        "Jenis_referensi": "ProsesBisnis",
+        "Updated_at": ""
+}
+#

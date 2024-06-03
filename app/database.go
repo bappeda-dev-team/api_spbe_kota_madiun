@@ -12,9 +12,10 @@ import (
 )
 
 func GetConnection() *sql.DB {
-	err := godotenv.Load("../.env")
+	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Fatal(err)
+		// log.Fatal("Error loading .env file")
 	}
 
 	dbUser := os.Getenv("DB_USER")
