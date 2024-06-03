@@ -255,11 +255,11 @@
         }
       }
     },
-    "/v1/prosesbisnis": {
+    "/v1/prosesbisnis/{kodeOPD}/{tahun}": {
       "get": {
         "tags": ["Proses Bisnis API"],
         "description": "List All Proses Bisnis",
-        "summary": "List All Proses Bisni",
+        "summary": "List Proses Bisnis By kode opd and year",
         "responses": {
           "200": {
             "description": "Success get all proses bisnis",
@@ -277,7 +277,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/referensiarsitektur"
+                        "$ref": "#/components/schemas/prosesbisnis"
                       }
                     }
                   }
@@ -362,23 +362,26 @@
           "bidang_urusan": {
             "type": "string"
           },
-          "rad_level_1": {
-            "type": "string"
+          "rad_level_1_id": {
+            "type": "integer"
           },
-          "rad_level_2": {
-            "type": "string"
+          "rad_level_2_id": {
+            "type": "integer"
           },
-          "rad_level_3": {
-            "type": "string"
+          "rad_level_3_id": {
+            "type": "integer"
           },
-          "rad_level_4": {
-            "type": "string"
+          "rad_level_4_id": {
+            "type": "integer"
           },
-          "rad_level_5": {
-            "type": "string"
+          "rad_level_5_id": {
+            "type": "integer"
           },
-          "rad_level_6": {
-            "type": "string"
+          "rad_level_6_id": {
+            "type": "integer"
+          },
+          "tahun": {
+            "type": "integer"
           }
         }
       }

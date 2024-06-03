@@ -17,14 +17,25 @@ func NewProsesBisnisRepository() ProsesBisnisRepository {
 }
 
 
-func (repository *ProsesBisnisRepositoryImpl)FindByKodeOpd(ctx context.Context, tx *sql.Tx, kodeOPD string, tahun int)([]domain.ProsesBisnis, error){
-	script := "select id, nama_proses_bisnis, sasaran_kota, kode_proses_bisnis, kode_opd, bidang_urusan, rab_level_1_id, rab_level_2_id, rab_level_3_id, tahun, created_at, updated_at from proses_bisnis where kode_opd = ? AND tahun = ?"
-	rows, err := tx.QueryContext(ctx, script, kodeOPD, tahun)
+func (repository *ProsesBisnisRepositoryImpl) FindByKodeOpd(ctx context.Context, tx *sql.Tx, kodeOPD string, tahun int) ([]domain.ProsesBisnis, error) {
+    script := "SELECT id, nama_proses_bisnis, sasaran_kota, kode_proses_bisnis, kode_opd, bidang_urusan, rab_level_1_id, rab_level_2_id, rab_level_3_id, tahun, created_at, updated_at FROM proses_bisnis WHERE 1=1"
+    var args []interface{}
+
+    if kodeOPD != "" {
+        script += " AND kode_opd = ?"
+        args = append(args, kodeOPD)
+    }
+    if tahun != 0 {
+        script += " AND tahun = ?"
+        args = append(args, tahun)
+    }
+
+    rows, err := tx.QueryContext(ctx, script, args...)
     if err != nil {
         return nil, err
     }
     defer rows.Close()
-    
+
     var prosesBisnisList []domain.ProsesBisnis
     for rows.Next() {
         var prosesBisnis domain.ProsesBisnis

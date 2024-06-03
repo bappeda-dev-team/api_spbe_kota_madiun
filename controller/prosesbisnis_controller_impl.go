@@ -20,13 +20,17 @@ func NewProsesBisnisController(prosbisService service.ProsesBisnisService)Proses
 	}
 }
 
-func (controller *ProsesBisnisControllerImpl)FindByKodeOPD(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-
+func (controller *ProsesBisnisControllerImpl) FindByKodeOPD(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
     kodeOPD := params.ByName("kodeOPD")
     tahunStr := params.ByName("tahun")
 
-    tahun, err := strconv.Atoi(tahunStr)
-    helper.PanicIfError(err)
+    var tahun int
+    var err error
+
+    if tahunStr != "" {
+        tahun, err = strconv.Atoi(tahunStr)
+        helper.PanicIfError(err)
+    }
 
     prosesBisnisResponse, err := controller.ProsesBisnisService.GetProsesBisnis(request.Context(), kodeOPD, tahun)
     if err != nil {

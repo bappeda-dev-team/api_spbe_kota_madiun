@@ -28,7 +28,7 @@ func NewProsesBisnisService(referensiarsitekturRepository repository.ReferensiAr
     }
 }
 
-func(service *ProsesBisnisServiceImpl) GetProsesBisnis(ctx context.Context, kodeOPD string, tahun int) ([]web.ProsesBisnisRespons, error) {
+func (service *ProsesBisnisServiceImpl) GetProsesBisnis(ctx context.Context, kodeOPD string, tahun int) ([]web.ProsesBisnisRespons, error) {
     tx, err := service.DB.Begin()
     if err != nil {
         return nil, err
@@ -55,37 +55,37 @@ func(service *ProsesBisnisServiceImpl) GetProsesBisnis(ctx context.Context, kode
             SasaranKota:      prosesBisnis.SasaranKota,
             KodeProsesBisnis: prosesBisnis.KodeProsesBisnis,
             KodeOPD:          prosesBisnis.KodeOPD,
-            BidangUrusan:      prosesBisnis.BidangUrusan,
-            RabLevel1:       web.ReferensiArsitekturResponse{
-				Id: rabLevel1.IdReferensi,
-				Kode_referensi: rabLevel1.Kode_referensi,
-				Nama_referensi: rabLevel1.Nama_referensi,
-				Level_referensi: rabLevel1.Level_referensi,
-				Jenis_referensi: rabLevel1.Jenis_referensi,
-				Tahun: rabLevel1.Tahun,
-				Created_at: rabLevel1.Created_at,
-				Updated_at: rabLevel1.Updated_at,
-			},
-            RabLevel2:         web.ReferensiArsitekturResponse{
-				Id: rabLevel2.IdReferensi,
-				Kode_referensi: rabLevel2.Kode_referensi,
-				Nama_referensi: rabLevel2.Nama_referensi,
-				Level_referensi: rabLevel2.Level_referensi,
-				Jenis_referensi: rabLevel2.Jenis_referensi,
-				Tahun: rabLevel2.Tahun,
-				Created_at: rabLevel2.Created_at,
-				Updated_at: rabLevel2.Updated_at,
-			},
-            RabLevel3:         web.ReferensiArsitekturResponse{
-				Id: rabLevel2.IdReferensi,
-				Kode_referensi: rabLevel3.Kode_referensi,
-				Nama_referensi: rabLevel3.Nama_referensi,
-				Level_referensi: rabLevel3.Level_referensi,
-				Jenis_referensi: rabLevel3.Jenis_referensi,
-				Tahun: rabLevel3.Tahun,
-				Created_at: rabLevel3.Created_at,
-				Updated_at: rabLevel3.Updated_at,
-			},
+            BidangUrusan:     prosesBisnis.BidangUrusan,
+            RabLevel1:        web.ReferensiArsitekturResponse{
+                Id: rabLevel1.IdReferensi,
+                Kode_referensi: rabLevel1.Kode_referensi,
+                Nama_referensi: rabLevel1.Nama_referensi,
+                Level_referensi: rabLevel1.Level_referensi,
+                Jenis_referensi: rabLevel1.Jenis_referensi,
+                Tahun: rabLevel1.Tahun,
+                Created_at: rabLevel1.Created_at,
+                Updated_at: rabLevel1.Updated_at,
+            },
+            RabLevel2: web.ReferensiArsitekturResponse{
+                Id: rabLevel2.IdReferensi,
+                Kode_referensi: rabLevel2.Kode_referensi,
+                Nama_referensi: rabLevel2.Nama_referensi,
+                Level_referensi: rabLevel2.Level_referensi,
+                Jenis_referensi: rabLevel2.Jenis_referensi,
+                Tahun: rabLevel2.Tahun,
+                Created_at: rabLevel2.Created_at,
+                Updated_at: rabLevel2.Updated_at,
+            },
+            RabLevel3: web.ReferensiArsitekturResponse{
+                Id: rabLevel3.IdReferensi,
+                Kode_referensi: rabLevel3.Kode_referensi,
+                Nama_referensi: rabLevel3.Nama_referensi,
+                Level_referensi: rabLevel3.Level_referensi,
+                Jenis_referensi: rabLevel3.Jenis_referensi,
+                Tahun: rabLevel3.Tahun,
+                Created_at: rabLevel3.Created_at,
+                Updated_at: rabLevel3.Updated_at,
+            },
             Tahun:            prosesBisnis.Tahun,
             CreatedAt:        prosesBisnis.CreatedAt.Format("2006-01-02 15:04:05"),
             UpdatedAt:        prosesBisnis.UpdatedAt.Format("2006-01-02 15:04:05"),
