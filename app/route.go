@@ -22,7 +22,11 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.GET("/v1/referensiarsitekturbyid/:referensiarsitekturId", referensiarsitekturController.FindById)
 	
 
-	router.GET("/v1/prosesbisnisall", prosesbisnisController.FindAll)
+	router.GET("/v1/prosesbisnis/:kodeOPD/:tahun", prosesbisnisController.FindByKodeOPD)
+	router.GET("/v1/prosesbisnisbyid/:prosesbisnisId", prosesbisnisController.FindById)
+	router.POST("/v1/createprosesbisnis", prosesbisnisController.Insert)
+	router.PUT("/v1/updateprosesbisnis/:prosesbisnisId", prosesbisnisController.Update)
+	router.DELETE("/v1/deleteprosesbisnis/:prosesbisnisId", prosesbisnisController.Delete)
 
 	router.PanicHandler = exception.ErrorHandler
 

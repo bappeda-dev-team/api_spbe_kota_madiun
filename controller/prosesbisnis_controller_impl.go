@@ -5,32 +5,30 @@ import (
 	"api_spbe_kota_madiun/model/web"
 	"api_spbe_kota_madiun/service"
 	"net/http"
+	"strconv"
 
 	"github.com/julienschmidt/httprouter"
 )
 
-// type ReferensiArsitekturControllerImpl struct {
-// 	ReferensiArsitekturService service.ReferensiArsitekturService
-// }
-
-// func NewReferensiarstitekturController(referenceService service.ReferensiArsitekturService)ReferensiArsitekturController{
-// 	return &ReferensiArsitekturControllerImpl{
-// 		ReferensiArsitekturService: referenceService,
-// 	}
-// }
-
 type ProsesBisnisControllerImpl struct {
-	ProseBisnisService service.ProsesBisnisService
+	ProsesBisnisService service.ProsesBisnisService
 }
 
 func NewProsesBisnisController(prosbisService service.ProsesBisnisService)ProsesBisnisController{
 	return &ProsesBisnisControllerImpl{
-		ProseBisnisService: prosbisService,
+		ProsesBisnisService: prosbisService,
 	}
 }
 
-func (controller *ProsesBisnisControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-    prosesBisnisResponse, err := controller.ProseBisnisService.GetProsesBisnis(request.Context())
+func (controller *ProsesBisnisControllerImpl)FindByKodeOPD(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+
+    kodeOPD := params.ByName("kodeOPD")
+    tahunStr := params.ByName("tahun")
+
+    tahun, err := strconv.Atoi(tahunStr)
+    helper.PanicIfError(err)
+
+    prosesBisnisResponse, err := controller.ProsesBisnisService.GetProsesBisnis(request.Context(), kodeOPD, tahun)
     if err != nil {
         webResponse := web.WebResponse{
             Code:   500,
@@ -43,9 +41,89 @@ func (controller *ProsesBisnisControllerImpl) FindAll(writer http.ResponseWriter
 
     webResponse := web.WebResponse{
         Code:   200,
-        Status: "Success get all proses bisnis",
+        Status: "Success get proses bisnis by kode opd and year",
         Data:   prosesBisnisResponse,
     }
 
     helper.WriteToResponseBody(writer, webResponse)
+}
+
+func (controller *ProsesBisnisControllerImpl)FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params){
+	prosesbisnisId := params.ByName("prosesbisnisId")
+    id, err := strconv.Atoi(prosesbisnisId)
+    if err != nil {
+        webResponse := web.WebResponse{
+            Code:   http.StatusBadRequest,
+            Status: "BAD REQUEST",
+            Data:   "Invalid ID",
+        }
+        helper.WriteToResponseBody(writer, webResponse)
+        return
+    }
+
+    prosesbisnisResponse, err := controller.ProsesBisnisService.FindById(request.Context(), id)
+    if err != nil {
+        webResponse := web.WebResponse{
+            Code:   http.StatusInternalServerError,
+            Status: "INTERNAL SERVER ERROR",
+            Data:   err.Error(),
+        }
+        helper.WriteToResponseBody(writer, webResponse)
+        return
+    }
+
+    // Mengirimkan respons dengan data proses bisnis
+    webResponse := web.WebResponse{
+        Code:   http.StatusOK,
+        Status: "Success get proses bisnis by id",
+        Data:   prosesbisnisResponse,
+    }
+    helper.WriteToResponseBody(writer, webResponse)
+}
+func (controller *ProsesBisnisControllerImpl)Insert(writer http.ResponseWriter, request *http.Request, params httprouter.Params){
+    prosesbisnisInsertRequest := web.ProsesBisnisCreateRequest{}
+	helper.ReadFromRequestBody(request, &prosesbisnisInsertRequest)
+
+	prosesbisnisResponse := controller.ProsesBisnisService.Insert(request.Context(), prosesbisnisInsertRequest)
+	webResponse := web.WebResponse{
+		Code: 200,
+		Status: "Success create proses bisnis",
+		Data: prosesbisnisResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+func (controller *ProsesBisnisControllerImpl)Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params){
+    prosesbisnisUpdateRequest := web.ProsesBisnisUpdateRequest{}
+	helper.ReadFromRequestBody(request, &prosesbisnisUpdateRequest)
+
+	prosesbisnisId := params.ByName("prosesbisnisId")
+	id,err := strconv.Atoi(prosesbisnisId)
+	helper.PanicIfError(err)
+	
+	prosesbisnisUpdateRequest.Id = id
+
+	prosesbisnisResponse := controller.ProsesBisnisService.Update(request.Context(),prosesbisnisUpdateRequest)
+
+	webResponse := web.WebResponse{
+		Code: 200,
+		Status: "Success update proses bisnis",
+		Data: prosesbisnisResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+func (controller *ProsesBisnisControllerImpl)Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params){
+    prosesbisnisId := params.ByName("prosesbisnisId")
+	id,err := strconv.Atoi(prosesbisnisId)
+	helper.PanicIfError(err)
+
+	controller.ProsesBisnisService.Delete(request.Context(), id)
+
+	webResponse := web.WebResponse{
+		Code: 200,
+		Status: "Success delete proses bisnis",
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }

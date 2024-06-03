@@ -38,7 +38,7 @@ func (repository *ReferensiArsitekturRepositoryImpl) Update(ctx context.Context,
 	currentTime := time.Now()
 	referensiarsitektur.Updated_at = currentTime
 
-	script := "update referensi_arsitekturs SET kode_referensi = ?, nama_referensi = ?, level_referensi = ?, jenis_referensi = ?, updated_at = ?, tahun = ? where id = ?"
+	script := "update referensi_arsitekturs set kode_referensi = ?, nama_referensi = ?, level_referensi = ?, jenis_referensi = ?, updated_at = ?, tahun = ? where id = ?"
 	_, err := tx.ExecContext(ctx, script, referensiarsitektur.Kode_referensi, referensiarsitektur.Nama_referensi, referensiarsitektur.Level_referensi, referensiarsitektur.Jenis_referensi,referensiarsitektur.Updated_at, referensiarsitektur.Tahun,referensiarsitektur.IdReferensi)
 	helper.PanicIfError(err)
 

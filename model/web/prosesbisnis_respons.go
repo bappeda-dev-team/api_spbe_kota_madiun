@@ -2,10 +2,10 @@ package web
 
 type ProsesBisnisRespons struct {
 	ID               int                         `json:"id"`
+	KodeOPD          string                      `json:"kode_opd"`
 	NamaProsesBisnis string                      `json:"nama_proses_bisnis"`
 	SasaranKota      string                      `json:"sasaran_kota"`
 	KodeProsesBisnis string                      `json:"kode_proses_bisnis"`
-	KodeOPD          string                      `json:"kode_opd"`
 	BidangUrusan     string                      `json:"bidang_urusan"`
 	RabLevel1        ReferensiArsitekturResponse `json:"rab_level_1"`
 	RabLevel2        ReferensiArsitekturResponse `json:"rab_level_2"`

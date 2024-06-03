@@ -1,5 +1,7 @@
 package domain
 
+import "time"
+
 type ProsesBisnis struct {
 	ID               int
 	NamaProsesBisnis string
@@ -14,6 +16,6 @@ type ProsesBisnis struct {
 	RabLevel5ID      int
 	RabLevel6ID      int
 	Tahun            int
-	CreatedAt        string
-	UpdatedAt        string
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
 }

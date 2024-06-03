@@ -25,22 +25,27 @@ func ToReferenceResponses(reference []domain.ReferensiArsitektur) []web.Referens
 	return referenceResponses
 }
 
-// func ToProsesBisnisResponse(prosesbisnis domain.ProsesBisnis)web.ProsesBinsisRespons{
-// 	return web.ProsesBinsisRespons{
-// 		Id: prosesbisnis.Id,
-// 		// Nama_proses_bisnis: prosesbisnis.Nama_proses_bisnis,
-// 		// Sasaran_kota: prosesbisnis.Sasaran_kota,
-// 		// Kode_proses_bisnis: prosesbisnis.Kode_proses_bisnis,
-// 		// Kode_opd: prosesbisnis.Kode_opd,
-// 		// Bidang_urusan: prosesbisnis.Bidang_urusan,
-// 		// Rab_level_1: prosesbisnis.Rab_level_1,
-// 		// Rab_level_2: prosesbisnis.Rab_level_2,
-// 		// Rab_level_3: prosesbisnis.Rab_level_3,
-// 		// Rab_level_4: prosesbisnis.Rab_level_4,
-// 		// Rab_level_5: prosesbisnis.Rab_level_5,
-// 		// Rab_level_6: prosesbisnis.Rab_level_6,
-// 	}
-// }
+func ToProsesBisnisResponse(prosesbisnis domain.ProsesBisnis)web.ProsesBisnisRespons{
+	return web.ProsesBisnisRespons{
+		ID: prosesbisnis.ID,
+		KodeOPD: prosesbisnis.KodeOPD,
+		NamaProsesBisnis: prosesbisnis.NamaProsesBisnis,
+		SasaranKota: prosesbisnis.SasaranKota,
+		KodeProsesBisnis: prosesbisnis.KodeProsesBisnis,
+		BidangUrusan: prosesbisnis.BidangUrusan,
+		RabLevel1: web.ReferensiArsitekturResponse{
+			Id: prosesbisnis.RabLevel1ID,
+		},
+		RabLevel2: web.ReferensiArsitekturResponse{
+			Id: prosesbisnis.RabLevel2ID,
+		},
+		RabLevel3: web.ReferensiArsitekturResponse{
+			Id: prosesbisnis.RabLevel3ID,
+		},
+		Tahun: prosesbisnis.Tahun,
+	}
+}
+
 
 // func ToProsesBisnisResponses(prosbis []domain.ProsesBisnis) []web.ProsesBinsisRespons {
 // 	var prosbisResponse []web.ProsesBinsisRespons
