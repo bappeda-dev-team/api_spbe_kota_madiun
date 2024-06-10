@@ -5,15 +5,15 @@ import (
 	"api_spbe_kota_madiun/model/web"
 )
 
-func ToReferensiArsitekturResponse(referensiarsitektur domain.ReferensiArsitektur) web.ReferensiArsitekturResponse{
+func ToReferensiArsitekturResponse(referensiarsitektur domain.ReferensiArsitektur) web.ReferensiArsitekturResponse {
 	return web.ReferensiArsitekturResponse{
-		Id: referensiarsitektur.IdReferensi,
-		Kode_referensi: referensiarsitektur.Kode_referensi,
-		Nama_referensi: referensiarsitektur.Nama_referensi,
+		Id:              referensiarsitektur.IdReferensi,
+		Kode_referensi:  referensiarsitektur.Kode_referensi,
+		Nama_referensi:  referensiarsitektur.Nama_referensi,
 		Level_referensi: referensiarsitektur.Level_referensi,
 		Jenis_referensi: referensiarsitektur.Jenis_referensi,
-		Created_at: referensiarsitektur.Created_at,
-		Updated_at: referensiarsitektur.Updated_at,
+		Created_at:      referensiarsitektur.Created_at,
+		Updated_at:      referensiarsitektur.Updated_at,
 	}
 }
 
@@ -25,14 +25,14 @@ func ToReferenceResponses(reference []domain.ReferensiArsitektur) []web.Referens
 	return referenceResponses
 }
 
-func ToProsesBisnisResponse(prosesbisnis domain.ProsesBisnis)web.ProsesBisnisRespons{
+func ToProsesBisnisResponse(prosesbisnis domain.ProsesBisnis) web.ProsesBisnisRespons {
 	return web.ProsesBisnisRespons{
-		ID: prosesbisnis.ID,
-		KodeOPD: prosesbisnis.KodeOPD,
+		ID:               prosesbisnis.ID,
+		KodeOPD:          prosesbisnis.KodeOPD,
 		NamaProsesBisnis: prosesbisnis.NamaProsesBisnis,
-		SasaranKota: prosesbisnis.SasaranKota,
+		SasaranKota:      prosesbisnis.SasaranKota,
 		KodeProsesBisnis: prosesbisnis.KodeProsesBisnis,
-		BidangUrusan: prosesbisnis.BidangUrusan,
+		BidangUrusan:     prosesbisnis.BidangUrusan,
 		RabLevel1: web.ReferensiArsitekturResponse{
 			Id: prosesbisnis.RabLevel1ID,
 		},
@@ -45,7 +45,6 @@ func ToProsesBisnisResponse(prosesbisnis domain.ProsesBisnis)web.ProsesBisnisRes
 		Tahun: prosesbisnis.Tahun,
 	}
 }
-
 
 // func ToProsesBisnisResponses(prosbis []domain.ProsesBisnis) []web.ProsesBinsisRespons {
 // 	var prosbisResponse []web.ProsesBinsisRespons

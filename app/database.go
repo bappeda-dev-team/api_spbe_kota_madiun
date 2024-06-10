@@ -12,13 +12,13 @@ import (
 )
 
 func GetConnection() *sql.DB {
-	err := godotenv.Load("../.env")
+	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
 	dbUser := os.Getenv("DB_USER")
-	dbPort := os.Getenv("DB_PORT") // Ensure this is set to something like "3306"
+	dbPort := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")
 
 	connStr := fmt.Sprintf("%s@tcp(localhost:%s)/%s?parseTime=true", dbUser, dbPort, dbName)

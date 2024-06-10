@@ -12,7 +12,7 @@ type ProsesBisnisCreateRequest struct {
 	RabLevel2ID      int    `json:"rab_level_2_id"`
 	RabLevel3ID      int    `json:"rab_level_3_id"`
 	RabLevel4ID      int    `json:"rab_level_4_id"`
-	RabLevel5ID      int    `json:"rab_level_5_id"` 
+	RabLevel5ID      int    `json:"rab_level_5_id"`
 	RabLevel6ID      int    `json:"rab_level_6_id"`
 	Tahun            int    `json:"tahun"`
 	CreatedAt        time.Time

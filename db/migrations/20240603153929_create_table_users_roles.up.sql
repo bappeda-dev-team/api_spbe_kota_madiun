@@ -1,0 +1,11 @@
+CREATE TABLE users_roles
+(
+    id INT NOT NULL AUTO_INCREMENT,
+    user_id INT,
+    role_id INT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users (id),
+    CONSTRAINT fk_role_id FOREIGN KEY (role_id) REFERENCES role (id)
+) ENGINE=InnoDB;

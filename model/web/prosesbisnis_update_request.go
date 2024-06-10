@@ -3,7 +3,7 @@ package web
 import "time"
 
 type ProsesBisnisUpdateRequest struct {
-	Id 				 int
+	Id               int
 	NamaProsesBisnis string `json:"nama_proses_bisnis"`
 	SasaranKota      string `json:"sasaran_kota"`
 	KodeProsesBisnis string `json:"kode_proses_bisnis"`
@@ -16,5 +16,5 @@ type ProsesBisnisUpdateRequest struct {
 	RabLevel5ID      int    `json:"rab_level_5_id"`
 	RabLevel6ID      int    `json:"rab_level_6_id"`
 	Tahun            int    `json:"tahun"`
-	UpdatedAt       time.Time
+	UpdatedAt        time.Time
 }
