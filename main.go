@@ -9,6 +9,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 	"sync"
 
 	"github.com/go-playground/validator/v10"
@@ -45,12 +46,22 @@ func main() {
 	go app.FetchSaranKota(ctx, db, &wg)
 
 	handler := c.Handler(router)
+	// ambil host dan port di env
+	// agar bisa disetting diluar build
+	// localhost tidak bisa dipakai untuk production
+	host := os.Getenv("host")
+	port := os.Getenv("port")
+	addr := fmt.Sprintf("%s:%s", host, port)
 
-	server := http.Server{
-		Addr:    "localhost:8080",
-		Handler: handler,
+	// set default value host and port
+	if addr == ":" {
+		addr = "localhost:8080"
 	}
 
+	server := http.Server{
+		Addr:    addr,
+		Handler: handler,
+	}
 	fmt.Println("running", server.Addr)
 
 	err := server.ListenAndServe()

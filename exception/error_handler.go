@@ -5,7 +5,7 @@ import (
 	"api_spbe_kota_madiun/model/web"
 	"net/http"
 
-	"github.com/go-playground/validator"
+	"github.com/go-playground/validator/v10"
 )
 
 func ErrorHandler(writer http.ResponseWriter, request *http.Request, err interface{}) {

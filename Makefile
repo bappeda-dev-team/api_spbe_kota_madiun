@@ -13,3 +13,18 @@ init-go:
 
 build:
 	go build -o api cmd/main.go
+
+tidy:
+	go mod tidy
+
+format:
+	go fmt ./...
+
+run:
+	go run cmd/main.go
+
+install-migrate:
+	brew install golang-migrate
+
+db-migrate:
+	migrate -path=./db/migrations -database=mysql://root@tcp(localhost:3306)/db_spbe up
