@@ -44,8 +44,8 @@ func (service *ReferensiArsitekturServiceImpl) Insert(ctx context.Context, reque
 		Nama_referensi:  request.Nama_referensi,
 		Level_referensi: request.Level_referensi,
 		Jenis_referensi: request.Jenis_referensi,
-		Created_at: currentTime,
-		Tahun : request.Tahun,
+		Created_at:      currentTime,
+		Tahun:           request.Tahun,
 	}
 
 	referensiarsitektur = service.ReferensiArsitekturRepository.Insert(ctx, tx, referensiarsitektur)

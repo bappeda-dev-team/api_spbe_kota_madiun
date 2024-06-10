@@ -51,14 +51,52 @@ func (service *ProsesBisnisServiceImpl) GetProsesBisnis(ctx context.Context, kod
 		rabLevel3, err := service.ReferensiArsitekturRepository.FindById(ctx, tx, prosesBisnis.RabLevel3ID)
 		helper.PanicIfError(err)
 
-		rabLevel4, err := service.PohonKinerjaRepository.FindById(ctx, tx, prosesBisnis.RabLevel4ID)
-		helper.PanicIfError(err)
+		var rabLevel4, rabLevel5, rabLevel6 *web.PohonKinerjaRespons
 
-		rabLevel5, err := service.PohonKinerjaRepository.FindById(ctx, tx, prosesBisnis.RabLevel5ID)
-		helper.PanicIfError(err)
+		if prosesBisnis.RabLevel4ID.Valid {
+			rabLevel4Data, err := service.PohonKinerjaRepository.FindById(ctx, tx, int(prosesBisnis.RabLevel4ID.Int64))
+			helper.PanicIfError(err)
+			rabLevel4 = &web.PohonKinerjaRespons{
+				ID:         rabLevel4Data.ID,
+				NamaPohon:  rabLevel4Data.NamaPohon,
+				JenisPohon: rabLevel4Data.JenisPohon,
+				LevelPohon: rabLevel4Data.LevelPohon,
+				KodeOpd:    rabLevel4Data.KodeOpd,
+				Tahun:      rabLevel4Data.Tahun,
+				CreatedAt:  rabLevel4Data.CreatedAt,
+				UpdatedAt:  rabLevel4Data.UpdatedAt,
+			}
+		}
 
-		rabLevel6, err := service.PohonKinerjaRepository.FindById(ctx, tx, prosesBisnis.RabLevel6ID)
-		helper.PanicIfError(err)
+		if prosesBisnis.RabLevel5ID.Valid {
+			rabLevel5Data, err := service.PohonKinerjaRepository.FindById(ctx, tx, int(prosesBisnis.RabLevel5ID.Int64))
+			helper.PanicIfError(err)
+			rabLevel5 = &web.PohonKinerjaRespons{
+				ID:         rabLevel5Data.ID,
+				NamaPohon:  rabLevel5Data.NamaPohon,
+				JenisPohon: rabLevel5Data.JenisPohon,
+				LevelPohon: rabLevel5Data.LevelPohon,
+				KodeOpd:    rabLevel5Data.KodeOpd,
+				Tahun:      rabLevel5Data.Tahun,
+				CreatedAt:  rabLevel5Data.CreatedAt,
+				UpdatedAt:  rabLevel5Data.UpdatedAt,
+			}
+		}
+
+		if prosesBisnis.RabLevel6ID.Valid {
+			rabLevel6Data, err := service.PohonKinerjaRepository.FindById(ctx, tx, int(prosesBisnis.RabLevel6ID.Int64))
+			helper.PanicIfError(err)
+			rabLevel6 = &web.PohonKinerjaRespons{
+				ID:         rabLevel6Data.ID,
+				NamaPohon:  rabLevel6Data.NamaPohon,
+				JenisPohon: rabLevel6Data.JenisPohon,
+				LevelPohon: rabLevel6Data.LevelPohon,
+				KodeOpd:    rabLevel6Data.KodeOpd,
+				Tahun:      rabLevel6Data.Tahun,
+				CreatedAt:  rabLevel6Data.CreatedAt,
+				UpdatedAt:  rabLevel6Data.UpdatedAt,
+			}
+		}
 
 		response := web.ProsesBisnisRespons{
 			ID:               prosesBisnis.ID,
@@ -97,36 +135,9 @@ func (service *ProsesBisnisServiceImpl) GetProsesBisnis(ctx context.Context, kod
 				Created_at:      rabLevel3.Created_at,
 				Updated_at:      rabLevel3.Updated_at,
 			},
-			RabLevel4: web.PohonKinerjaRespons{
-				ID:         rabLevel4.ID,
-				NamaPohon:  rabLevel4.NamaPohon,
-				JenisPohon: rabLevel4.JenisPohon,
-				LevelPohon: rabLevel4.LevelPohon,
-				KodeOpd:    rabLevel4.KodeOpd,
-				Tahun:      rabLevel4.Tahun,
-				CreatedAt:  rabLevel4.CreatedAt,
-				UpdatedAt:  rabLevel4.UpdatedAt,
-			},
-			RabLevel5: web.PohonKinerjaRespons{
-				ID:         rabLevel5.ID,
-				NamaPohon:  rabLevel5.NamaPohon,
-				JenisPohon: rabLevel5.JenisPohon,
-				LevelPohon: rabLevel5.LevelPohon,
-				KodeOpd:    rabLevel5.KodeOpd,
-				Tahun:      rabLevel5.Tahun,
-				CreatedAt:  rabLevel5.CreatedAt,
-				UpdatedAt:  rabLevel5.UpdatedAt,
-			},
-			RabLevel6: web.PohonKinerjaRespons{
-				ID:         rabLevel6.ID,
-				NamaPohon:  rabLevel6.NamaPohon,
-				JenisPohon: rabLevel6.JenisPohon,
-				LevelPohon: rabLevel6.LevelPohon,
-				KodeOpd:    rabLevel6.KodeOpd,
-				Tahun:      rabLevel6.Tahun,
-				CreatedAt:  rabLevel6.CreatedAt,
-				UpdatedAt:  rabLevel6.UpdatedAt,
-			},
+			RabLevel4: rabLevel4,
+			RabLevel5: rabLevel5,
+			RabLevel6: rabLevel6,
 			Tahun:     prosesBisnis.Tahun,
 			CreatedAt: prosesBisnis.CreatedAt.Format("2006-01-02 15:04:05"),
 			UpdatedAt: prosesBisnis.UpdatedAt.Format("2006-01-02 15:04:05"),

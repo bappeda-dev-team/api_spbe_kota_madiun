@@ -39,7 +39,7 @@ func (repository *ReferensiArsitekturRepositoryImpl) Update(ctx context.Context,
 	referensiarsitektur.Updated_at = currentTime
 
 	script := "update referensi_arsitekturs set kode_referensi = ?, nama_referensi = ?, level_referensi = ?, jenis_referensi = ?, updated_at = ?, tahun = ? where id = ?"
-	_, err := tx.ExecContext(ctx, script, referensiarsitektur.Kode_referensi, referensiarsitektur.Nama_referensi, referensiarsitektur.Level_referensi, referensiarsitektur.Jenis_referensi,referensiarsitektur.Updated_at, referensiarsitektur.Tahun,referensiarsitektur.IdReferensi)
+	_, err := tx.ExecContext(ctx, script, referensiarsitektur.Kode_referensi, referensiarsitektur.Nama_referensi, referensiarsitektur.Level_referensi, referensiarsitektur.Jenis_referensi, referensiarsitektur.Updated_at, referensiarsitektur.Tahun, referensiarsitektur.IdReferensi)
 	helper.PanicIfError(err)
 
 	return referensiarsitektur
@@ -63,7 +63,7 @@ func (repository *ReferensiArsitekturRepositoryImpl) FindAll(ctx context.Context
 	var reference []domain.ReferensiArsitektur
 	for rows.Next() {
 		referensi := domain.ReferensiArsitektur{}
-		err := rows.Scan(&referensi.IdReferensi, &referensi.Kode_referensi, &referensi.Nama_referensi, &referensi.Level_referensi, &referensi.Jenis_referensi,&referensi.Created_at,&referensi.Updated_at,&referensi.Tahun)
+		err := rows.Scan(&referensi.IdReferensi, &referensi.Kode_referensi, &referensi.Nama_referensi, &referensi.Level_referensi, &referensi.Jenis_referensi, &referensi.Created_at, &referensi.Updated_at, &referensi.Tahun)
 		helper.PanicIfError(err)
 		reference = append(reference, referensi)
 	}
