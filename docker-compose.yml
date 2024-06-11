@@ -9,6 +9,16 @@ services:
     volumes:
       - spbe-database-volume:/var/lib/mysql
     restart: on-failure
+  phpmyadmin:
+    image: phpmyadmin:5
+    profiles: [debug]
+    environment:
+      - PMA_HOST=db-mysql
+    depends_on:
+      - db-mysql
+    ports:
+      - "8081:80"
+    restart: always
   backend:
     build: .
     image: api-spbe:latest
@@ -23,6 +33,7 @@ services:
     restart: unless-stopped
   migrate:
     image: migrate/migrate
+    profiles: [migrate]
     volumes:
       - ./db/migrations:/migrations
     depends_on:
