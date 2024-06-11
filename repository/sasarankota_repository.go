@@ -8,4 +8,5 @@ import (
 
 type SasaranKotaRepository interface {
 	FindById(ctx context.Context, tx *sql.Tx, sasarankotaId int) (domain.SasaranKota, error)
+	FindAll(ctx context.Context, tx *sql.Tx) []domain.SasaranKota
 }

@@ -33,3 +33,12 @@ func (service *PohonKinerjaServiceImpl) FindById(ctx context.Context, pohonId in
 
 	return helper.ToPohonKinerjaResponse(pohon)
 }
+
+func (service *PohonKinerjaServiceImpl) FindAll(ctx context.Context) []web.PohonKinerjaRespons {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	pohon := service.PohonKinerjaRepository.FindAll(ctx, tx)
+	return helper.ToPohonResponses(pohon)
+}

@@ -8,4 +8,5 @@ import (
 
 type PohonKinerjaRepository interface {
 	FindById(ctx context.Context, tx *sql.Tx, pohonkinerjaId int) (domain.PohonKinerja, error)
+	FindAll(ctx context.Context, tx *sql.Tx) []domain.PohonKinerja
 }

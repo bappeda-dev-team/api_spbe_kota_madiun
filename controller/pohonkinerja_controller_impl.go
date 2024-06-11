@@ -35,3 +35,15 @@ func (controller *PohonKinerjaControllerImpl) FindById(writer http.ResponseWrite
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
+
+func (controller *PohonKinerjaControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	pohonResponse := controller.PohonKinerjaService.FindAll(request.Context())
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "Success get all referensi arsitektur",
+		Data:   pohonResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}

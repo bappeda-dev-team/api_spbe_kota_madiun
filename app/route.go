@@ -34,9 +34,11 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 
 	//sasaran kota
 	router.GET("/v1/sasarankota/:sasarankotaId", sasarankotaController.FindById)
+	router.GET("/v1/sasarankota", sasarankotaController.FindAll)
 
 	//pohon kinerja
 	router.GET("/v1/pohonkinerja/:pohonId", pohonkinerja.FindById)
+	router.GET("/v1/pohonkinerja", pohonkinerja.FindAll)
 
 	router.PanicHandler = exception.ErrorHandler
 

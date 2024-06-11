@@ -83,6 +83,23 @@ func ToPohonKinerjaResponse(pohon domain.PohonKinerja) web.PohonKinerjaRespons {
 	}
 }
 
+// get all
+func ToSasaranResponses(sasaran []domain.SasaranKota) []web.SasaranKotaRespons {
+	var sasaranKotaResponses []web.SasaranKotaRespons
+	for _, sasaranKota := range sasaran {
+		sasaranKotaResponses = append(sasaranKotaResponses, ToSasaranKotaResponse(sasaranKota))
+	}
+	return sasaranKotaResponses
+}
+
+func ToPohonResponses(pohon []domain.PohonKinerja) []web.PohonKinerjaRespons {
+	var pohonRespons []web.PohonKinerjaRespons
+	for _, pohonKinerja := range pohon {
+		pohonRespons = append(pohonRespons, ToPohonKinerjaResponse(pohonKinerja))
+	}
+	return pohonRespons
+}
+
 func nullInt64ToInt(n sql.NullInt64) int {
 	if n.Valid {
 		return int(n.Int64)
