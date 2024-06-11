@@ -17,7 +17,7 @@ type PohonKinerjaServiceImpl struct {
 func NewPohonKinerjaService(pohonkinerjaRepository repository.PohonKinerjaRepository, DB *sql.DB) PohonKinerjaService {
 	return &PohonKinerjaServiceImpl{
 		PohonKinerjaRepository: pohonkinerjaRepository,
-		DB:                    DB,
+		DB:                     DB,
 	}
 }
 

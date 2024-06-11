@@ -14,7 +14,7 @@ import (
 
 type ProsesBisnisServiceImpl struct {
 	ProsesBisnisRepository        repository.ProsesBisnisRepository
-	SasaranKotaRepository repository.SasaranKotaRepository
+	SasaranKotaRepository         repository.SasaranKotaRepository
 	ReferensiArsitekturRepository repository.ReferensiArsitekturRepository
 	PohonKinerjaRepository        repository.PohonKinerjaRepository
 	DB                            *sql.DB
@@ -24,7 +24,7 @@ type ProsesBisnisServiceImpl struct {
 func NewProsesBisnisService(referensiarsitekturRepository repository.ReferensiArsitekturRepository, sasarankotaRepository repository.SasaranKotaRepository, prosesbisnisRepository repository.ProsesBisnisRepository, pohonkinerjaRepository repository.PohonKinerjaRepository, DB *sql.DB, validate *validator.Validate) ProsesBisnisService {
 	return &ProsesBisnisServiceImpl{
 		ProsesBisnisRepository:        prosesbisnisRepository,
-		SasaranKotaRepository:		 sasarankotaRepository,
+		SasaranKotaRepository:         sasarankotaRepository,
 		ReferensiArsitekturRepository: referensiarsitekturRepository,
 		PohonKinerjaRepository:        pohonkinerjaRepository,
 		DB:                            DB,
@@ -44,7 +44,7 @@ func (service *ProsesBisnisServiceImpl) GetProsesBisnis(ctx context.Context, kod
 
 	var responses []web.ProsesBisnisRespons
 	for _, prosesBisnis := range prosesBisnisList {
-		sasaranKota ,err := service.SasaranKotaRepository.FindById(ctx, tx, prosesBisnis.SasaranKotaId)
+		sasaranKota, err := service.SasaranKotaRepository.FindById(ctx, tx, prosesBisnis.SasaranKotaId)
 		helper.PanicIfError(err)
 
 		rabLevel1, err := service.ReferensiArsitekturRepository.FindById(ctx, tx, prosesBisnis.RabLevel1ID)
@@ -106,13 +106,13 @@ func (service *ProsesBisnisServiceImpl) GetProsesBisnis(ctx context.Context, kod
 		response := web.ProsesBisnisRespons{
 			ID:               prosesBisnis.ID,
 			NamaProsesBisnis: prosesBisnis.NamaProsesBisnis,
-			SasaranKota:      web.SasaranKotaRespons{
-				ID: sasaranKota.ID,
-				Sasaran: sasaranKota.Sasaran,
-				TujuanKota: sasaranKota.TujuanKota,
+			SasaranKota: web.SasaranKotaRespons{
+				ID:           sasaranKota.ID,
+				Sasaran:      sasaranKota.Sasaran,
+				TujuanKota:   sasaranKota.TujuanKota,
 				StrategiKota: sasaranKota.StrategiKota,
-				CreatedAt: sasaranKota.CreatedAt,
-				UpdatedAt: sasaranKota.UpdatedAt,
+				CreatedAt:    sasaranKota.CreatedAt,
+				UpdatedAt:    sasaranKota.UpdatedAt,
 			},
 			KodeProsesBisnis: prosesBisnis.KodeProsesBisnis,
 			KodeOPD:          prosesBisnis.KodeOPD,
@@ -172,7 +172,7 @@ func (service *ProsesBisnisServiceImpl) FindById(ctx context.Context, prosesbisn
 		return web.ProsesBisnisRespons{}, err
 	}
 
-	sasaranKota ,err := service.SasaranKotaRepository.FindById(ctx, tx, prosesBisnis.SasaranKotaId)
+	sasaranKota, err := service.SasaranKotaRepository.FindById(ctx, tx, prosesBisnis.SasaranKotaId)
 	helper.PanicIfError(err)
 
 	rabLevel1, err := service.ReferensiArsitekturRepository.FindById(ctx, tx, prosesBisnis.RabLevel1ID)
@@ -184,17 +184,16 @@ func (service *ProsesBisnisServiceImpl) FindById(ctx context.Context, prosesbisn
 	rabLevel3, err := service.ReferensiArsitekturRepository.FindById(ctx, tx, prosesBisnis.RabLevel3ID)
 	helper.PanicIfError(err)
 
-
 	response := web.ProsesBisnisRespons{
 		ID:               prosesBisnis.ID,
 		NamaProsesBisnis: prosesBisnis.NamaProsesBisnis,
-		SasaranKota:      web.SasaranKotaRespons{
-			ID: sasaranKota.ID,
-			Sasaran: sasaranKota.Sasaran,
-			TujuanKota: sasaranKota.TujuanKota,
+		SasaranKota: web.SasaranKotaRespons{
+			ID:           sasaranKota.ID,
+			Sasaran:      sasaranKota.Sasaran,
+			TujuanKota:   sasaranKota.TujuanKota,
 			StrategiKota: sasaranKota.StrategiKota,
-			CreatedAt: sasaranKota.CreatedAt,
-			UpdatedAt: sasaranKota.UpdatedAt,
+			CreatedAt:    sasaranKota.CreatedAt,
+			UpdatedAt:    sasaranKota.UpdatedAt,
 		},
 		KodeProsesBisnis: prosesBisnis.KodeProsesBisnis,
 		KodeOPD:          prosesBisnis.KodeOPD,
@@ -238,64 +237,64 @@ func (service *ProsesBisnisServiceImpl) FindById(ctx context.Context, prosesbisn
 }
 
 func (service *ProsesBisnisServiceImpl) Insert(ctx context.Context, request web.ProsesBisnisCreateRequest) web.ProsesBisnisRespons {
-    err := service.Validate.Struct(request)
-    helper.PanicIfError(err)
+	err := service.Validate.Struct(request)
+	helper.PanicIfError(err)
 
-    tx, err := service.DB.Begin()
-    helper.PanicIfError(err)
-    defer helper.CommitOrRollback(tx)
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
 
-    currentTime := time.Now()
+	currentTime := time.Now()
 	kodeprosbis := helper.GenerateRandomKodeProsesBisnis()
 
-    prosesBisnis := domain.ProsesBisnis{
-        NamaProsesBisnis: request.NamaProsesBisnis,
-        SasaranKotaId: 	request.SasaranKotaId,
-        KodeProsesBisnis: kodeprosbis,
-        KodeOPD:          request.KodeOPD,
-        BidangUrusan:     request.BidangUrusan,
-        RabLevel1ID:      request.RabLevel1ID,
-        RabLevel2ID:      request.RabLevel2ID,
-        RabLevel3ID:      request.RabLevel3ID,
+	prosesBisnis := domain.ProsesBisnis{
+		NamaProsesBisnis: request.NamaProsesBisnis,
+		SasaranKotaId:    request.SasaranKotaId,
+		KodeProsesBisnis: kodeprosbis,
+		KodeOPD:          request.KodeOPD,
+		BidangUrusan:     request.BidangUrusan,
+		RabLevel1ID:      request.RabLevel1ID,
+		RabLevel2ID:      request.RabLevel2ID,
+		RabLevel3ID:      request.RabLevel3ID,
 		RabLevel4ID: sql.NullInt64{
-            Int64: int64(0),
-            Valid: false,
-        },
-        RabLevel5ID: sql.NullInt64{
-            Int64: int64(0),
-            Valid: false,
-        },
-        RabLevel6ID: sql.NullInt64{
-            Int64: int64(0),
-            Valid: false,
-        },
-        Tahun:     request.Tahun,
-        CreatedAt: currentTime,
-    }
-	    // Mengisi nilai jika tidak null
-		if request.RabLevel4ID != nil {
-			prosesBisnis.RabLevel4ID = sql.NullInt64{
-				Int64: int64(*request.RabLevel4ID),
-				Valid: true,
-			}
+			Int64: int64(0),
+			Valid: false,
+		},
+		RabLevel5ID: sql.NullInt64{
+			Int64: int64(0),
+			Valid: false,
+		},
+		RabLevel6ID: sql.NullInt64{
+			Int64: int64(0),
+			Valid: false,
+		},
+		Tahun:     request.Tahun,
+		CreatedAt: currentTime,
+	}
+	// Mengisi nilai jika tidak null
+	if request.RabLevel4ID != nil {
+		prosesBisnis.RabLevel4ID = sql.NullInt64{
+			Int64: int64(*request.RabLevel4ID),
+			Valid: true,
 		}
+	}
 
-		if request.RabLevel5ID != nil {
-			prosesBisnis.RabLevel5ID = sql.NullInt64{
-				Int64: int64(*request.RabLevel5ID),
-				Valid: true,
-			}
+	if request.RabLevel5ID != nil {
+		prosesBisnis.RabLevel5ID = sql.NullInt64{
+			Int64: int64(*request.RabLevel5ID),
+			Valid: true,
 		}
-		
-		if request.RabLevel6ID != nil {
-			prosesBisnis.RabLevel6ID = sql.NullInt64{
-				Int64: int64(*request.RabLevel6ID),
-				Valid: true,
-			}
-		}
+	}
 
-    prosesBisnis = service.ProsesBisnisRepository.Insert(ctx, tx, prosesBisnis)
-    return helper.ToProsesBisnisResponse(prosesBisnis)
+	if request.RabLevel6ID != nil {
+		prosesBisnis.RabLevel6ID = sql.NullInt64{
+			Int64: int64(*request.RabLevel6ID),
+			Valid: true,
+		}
+	}
+
+	prosesBisnis = service.ProsesBisnisRepository.Insert(ctx, tx, prosesBisnis)
+	return helper.ToProsesBisnisResponse(prosesBisnis)
 }
 
 func (service *ProsesBisnisServiceImpl) Update(ctx context.Context, request web.ProsesBisnisUpdateRequest) web.ProsesBisnisRespons {

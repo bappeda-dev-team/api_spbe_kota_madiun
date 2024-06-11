@@ -4,7 +4,7 @@ type ProsesBisnisRespons struct {
 	ID               int                         `json:"id"`
 	KodeOPD          string                      `json:"kode_opd"`
 	NamaProsesBisnis string                      `json:"nama_proses_bisnis"`
-	SasaranKota      SasaranKotaRespons                     `json:"sasaran_kota"`
+	SasaranKota      SasaranKotaRespons          `json:"sasaran_kota"`
 	KodeProsesBisnis string                      `json:"kode_proses_bisnis"`
 	BidangUrusan     string                      `json:"bidang_urusan"`
 	RabLevel1        ReferensiArsitekturResponse `json:"rab_level_1"`

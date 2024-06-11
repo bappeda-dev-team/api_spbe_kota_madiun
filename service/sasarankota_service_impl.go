@@ -17,11 +17,11 @@ type SasaranKotaServiceImpl struct {
 func NewSasaranKotaService(sasarankotaRepository repository.SasaranKotaRepository, DB *sql.DB) SasaranKotaService {
 	return &SasaranKotaServiceImpl{
 		SasaranKotaRepository: sasarankotaRepository,
-		DB:                            DB,
+		DB:                    DB,
 	}
 }
 
-func (service *SasaranKotaServiceImpl)FindById(ctx context.Context, sasarankotaId int) web.SasaranKotaRespons{
+func (service *SasaranKotaServiceImpl) FindById(ctx context.Context, sasarankotaId int) web.SasaranKotaRespons {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)

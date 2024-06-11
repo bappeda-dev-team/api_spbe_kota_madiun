@@ -14,7 +14,6 @@ func GenerateRandomKodeProsesBisnis() string {
 
 	randomInt := rand.Intn(max-min) + min
 
-
 	randomKodeProsesBisnis := strconv.Itoa(randomInt)
 
 	return randomKodeProsesBisnis

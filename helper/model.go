@@ -31,7 +31,7 @@ func ToProsesBisnisResponse(prosesbisnis domain.ProsesBisnis) web.ProsesBisnisRe
 		ID:               prosesbisnis.ID,
 		KodeOPD:          prosesbisnis.KodeOPD,
 		NamaProsesBisnis: prosesbisnis.NamaProsesBisnis,
-		SasaranKota:      web.SasaranKotaRespons{
+		SasaranKota: web.SasaranKotaRespons{
 			ID: prosesbisnis.SasaranKotaId,
 		},
 		KodeProsesBisnis: prosesbisnis.KodeProsesBisnis,
@@ -60,26 +60,26 @@ func ToProsesBisnisResponse(prosesbisnis domain.ProsesBisnis) web.ProsesBisnisRe
 
 func ToSasaranKotaResponse(sasaran domain.SasaranKota) web.SasaranKotaRespons {
 	return web.SasaranKotaRespons{
-		ID:              sasaran.ID,
-		Sasaran: sasaran.Sasaran,
-		TujuanKota: sasaran.TujuanKota,
+		ID:           sasaran.ID,
+		Sasaran:      sasaran.Sasaran,
+		TujuanKota:   sasaran.TujuanKota,
 		StrategiKota: sasaran.StrategiKota,
-		Tahun: sasaran.Tahun,
-		CreatedAt:      sasaran.CreatedAt,
-		UpdatedAt:      sasaran.UpdatedAt,
+		Tahun:        sasaran.Tahun,
+		CreatedAt:    sasaran.CreatedAt,
+		UpdatedAt:    sasaran.UpdatedAt,
 	}
 }
 
-func ToPohonKinerjaResponse(pohon domain.PohonKinerja) web.PohonKinerjaRespons{
+func ToPohonKinerjaResponse(pohon domain.PohonKinerja) web.PohonKinerjaRespons {
 	return web.PohonKinerjaRespons{
-		ID: pohon.ID,
-		NamaPohon: pohon.NamaPohon,
+		ID:         pohon.ID,
+		NamaPohon:  pohon.NamaPohon,
 		JenisPohon: pohon.JenisPohon,
 		LevelPohon: pohon.LevelPohon,
-		KodeOpd: pohon.KodeOpd,
-		Tahun: pohon.Tahun,
-		CreatedAt:      pohon.CreatedAt,
-		UpdatedAt:      pohon.UpdatedAt,
+		KodeOpd:    pohon.KodeOpd,
+		Tahun:      pohon.Tahun,
+		CreatedAt:  pohon.CreatedAt,
+		UpdatedAt:  pohon.UpdatedAt,
 	}
 }
 

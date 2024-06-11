@@ -5,7 +5,7 @@ import "time"
 type ProsesBisnisUpdateRequest struct {
 	Id               int
 	NamaProsesBisnis string `json:"nama_proses_bisnis"`
-	SasaranKotaId      int `json:"sasaran_kota_id"`
+	SasaranKotaId    int    `json:"sasaran_kota_id"`
 	KodeProsesBisnis string `json:"kode_proses_bisnis"`
 	KodeOPD          string `json:"kode_opd"`
 	BidangUrusan     string `json:"bidang_urusan"`

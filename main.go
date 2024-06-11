@@ -30,7 +30,7 @@ func main() {
 	prosesbisnisRepository := repository.NewProsesBisnisRepository()
 	pohonkinerjaRepository := repository.NewPohonKinerjaRepository()
 	sasarankotaRepository := repository.NewSasaranKotaRepository()
-	prosesbisnisService := service.NewProsesBisnisService(referensiarsitekturRepository, sasarankotaRepository,prosesbisnisRepository, pohonkinerjaRepository, db, validate)
+	prosesbisnisService := service.NewProsesBisnisService(referensiarsitekturRepository, sasarankotaRepository, prosesbisnisRepository, pohonkinerjaRepository, db, validate)
 	prosesbisnisController := controller.NewProsesBisnisController(prosesbisnisService)
 
 	//sasaran kota

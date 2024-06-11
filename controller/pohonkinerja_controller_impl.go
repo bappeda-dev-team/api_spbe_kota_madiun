@@ -20,7 +20,7 @@ func NewPohonKinerjaController(pohonService service.PohonKinerjaService) PohonKi
 	}
 }
 
-func (controller *PohonKinerjaControllerImpl)FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params){
+func (controller *PohonKinerjaControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	pohonId := params.ByName("pohonId")
 	id, err := strconv.Atoi(pohonId)
 	helper.PanicIfError(err)

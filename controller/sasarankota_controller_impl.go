@@ -20,7 +20,7 @@ func NewSasaranKotaController(sasaranService service.SasaranKotaService) Sasaran
 	}
 }
 
-func (controller *SasaranKotaControllerImpl)FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params){
+func (controller *SasaranKotaControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	sasarankotaId := params.ByName("sasarankotaId")
 	id, err := strconv.Atoi(sasarankotaId)
 	helper.PanicIfError(err)

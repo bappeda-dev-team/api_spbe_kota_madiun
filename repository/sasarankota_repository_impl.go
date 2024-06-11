@@ -20,14 +20,14 @@ func (repository *SasaranKotaRepositoryImpl) FindById(ctx context.Context, tx *s
 	script := "select id, sasaran, strategi_kota, tujuan_kota, tahun, created_at, updated_at from sasaran_kota where id = ?"
 	rows, err := tx.QueryContext(ctx, script, sasarankotaId)
 	if err != nil {
-		log.Printf("Error executing query: %v", err) 
+		log.Printf("Error executing query: %v", err)
 		helper.PanicIfError(err)
 	}
 	defer rows.Close()
 
 	sasaran := domain.SasaranKota{}
 	if rows.Next() {
-		err := rows.Scan(&sasaran.ID, &sasaran.Sasaran, &sasaran.StrategiKota, &sasaran.TujuanKota, &sasaran.Tahun, &sasaran.CreatedAt, &sasaran.UpdatedAt )
+		err := rows.Scan(&sasaran.ID, &sasaran.Sasaran, &sasaran.StrategiKota, &sasaran.TujuanKota, &sasaran.Tahun, &sasaran.CreatedAt, &sasaran.UpdatedAt)
 		if err != nil {
 			log.Printf("Error scanning row: %v", err)
 			helper.PanicIfError(err)
