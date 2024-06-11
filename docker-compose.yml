@@ -1,0 +1,41 @@
+services:
+  db-mysql:
+    image: mysql:8
+    environment:
+      - MYSQL_ROOT_PASSWORD=espbe-mysql
+      - MYSQL_DATABASE=db_spbe
+    ports:
+      - "3306:3306"
+    volumes:
+      - spbe-database-volume:/var/lib/mysql
+    restart: on-failure
+  backend:
+    build: .
+    image: api-spbe:latest
+    environment:
+      - DB_URL=root:espbe-mysql@tcp(db-mysql:3306)/db_spbe?parseTime=true
+      - host=0.0.0.0
+      - port=8080
+    depends_on:
+      - db-mysql
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+  migrate:
+    image: migrate/migrate
+    volumes:
+      - ./db/migrations:/migrations
+    depends_on:
+      db-mysql:
+        condition: service_started
+    command:
+      [
+        "-path",
+        "/migrations/",
+        "-database",
+        "mysql://root:espbe-mysql@tcp(db-mysql:3306)/db_spbe",
+        "up",
+      ]
+
+volumes:
+  spbe-database-volume: {}

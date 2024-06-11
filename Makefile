@@ -27,4 +27,4 @@ install-migrate:
 	brew install golang-migrate
 
 db-migrate:
-	migrate -path=./db/migrations -database=mysql://root@tcp(localhost:3306)/db_spbe up
+	migrate -path db/migrations -database "mysql://root@tcp(localhost:3306)/db_spbe" up

@@ -1,0 +1,10 @@
+api
+vendor/
+
+.dockerignore
+.gcloudignore
+
+.gitignore
+
+Makefile
+README.md
