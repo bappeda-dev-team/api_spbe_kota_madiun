@@ -3,6 +3,9 @@
 # referensi arsitektur
 GET http://localhost:8080/v1/referensiarsitektur
 
+# proses bisnis
+GET http://localhost:8080/v1/prosesbisnis
+
 # insert data
 POST http://localhost:8080/v1/createreferensiarsitektur
 Content-Type: application/json

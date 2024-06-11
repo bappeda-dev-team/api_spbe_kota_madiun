@@ -12,7 +12,7 @@ init-go:
 	echo 'initialize go in your pc..'
 
 build:
-	go build -o api cmd/main.go
+	go build -o api main.go
 
 tidy:
 	go mod tidy
