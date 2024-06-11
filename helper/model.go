@@ -3,6 +3,7 @@ package helper
 import (
 	"api_spbe_kota_madiun/model/domain"
 	"api_spbe_kota_madiun/model/web"
+	"database/sql"
 )
 
 func ToReferensiArsitekturResponse(referensiarsitektur domain.ReferensiArsitektur) web.ReferensiArsitekturResponse {
@@ -30,7 +31,9 @@ func ToProsesBisnisResponse(prosesbisnis domain.ProsesBisnis) web.ProsesBisnisRe
 		ID:               prosesbisnis.ID,
 		KodeOPD:          prosesbisnis.KodeOPD,
 		NamaProsesBisnis: prosesbisnis.NamaProsesBisnis,
-		SasaranKota:      prosesbisnis.SasaranKota,
+		SasaranKota:      web.SasaranKotaRespons{
+			ID: prosesbisnis.SasaranKotaId,
+		},
 		KodeProsesBisnis: prosesbisnis.KodeProsesBisnis,
 		BidangUrusan:     prosesbisnis.BidangUrusan,
 		RabLevel1: web.ReferensiArsitekturResponse{
@@ -42,14 +45,47 @@ func ToProsesBisnisResponse(prosesbisnis domain.ProsesBisnis) web.ProsesBisnisRe
 		RabLevel3: web.ReferensiArsitekturResponse{
 			Id: prosesbisnis.RabLevel3ID,
 		},
+		RabLevel4: &web.PohonKinerjaRespons{
+			ID: nullInt64ToInt(prosesbisnis.RabLevel4ID),
+		},
+		RabLevel5: &web.PohonKinerjaRespons{
+			ID: nullInt64ToInt(prosesbisnis.RabLevel5ID),
+		},
+		RabLevel6: &web.PohonKinerjaRespons{
+			ID: nullInt64ToInt(prosesbisnis.RabLevel6ID),
+		},
 		Tahun: prosesbisnis.Tahun,
 	}
 }
 
-// func ToProsesBisnisResponses(prosbis []domain.ProsesBisnis) []web.ProsesBinsisRespons {
-// 	var prosbisResponse []web.ProsesBinsisRespons
-// 	for _, prosesbisnis := range prosbis {
-// 		prosbisResponse = append(prosbisResponse, ToProsesBisnisResponse(prosesbisnis))
-// 	}
-// 	return prosbisResponse
-// }
+func ToSasaranKotaResponse(sasaran domain.SasaranKota) web.SasaranKotaRespons {
+	return web.SasaranKotaRespons{
+		ID:              sasaran.ID,
+		Sasaran: sasaran.Sasaran,
+		TujuanKota: sasaran.TujuanKota,
+		StrategiKota: sasaran.StrategiKota,
+		Tahun: sasaran.Tahun,
+		CreatedAt:      sasaran.CreatedAt,
+		UpdatedAt:      sasaran.UpdatedAt,
+	}
+}
+
+func ToPohonKinerjaResponse(pohon domain.PohonKinerja) web.PohonKinerjaRespons{
+	return web.PohonKinerjaRespons{
+		ID: pohon.ID,
+		NamaPohon: pohon.NamaPohon,
+		JenisPohon: pohon.JenisPohon,
+		LevelPohon: pohon.LevelPohon,
+		KodeOpd: pohon.KodeOpd,
+		Tahun: pohon.Tahun,
+		CreatedAt:      pohon.CreatedAt,
+		UpdatedAt:      pohon.UpdatedAt,
+	}
+}
+
+func nullInt64ToInt(n sql.NullInt64) int {
+	if n.Valid {
+		return int(n.Int64)
+	}
+	return 0
+}

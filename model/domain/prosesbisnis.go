@@ -8,7 +8,7 @@ import (
 type ProsesBisnis struct {
 	ID               int
 	NamaProsesBisnis string
-	SasaranKota      string
+	SasaranKotaId      int
 	KodeProsesBisnis string
 	KodeOPD          string
 	BidangUrusan     string

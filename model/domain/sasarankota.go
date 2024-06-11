@@ -2,7 +2,7 @@ package domain
 
 import "time"
 
-type SasaranKotaApi struct {
+type SasaranKota struct {
 	ID           int
 	TujuanKota   string
 	StrategiKota string
