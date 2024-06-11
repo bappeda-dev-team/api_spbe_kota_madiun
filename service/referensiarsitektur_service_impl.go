@@ -44,8 +44,8 @@ func (service *ReferensiArsitekturServiceImpl) Insert(ctx context.Context, reque
 		Nama_referensi:  request.Nama_referensi,
 		Level_referensi: request.Level_referensi,
 		Jenis_referensi: request.Jenis_referensi,
-		Created_at: currentTime,
-		Tahun : request.Tahun,
+		Created_at:      currentTime,
+		Tahun:           request.Tahun,
 	}
 
 	referensiarsitektur = service.ReferensiArsitekturRepository.Insert(ctx, tx, referensiarsitektur)
@@ -62,14 +62,13 @@ func (service *ReferensiArsitekturServiceImpl) Update(ctx context.Context, reque
 
 	referensiarsitektur, err := service.ReferensiArsitekturRepository.FindById(ctx, tx, request.Id)
 	helper.PanicIfError(err)
-	
-	referensiarsitektur.Kode_referensi= request.Kode_referensi
-	referensiarsitektur.Nama_referensi= request.Nama_referensi
-	referensiarsitektur.Level_referensi= request.Level_referensi
-	referensiarsitektur.Jenis_referensi= request.Jenis_referensi
-	referensiarsitektur.Updated_at= request.Updated_at
+
+	referensiarsitektur.Kode_referensi = request.Kode_referensi
+	referensiarsitektur.Nama_referensi = request.Nama_referensi
+	referensiarsitektur.Level_referensi = request.Level_referensi
+	referensiarsitektur.Jenis_referensi = request.Jenis_referensi
+	referensiarsitektur.Updated_at = request.Updated_at
 	referensiarsitektur.Tahun = request.Tahun
-	
 
 	referensiarsitektur = service.ReferensiArsitekturRepository.Update(ctx, tx, referensiarsitektur)
 	return helper.ToReferensiArsitekturResponse(referensiarsitektur)
@@ -96,12 +95,12 @@ func (service *ReferensiArsitekturServiceImpl) FindAll(ctx context.Context) []we
 	return helper.ToReferenceResponses(reference)
 }
 
-func (service *ReferensiArsitekturServiceImpl)GetDataHierarchy(ctx context.Context, kodeReferensi string) ([]web.ReferensiArsitekturResponse, error){
+func (service *ReferensiArsitekturServiceImpl) GetDataHierarchy(ctx context.Context, kodeReferensi string) ([]web.ReferensiArsitekturResponse, error) {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	referensiList, err :=  service.ReferensiArsitekturRepository.FindByKodeRef(ctx, tx, kodeReferensi)
+	referensiList, err := service.ReferensiArsitekturRepository.FindByKodeRef(ctx, tx, kodeReferensi)
 	if err != nil {
 		if err.Error() == "data not found" {
 			log.Println("Service: Data not found for kodeReferensi:", kodeReferensi)
@@ -114,18 +113,18 @@ func (service *ReferensiArsitekturServiceImpl)GetDataHierarchy(ctx context.Conte
 		log.Println("Service: Data not found for kodeReferensi:", kodeReferensi)
 		return nil, errors.New("data not found")
 	}
-	
+
 	var responseList []web.ReferensiArsitekturResponse
 	for _, referensi := range referensiList {
 		response := web.ReferensiArsitekturResponse{
-			Id: referensi.IdReferensi,
+			Id:              referensi.IdReferensi,
 			Kode_referensi:  referensi.Kode_referensi,
 			Nama_referensi:  referensi.Nama_referensi,
 			Level_referensi: referensi.Level_referensi,
 			Jenis_referensi: referensi.Jenis_referensi,
-			Created_at: referensi.Created_at,
-			Updated_at: referensi.Updated_at,
-			Tahun : referensi.Tahun,
+			Created_at:      referensi.Created_at,
+			Updated_at:      referensi.Updated_at,
+			Tahun:           referensi.Tahun,
 		}
 		responseList = append(responseList, response)
 	}
@@ -146,4 +145,3 @@ func (service *ReferensiArsitekturServiceImpl) FindById(ctx context.Context, ref
 
 	return helper.ToReferensiArsitekturResponse(referensiarsitektur)
 }
-

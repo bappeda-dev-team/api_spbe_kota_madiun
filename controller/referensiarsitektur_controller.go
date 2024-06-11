@@ -15,4 +15,3 @@ type ReferensiArsitekturController interface {
 	FindByKodeReferensi(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 }
-

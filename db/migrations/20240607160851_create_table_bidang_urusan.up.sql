@@ -1,0 +1,10 @@
+CREATE TABLE bidang_urusan
+(
+    id INT NOT NULL AUTO_INCREMENT,
+    kode_bidang_urusan VARCHAR(255),
+    bidang_urusan VARCHAR(255),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    INDEX (bidang_urusan)
+) ENGINE=InnoDB;

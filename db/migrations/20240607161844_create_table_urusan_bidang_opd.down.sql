@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS urusan_bidang_opd;

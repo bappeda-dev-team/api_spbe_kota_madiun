@@ -26,9 +26,9 @@ func (controller *ReferensiArsitekturControllerImpl) Insert(writer http.Response
 
 	referensiarsitekturResponse := controller.ReferensiArsitekturService.Insert(request.Context(), referensiarsitekturInsertRequest)
 	webResponse := web.WebResponse{
-		Code: 200,
+		Code:   200,
 		Status: "Success create referensi arsitektur",
-		Data: referensiarsitekturResponse,
+		Data:   referensiarsitekturResponse,
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)
@@ -47,9 +47,9 @@ func (controller *ReferensiArsitekturControllerImpl) Update(writer http.Response
 	referensiarsitekturResponse := controller.ReferensiArsitekturService.Update(request.Context(), referensiarsitekturUpdateRequest)
 
 	webResponse := web.WebResponse{
-		Code: 200,
+		Code:   200,
 		Status: "Success update referensi arsitektur",
-		Data: referensiarsitekturResponse,
+		Data:   referensiarsitekturResponse,
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)
@@ -64,7 +64,7 @@ func (controller *ReferensiArsitekturControllerImpl) Delete(writer http.Response
 	controller.ReferensiArsitekturService.Delete(request.Context(), id)
 
 	webResponse := web.WebResponse{
-		Code: 200,
+		Code:   200,
 		Status: "Success delete referensi arsitektur",
 	}
 
@@ -75,19 +75,19 @@ func (controller *ReferensiArsitekturControllerImpl) FindAll(writer http.Respons
 	referensiarsitekturResponse := controller.ReferensiArsitekturService.FindAll(request.Context())
 
 	webResponse := web.WebResponse{
-		Code: 200,
+		Code:   200,
 		Status: "Success get all referensi arsitektur",
-		Data: referensiarsitekturResponse,
+		Data:   referensiarsitekturResponse,
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
 
-func (controller *ReferensiArsitekturControllerImpl) FindByKodeReferensi(writer http.ResponseWriter, request *http.Request, params httprouter.Params){
+func (controller *ReferensiArsitekturControllerImpl) FindByKodeReferensi(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 
 	kodeReferensi := params.ByName("kodeReferensi")
 
-	referensiarsitekturResponse, err := controller.ReferensiArsitekturService.GetDataHierarchy(request.Context(),kodeReferensi)
+	referensiarsitekturResponse, err := controller.ReferensiArsitekturService.GetDataHierarchy(request.Context(), kodeReferensi)
 	if err != nil {
 		if err.Error() == "data not found" {
 			webResponse := web.WebResponse{
@@ -114,15 +114,14 @@ func (controller *ReferensiArsitekturControllerImpl) FindByKodeReferensi(writer 
 	}
 	helper.WriteToResponseBody(writer, webResponse)
 
-
 }
 
-func (controller *ReferensiArsitekturControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params){
+func (controller *ReferensiArsitekturControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	referensiarsitekturId := params.ByName("referensiarsitekturId")
 	id, err := strconv.Atoi(referensiarsitekturId)
 	helper.PanicIfError(err)
 
-	referensiarsitekturResponse := controller.ReferensiArsitekturService.FindById(request.Context(),id)
+	referensiarsitekturResponse := controller.ReferensiArsitekturService.FindById(request.Context(), id)
 
 	webResponse := web.WebResponse{
 		Code:   200,
