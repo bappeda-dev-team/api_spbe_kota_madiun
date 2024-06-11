@@ -2,7 +2,6 @@ package app
 
 import (
 	"database/sql"
-	"fmt"
 	"os"
 	"testing"
 	"time"
