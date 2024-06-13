@@ -41,7 +41,7 @@ func (controller *PohonKinerjaControllerImpl) FindAll(writer http.ResponseWriter
 
 	webResponse := web.WebResponse{
 		Code:   200,
-		Status: "Success get all referensi arsitektur",
+		Status: "Success get all pohon kinerja",
 		Data:   pohonResponse,
 	}
 
