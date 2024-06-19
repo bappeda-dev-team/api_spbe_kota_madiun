@@ -226,6 +226,38 @@ func (service *ProsesBisnisServiceImpl) FindById(ctx context.Context, prosesbisn
 		}
 	}
 
+	var rabLevel4, rabLevel5, rabLevel6 *web.ProsBisPohonKinerjaRespons
+
+		if prosesBisnis.RabLevel4ID.Valid {
+			rabLevel4Data, err := service.PohonKinerjaRepository.FindById(ctx, tx, int(prosesBisnis.RabLevel4ID.Int32))
+			helper.PanicIfError(err)
+			rabLevel4 = &web.ProsBisPohonKinerjaRespons{
+				ID:         rabLevel4Data.ID,
+				NamaPohon:  rabLevel4Data.NamaPohon,
+				LevelPohon: rabLevel4Data.LevelPohon,
+			}
+		}
+
+		if prosesBisnis.RabLevel5ID.Valid {
+			rabLevel5Data, err := service.PohonKinerjaRepository.FindById(ctx, tx, int(prosesBisnis.RabLevel5ID.Int32))
+			helper.PanicIfError(err)
+			rabLevel5 = &web.ProsBisPohonKinerjaRespons{
+				ID:         rabLevel5Data.ID,
+				NamaPohon:  rabLevel5Data.NamaPohon,
+				LevelPohon: rabLevel5Data.LevelPohon,
+			}
+		}
+
+		if prosesBisnis.RabLevel6ID.Valid {
+			rabLevel6Data, err := service.PohonKinerjaRepository.FindById(ctx, tx, int(prosesBisnis.RabLevel6ID.Int32))
+			helper.PanicIfError(err)
+			rabLevel6 = &web.ProsBisPohonKinerjaRespons{
+				ID:         rabLevel6Data.ID,
+				NamaPohon:  rabLevel6Data.NamaPohon,
+				LevelPohon: rabLevel6Data.LevelPohon,
+			}
+		}
+
 	response := web.ProsesBisnisRespons{
 		ID:               prosesBisnis.ID,
 		NamaProsesBisnis: prosesBisnis.NamaProsesBisnis,
@@ -236,6 +268,9 @@ func (service *ProsesBisnisServiceImpl) FindById(ctx context.Context, prosesbisn
 		RabLevel1:        rabLevel1,
 		RabLevel2:        rabLevel2,
 		RabLevel3:        rabLevel3,
+		RabLevel4: rabLevel4,
+		RabLevel5: rabLevel5,
+		RabLevel6: rabLevel6,
 		Tahun:            prosesBisnis.Tahun,
 		CreatedAt:        prosesBisnis.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt:        prosesBisnis.UpdatedAt.Format("2006-01-02 15:04:05"),
@@ -397,4 +432,139 @@ func (service *ProsesBisnisServiceImpl) Delete(ctx context.Context, prosesbisnis
 	helper.PanicIfError(err)
 
 	service.ProsesBisnisRepository.Delete(ctx, tx, prosesBisnis)
+}
+
+func (service *ProsesBisnisServiceImpl) FindByNull(ctx context.Context) ([]web.ProsesBisnisRespons, error) {
+	tx, err := service.DB.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer helper.CommitOrRollback(tx)
+
+	prosesBisnisList, err := service.ProsesBisnisRepository.FindByNull(ctx, tx)
+	if err != nil {
+		return nil, err
+	}
+
+	var responseList []web.ProsesBisnisRespons
+	for _, prosesBisnis := range prosesBisnisList {
+		response := web.ProsesBisnisRespons{
+			ID:               prosesBisnis.ID,
+			NamaProsesBisnis: prosesBisnis.NamaProsesBisnis,
+			KodeOPD:          prosesBisnis.KodeOPD,
+			KodeProsesBisnis: prosesBisnis.KodeProsesBisnis,
+			Tahun:            prosesBisnis.Tahun,
+			CreatedAt:        prosesBisnis.CreatedAt.Format("2006-01-02 15:04:05"),
+			UpdatedAt:        prosesBisnis.UpdatedAt.Format("2006-01-02 15:04:05"),
+		}
+
+		// Populate SasaranKota
+		if prosesBisnis.SasaranKotaId.Valid {
+			sasarankotaData, err := service.SasaranKotaRepository.FindById(ctx, tx, int(prosesBisnis.SasaranKotaId.Int32))
+			if err != nil {
+				return nil, err
+			}
+			response.SasaranKota = &web.ProsbisSasaranKotaRespons{
+				ID:      sasarankotaData.ID,
+				Sasaran: sasarankotaData.Sasaran,
+			}
+		}
+
+		// Populate BidangUrusan
+		if prosesBisnis.BidangUrusanId.Valid {
+			bidangurusanData, err := service.BidangUrusanRepository.FindById(ctx, tx, int(prosesBisnis.BidangUrusanId.Int32))
+			if err != nil {
+				return nil, err
+			}
+			response.BidangUrusan = &web.ProsBisBidangUrusanRespons{
+				Id:           bidangurusanData.ID,
+				BidangUrusan: bidangurusanData.BidangUrusan,
+			}
+		}
+
+		// Populate RabLevel1
+		if prosesBisnis.RabLevel1ID.Valid {
+			rabLevel1Data, err := service.ReferensiArsitekturRepository.FindById(ctx, tx, int(prosesBisnis.RabLevel1ID.Int32))
+			if err != nil {
+				return nil, err
+			}
+			response.RabLevel1 = &web.ProsBisReferensiArsitekturRespons{
+				Id:              rabLevel1Data.IdReferensi,
+				Kode_referensi:  rabLevel1Data.Kode_referensi,
+				Nama_referensi:  rabLevel1Data.Nama_referensi,
+				Level_referensi: rabLevel1Data.Level_referensi,
+			}
+		}
+
+		// Populate RabLevel2
+		if prosesBisnis.RabLevel2ID.Valid {
+			rabLevel2Data, err := service.ReferensiArsitekturRepository.FindById(ctx, tx, int(prosesBisnis.RabLevel2ID.Int32))
+			if err != nil {
+				return nil, err
+			}
+			response.RabLevel2 = &web.ProsBisReferensiArsitekturRespons{
+				Id:              rabLevel2Data.IdReferensi,
+				Kode_referensi:  rabLevel2Data.Kode_referensi,
+				Nama_referensi:  rabLevel2Data.Nama_referensi,
+				Level_referensi: rabLevel2Data.Level_referensi,
+			}
+		}
+
+		// Populate RabLevel3
+		if prosesBisnis.RabLevel3ID.Valid {
+			rabLevel3Data, err := service.ReferensiArsitekturRepository.FindById(ctx, tx, int(prosesBisnis.RabLevel3ID.Int32))
+			if err != nil {
+				return nil, err
+			}
+			response.RabLevel3 = &web.ProsBisReferensiArsitekturRespons{
+				Id:              rabLevel3Data.IdReferensi,
+				Kode_referensi:  rabLevel3Data.Kode_referensi,
+				Nama_referensi:  rabLevel3Data.Nama_referensi,
+				Level_referensi: rabLevel3Data.Level_referensi,
+			}
+		}
+
+		// Populate RabLevel4
+		if prosesBisnis.RabLevel4ID.Valid {
+			rabLevel4Data, err := service.PohonKinerjaRepository.FindById(ctx, tx, int(prosesBisnis.RabLevel4ID.Int32))
+			if err != nil {
+				return nil, err
+			}
+			response.RabLevel4 = &web.ProsBisPohonKinerjaRespons{
+				ID:         rabLevel4Data.ID,
+				NamaPohon:  rabLevel4Data.NamaPohon,
+				LevelPohon: rabLevel4Data.LevelPohon,
+			}
+		}
+
+		// Populate RabLevel5
+		if prosesBisnis.RabLevel5ID.Valid {
+			rabLevel5Data, err := service.PohonKinerjaRepository.FindById(ctx, tx, int(prosesBisnis.RabLevel5ID.Int32))
+			if err != nil {
+				return nil, err
+			}
+			response.RabLevel5 = &web.ProsBisPohonKinerjaRespons{
+				ID:         rabLevel5Data.ID,
+				NamaPohon:  rabLevel5Data.NamaPohon,
+				LevelPohon: rabLevel5Data.LevelPohon,
+			}
+		}
+
+		// Populate RabLevel6
+		if prosesBisnis.RabLevel6ID.Valid {
+			rabLevel6Data, err := service.PohonKinerjaRepository.FindById(ctx, tx, int(prosesBisnis.RabLevel6ID.Int32))
+			if err != nil {
+				return nil, err
+			}
+			response.RabLevel6 = &web.ProsBisPohonKinerjaRespons{
+				ID:         rabLevel6Data.ID,
+				NamaPohon:  rabLevel6Data.NamaPohon,
+				LevelPohon: rabLevel6Data.LevelPohon,
+			}
+		}
+
+		responseList = append(responseList, response)
+	}
+
+	return responseList, nil
 }

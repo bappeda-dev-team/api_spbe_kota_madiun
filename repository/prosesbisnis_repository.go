@@ -12,4 +12,5 @@ type ProsesBisnisRepository interface {
 	Insert(ctx context.Context, tx *sql.Tx, prosesBisnis domain.ProsesBisnis) domain.ProsesBisnis
 	Update(ctx context.Context, tx *sql.Tx, prosesBisnis domain.ProsesBisnis) domain.ProsesBisnis
 	Delete(ctx context.Context, tx *sql.Tx, prosesBisnis domain.ProsesBisnis)
+	FindByNull(ctx context.Context, tx *sql.Tx) ([]domain.ProsesBisnis, error)
 }

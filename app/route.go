@@ -31,6 +31,7 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.POST("/v1/createprosesbisnis", prosesbisnisController.Insert)
 	router.PUT("/v1/updateprosesbisnis/:prosesbisnisId", prosesbisnisController.Update)
 	router.DELETE("/v1/deleteprosesbisnis/:prosesbisnisId", prosesbisnisController.Delete)
+	router.GET("/v1/GapProsesBisnis", prosesbisnisController.FindByNull)
 
 	//sasaran kota
 	router.GET("/v1/sasarankota/:sasarankotaId", sasarankotaController.FindById)
