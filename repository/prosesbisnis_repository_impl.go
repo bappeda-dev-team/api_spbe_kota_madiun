@@ -106,7 +106,7 @@ func (repository *ProsesBisnisRepositoryImpl) Delete(ctx context.Context, tx *sq
 	helper.PanicIfError(err)
 }
 
-func (repository *ProsesBisnisRepositoryImpl) FindByNull(ctx context.Context, tx *sql.Tx) ([]domain.ProsesBisnis, error){
+func (repository *ProsesBisnisRepositoryImpl) FindByNull(ctx context.Context, tx *sql.Tx) ([]domain.ProsesBisnis, error) {
 	script := "SELECT id, nama_proses_bisnis, sasaran_kota_id, kode_proses_bisnis, kode_opd, bidang_urusan_id, rab_level_1_id, rab_level_2_id, rab_level_3_id, rab_level_4_id, rab_level_5_id, rab_level_6_id, tahun, created_at, updated_at FROM proses_bisnis WHERE nama_proses_bisnis is null or sasaran_kota_id is null or kode_proses_bisnis is null or kode_opd is null or bidang_urusan_id is null or rab_level_1_id is null or rab_level_2_id is null or rab_level_3_id is null or rab_level_4_id is null or rab_level_5_id is null or rab_level_6_id is null or tahun is null"
 
 	rows, err := tx.QueryContext(ctx, script)

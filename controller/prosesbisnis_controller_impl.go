@@ -133,7 +133,7 @@ func (controller *ProsesBisnisControllerImpl) Delete(writer http.ResponseWriter,
 	helper.WriteToResponseBody(writer, webResponse)
 }
 
-func (controller *ProsesBisnisControllerImpl)FindByNull(writer http.ResponseWriter, request *http.Request, params httprouter.Params){
+func (controller *ProsesBisnisControllerImpl) FindByNull(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	prosesBisnisService, err := controller.ProsesBisnisService.FindByNull(request.Context())
 	if err != nil {
 		http.Error(writer, "Failed to fetch data", http.StatusInternalServerError)
@@ -148,4 +148,3 @@ func (controller *ProsesBisnisControllerImpl)FindByNull(writer http.ResponseWrit
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
- 

@@ -16,7 +16,6 @@ import (
 	"github.com/rs/cors"
 )
 
-
 func main() {
 
 	db := app.GetConnection()
