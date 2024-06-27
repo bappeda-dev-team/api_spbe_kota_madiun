@@ -33,3 +33,12 @@ func (service *SasaranKotaServiceImpl) FindById(ctx context.Context, sasarankota
 
 	return helper.ToSasaranKotaResponse(sasaran)
 }
+
+func (service *SasaranKotaServiceImpl) FindAll(ctx context.Context) []web.SasaranKotaRespons {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	sasaran := service.SasaranKotaRepository.FindAll(ctx, tx)
+	return helper.ToSasaranResponses(sasaran)
+}

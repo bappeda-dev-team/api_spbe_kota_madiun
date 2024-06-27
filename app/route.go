@@ -11,7 +11,7 @@ type RouteController struct {
 }
 
 func NewRouter(referensiarsitekturController controller.ReferensiArsitekturController,
-	prosesbisnisController controller.ProsesBisnisController, sasarankotaController controller.SasaranKotaController, pohonkinerja controller.PohonKinerjaController) *httprouter.Router {
+	prosesbisnisController controller.ProsesBisnisController, sasarankotaController controller.SasaranKotaController, pohonkinerja controller.PohonKinerjaController, bidangurusan controller.BidangUrusanController) *httprouter.Router {
 	router := httprouter.New()
 
 	//referensi arsitektur router
@@ -31,12 +31,18 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.POST("/v1/createprosesbisnis", prosesbisnisController.Insert)
 	router.PUT("/v1/updateprosesbisnis/:prosesbisnisId", prosesbisnisController.Update)
 	router.DELETE("/v1/deleteprosesbisnis/:prosesbisnisId", prosesbisnisController.Delete)
+	router.GET("/v1/GapProsesBisnis", prosesbisnisController.FindByNull)
 
 	//sasaran kota
 	router.GET("/v1/sasarankota/:sasarankotaId", sasarankotaController.FindById)
+	router.GET("/v1/sasarankota", sasarankotaController.FindAll)
 
 	//pohon kinerja
 	router.GET("/v1/pohonkinerja/:pohonId", pohonkinerja.FindById)
+	router.GET("/v1/pohonkinerja", pohonkinerja.FindAll)
+
+	//bidangurusan
+	router.GET("/v1/bidangurusan", bidangurusan.FindAll)
 
 	router.PanicHandler = exception.ErrorHandler
 

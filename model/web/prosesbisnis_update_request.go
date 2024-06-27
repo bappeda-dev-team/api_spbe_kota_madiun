@@ -8,7 +8,7 @@ type ProsesBisnisUpdateRequest struct {
 	SasaranKotaId    int    `json:"sasaran_kota_id"`
 	KodeProsesBisnis string `json:"kode_proses_bisnis"`
 	KodeOPD          string `json:"kode_opd"`
-	BidangUrusan     string `json:"bidang_urusan"`
+	BidangUrusanId   int    `json:"bidang_urusan_id"`
 	RabLevel1ID      int    `json:"rab_level_1_id"`
 	RabLevel2ID      int    `json:"rab_level_2_id"`
 	RabLevel3ID      int    `json:"rab_level_3_id"`

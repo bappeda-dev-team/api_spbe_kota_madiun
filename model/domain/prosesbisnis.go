@@ -8,16 +8,16 @@ import (
 type ProsesBisnis struct {
 	ID               int
 	NamaProsesBisnis string
-	SasaranKotaId    int
+	SasaranKotaId    sql.NullInt32
 	KodeProsesBisnis string
 	KodeOPD          string
-	BidangUrusan     string
-	RabLevel1ID      int
-	RabLevel2ID      int
-	RabLevel3ID      int
-	RabLevel4ID      sql.NullInt64
-	RabLevel5ID      sql.NullInt64
-	RabLevel6ID      sql.NullInt64
+	BidangUrusanId   sql.NullInt32
+	RabLevel1ID      sql.NullInt32
+	RabLevel2ID      sql.NullInt32
+	RabLevel3ID      sql.NullInt32
+	RabLevel4ID      sql.NullInt32
+	RabLevel5ID      sql.NullInt32
+	RabLevel6ID      sql.NullInt32
 	Tahun            int
 	CreatedAt        time.Time
 	UpdatedAt        time.Time

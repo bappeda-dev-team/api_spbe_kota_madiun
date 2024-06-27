@@ -31,28 +31,30 @@ func ToProsesBisnisResponse(prosesbisnis domain.ProsesBisnis) web.ProsesBisnisRe
 		ID:               prosesbisnis.ID,
 		KodeOPD:          prosesbisnis.KodeOPD,
 		NamaProsesBisnis: prosesbisnis.NamaProsesBisnis,
-		SasaranKota: web.SasaranKotaRespons{
-			ID: prosesbisnis.SasaranKotaId,
+		SasaranKota: &web.ProsbisSasaranKotaRespons{
+			ID: nullInt32ToInt(prosesbisnis.SasaranKotaId),
 		},
 		KodeProsesBisnis: prosesbisnis.KodeProsesBisnis,
-		BidangUrusan:     prosesbisnis.BidangUrusan,
-		RabLevel1: web.ReferensiArsitekturResponse{
-			Id: prosesbisnis.RabLevel1ID,
+		BidangUrusan: &web.ProsBisBidangUrusanRespons{
+			Id: nullInt32ToInt(prosesbisnis.BidangUrusanId),
 		},
-		RabLevel2: web.ReferensiArsitekturResponse{
-			Id: prosesbisnis.RabLevel2ID,
+		RabLevel1: &web.ProsBisReferensiArsitekturRespons{
+			Id: nullInt32ToInt(prosesbisnis.RabLevel1ID),
 		},
-		RabLevel3: web.ReferensiArsitekturResponse{
-			Id: prosesbisnis.RabLevel3ID,
+		RabLevel2: &web.ProsBisReferensiArsitekturRespons{
+			Id: nullInt32ToInt(prosesbisnis.RabLevel2ID),
 		},
-		RabLevel4: &web.PohonKinerjaRespons{
-			ID: nullInt64ToInt(prosesbisnis.RabLevel4ID),
+		RabLevel3: &web.ProsBisReferensiArsitekturRespons{
+			Id: nullInt32ToInt(prosesbisnis.RabLevel3ID),
 		},
-		RabLevel5: &web.PohonKinerjaRespons{
-			ID: nullInt64ToInt(prosesbisnis.RabLevel5ID),
+		RabLevel4: &web.ProsBisPohonKinerjaRespons{
+			ID: nullInt32ToInt(prosesbisnis.RabLevel4ID),
 		},
-		RabLevel6: &web.PohonKinerjaRespons{
-			ID: nullInt64ToInt(prosesbisnis.RabLevel6ID),
+		RabLevel5: &web.ProsBisPohonKinerjaRespons{
+			ID: nullInt32ToInt(prosesbisnis.RabLevel5ID),
+		},
+		RabLevel6: &web.ProsBisPohonKinerjaRespons{
+			ID: nullInt32ToInt(prosesbisnis.RabLevel6ID),
 		},
 		Tahun: prosesbisnis.Tahun,
 	}
@@ -83,9 +85,42 @@ func ToPohonKinerjaResponse(pohon domain.PohonKinerja) web.PohonKinerjaRespons {
 	}
 }
 
-func nullInt64ToInt(n sql.NullInt64) int {
+func ToBidangUrusanResponse(bidang domain.BidangUrusan) web.BidangUrusanRespons {
+	return web.BidangUrusanRespons{
+		Id:               bidang.ID,
+		KodeBidangUrusan: bidang.KodeBidangUrusan,
+		BidangUrusan:     bidang.BidangUrusan,
+	}
+}
+
+// get all
+func ToSasaranResponses(sasaran []domain.SasaranKota) []web.SasaranKotaRespons {
+	var sasaranKotaResponses []web.SasaranKotaRespons
+	for _, sasaranKota := range sasaran {
+		sasaranKotaResponses = append(sasaranKotaResponses, ToSasaranKotaResponse(sasaranKota))
+	}
+	return sasaranKotaResponses
+}
+
+func ToBidangResponses(bidang []domain.BidangUrusan) []web.BidangUrusanRespons {
+	var bidangUrusanRespons []web.BidangUrusanRespons
+	for _, bidangUrusan := range bidang {
+		bidangUrusanRespons = append(bidangUrusanRespons, ToBidangUrusanResponse(bidangUrusan))
+	}
+	return bidangUrusanRespons
+}
+
+func ToPohonResponses(pohon []domain.PohonKinerja) []web.PohonKinerjaRespons {
+	var pohonRespons []web.PohonKinerjaRespons
+	for _, pohonKinerja := range pohon {
+		pohonRespons = append(pohonRespons, ToPohonKinerjaResponse(pohonKinerja))
+	}
+	return pohonRespons
+}
+
+func nullInt32ToInt(n sql.NullInt32) int {
 	if n.Valid {
-		return int(n.Int64)
+		return int(n.Int32)
 	}
 	return 0
 }

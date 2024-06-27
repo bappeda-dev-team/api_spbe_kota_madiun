@@ -132,3 +132,19 @@ func (controller *ProsesBisnisControllerImpl) Delete(writer http.ResponseWriter,
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
+
+func (controller *ProsesBisnisControllerImpl) FindByNull(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	prosesBisnisService, err := controller.ProsesBisnisService.FindByNull(request.Context())
+	if err != nil {
+		http.Error(writer, "Failed to fetch data", http.StatusInternalServerError)
+		return
+	}
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "Success get all Bidang Urusan",
+		Data:   prosesBisnisService,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}

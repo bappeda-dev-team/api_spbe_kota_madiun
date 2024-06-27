@@ -35,3 +35,15 @@ func (controller *SasaranKotaControllerImpl) FindById(writer http.ResponseWriter
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
+
+func (controller *SasaranKotaControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	sasarankotaResponse := controller.SasaranKotaService.FindAll(request.Context())
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "Success get all sasaran kota",
+		Data:   sasarankotaResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}

@@ -1,0 +1,1 @@
+ALTER TABLE proses_bisnis ADD CONSTRAINT fk_bidang_urusan_id FOREIGN KEY (bidang_urusan_id) REFERENCES bidang_urusan (id);

@@ -7,4 +7,5 @@ import (
 
 type PohonKinerjaService interface {
 	FindById(ctx context.Context, pohonId int) web.PohonKinerjaRespons
+	FindAll(ctx context.Context) []web.PohonKinerjaRespons
 }

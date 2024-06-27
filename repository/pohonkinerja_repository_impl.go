@@ -38,3 +38,20 @@ func (repository *PohonKinerjaRepositoryImpl) FindById(ctx context.Context, tx *
 		return pohonKinerja, errors.New("Pohon Kinerja is not found")
 	}
 }
+
+func (repository *PohonKinerjaRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.PohonKinerja {
+	script := "select id, nama_pohon, jenis_pohon, level_pohon, created_at, updated_at, tahun, kode_opd from pohon_kinerja"
+
+	rows, err := tx.QueryContext(ctx, script)
+	helper.PanicIfError(err)
+	defer rows.Close()
+
+	var pohon []domain.PohonKinerja
+	for rows.Next() {
+		pohonKinerja := domain.PohonKinerja{}
+		err := rows.Scan(&pohonKinerja.ID, &pohonKinerja.NamaPohon, &pohonKinerja.JenisPohon, &pohonKinerja.LevelPohon, &pohonKinerja.CreatedAt, &pohonKinerja.UpdatedAt, &pohonKinerja.Tahun, &pohonKinerja.KodeOpd)
+		helper.PanicIfError(err)
+		pohon = append(pohon, pohonKinerja)
+	}
+	return pohon
+}

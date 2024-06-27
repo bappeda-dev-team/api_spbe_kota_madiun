@@ -30,7 +30,8 @@ func main() {
 	prosesbisnisRepository := repository.NewProsesBisnisRepository()
 	pohonkinerjaRepository := repository.NewPohonKinerjaRepository()
 	sasarankotaRepository := repository.NewSasaranKotaRepository()
-	prosesbisnisService := service.NewProsesBisnisService(referensiarsitekturRepository, sasarankotaRepository, prosesbisnisRepository, pohonkinerjaRepository, db, validate)
+	bidangurusanRepository := repository.NewBidangUrusanRepository()
+	prosesbisnisService := service.NewProsesBisnisService(referensiarsitekturRepository, sasarankotaRepository, bidangurusanRepository, prosesbisnisRepository, pohonkinerjaRepository, db, validate)
 	prosesbisnisController := controller.NewProsesBisnisController(prosesbisnisService)
 
 	//sasaran kota
@@ -41,7 +42,11 @@ func main() {
 	pohonkinerjaService := service.NewPohonKinerjaService(pohonkinerjaRepository, db)
 	pohonkinerjaController := controller.NewPohonKinerjaController(pohonkinerjaService)
 
-	router := app.NewRouter(referensiarsitekturController, prosesbisnisController, sasarankotaController, pohonkinerjaController)
+	//bidang Urusan
+	bidangurusanService := service.NewBidangUrusanService(bidangurusanRepository, db)
+	bidangurusanController := controller.NewBidangUrusanController(bidangurusanService)
+
+	router := app.NewRouter(referensiarsitekturController, prosesbisnisController, sasarankotaController, pohonkinerjaController, bidangurusanController)
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
