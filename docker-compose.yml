@@ -18,7 +18,7 @@ services:
       - db-mysql
     ports:
       - "8081:80"
-    restart: always
+    restart: "no"
   backend:
     build: .
     image: api-spbe:latest
