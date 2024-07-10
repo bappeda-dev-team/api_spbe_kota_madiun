@@ -47,3 +47,18 @@ func (controller *SasaranKotaControllerImpl) FindAll(writer http.ResponseWriter,
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
+
+func (controller *SasaranKotaControllerImpl) Insert(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	sasarankotaApiResponse, err := controller.SasaranKotaService.InsertApi(request.Context())
+	if err != nil {
+		helper.PanicIfError(err)
+	}
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "Success fetching and inserting Sasaran Kota",
+		Data:   sasarankotaApiResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}

@@ -44,6 +44,9 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	//bidangurusan
 	router.GET("/v1/bidangurusan", bidangurusan.FindAll)
 
+	//fetch api
+	router.GET("/sasarankotafetch", sasarankotaController.Insert)
+
 	router.PanicHandler = exception.ErrorHandler
 
 	return router

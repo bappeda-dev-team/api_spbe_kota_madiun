@@ -59,7 +59,7 @@ func main() {
 	ctx := context.Background()
 	go app.FetchPohonKinerja(ctx, db, &wg)
 	// go app.FetchKodeOpd(ctx, db, &wg)
-	go app.FetchSaranKota(ctx, db, &wg)
+	// go app.FetchSaranKota(ctx, db, &wg)
 
 	handler := c.Handler(router)
 	// ambil host dan port di env
