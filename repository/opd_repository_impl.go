@@ -1,4 +1,4 @@
-package app
+package repository
 
 import (
 	"api_spbe_kota_madiun/model/web"
@@ -10,23 +10,28 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"sync"
 )
 
-func FetchSaranKota(ctx context.Context, db *sql.DB, wg *sync.WaitGroup) {
-	defer wg.Done()
+type OpdRepositoryImpl struct {
+}
+
+func NewOpdRepository() OpdRepository {
+	return &OpdRepositoryImpl{}
+}
+
+func (rrepository *OpdRepositoryImpl) FetchKodeOpd(ctx context.Context, tx *sql.Tx) (web.Opd, error) {
 	log.Println("Starting FetchKodeOpd")
-	apiURL := "https://kak.madiunkota.go.id/api/skp/sasaran_kota"
+	apiURL := "https://kak.madiunkota.go.id/api/opd/urusan_opd"
 	method := "POST"
 
 	formData := url.Values{}
-	formData.Set("tahun", "2024")
+	// formData.Set("tahun", "2024")
 
 	client := &http.Client{}
 	req, err := http.NewRequest(method, apiURL, strings.NewReader(formData.Encode()))
 	if err != nil {
 		log.Println("Error creating request:", err)
-		return
+		return web.Opd{}, err
 	}
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Add("Accept", "application/json")
@@ -34,58 +39,46 @@ func FetchSaranKota(ctx context.Context, db *sql.DB, wg *sync.WaitGroup) {
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println("Error making request:", err)
-		return
+		return web.Opd{}, err
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Println("Error reading response body:", err)
-		return
+		return web.Opd{}, err
 	}
 
 	log.Println("Received data:", string(body))
 
-	var result web.APIResponseDataSasaranKota
+	var result web.ResponsesAPI
 	err = json.Unmarshal(body, &result)
 	if err != nil {
 		log.Println("Error unmarshalling JSON:", err)
-		return
+		return web.Opd{}, err
 	}
 
-	log.Printf("Parsed Data: %+v\n", result.Data)
-
-	tx, err := db.BeginTx(ctx, nil)
-	if err != nil {
-		log.Println("Error starting transaction:", err)
-		return
-	}
-	defer tx.Rollback()
+	log.Printf("Parsed Data: %+v\n", result.Results)
 
 	stmt, err := tx.PrepareContext(ctx, `
-		INSERT INTO sasaran_kota ( sasaran, strategi_kota, tujuan_kota, tahun)
-		VALUES (?, ?, ?, 2024)
-		ON DUPLICATE KEY UPDATE
-		sasaran=VALUES(sasaran),strategi_kota=VALUES(strategi_kota), tujuan_kota=VALUES(tujuan_kota)`)
+		INSERT INTO opd (kode_opd, nama_opd)
+		VALUES (?, ?)
+		ON DUPLICATE KEY UPDATE nama_opd=VALUES(nama_opd)`)
 	if err != nil {
 		log.Println("Error preparing statement:", err)
-		return
+		return web.Opd{}, err
 	}
 	defer stmt.Close()
 
-	for _, item := range result.Data.SasaranKota {
-		log.Printf("Insert Sasaran Kota: Sasaran=%v, Strategi Kota=%v, Tujuan Kota=%v \n", item.Sasaran, item.StrategiKota, item.TujuanKota)
-		_, err := stmt.ExecContext(ctx, item.Sasaran, item.StrategiKota, item.TujuanKota)
+	for _, item := range result.Results {
+		log.Printf("Inserting OPD: KodeOpd=%v, NamaOpd=%v\n", item.KodeOpd, item.NamaOpd)
+		_, err := stmt.ExecContext(ctx, item.KodeOpd, item.NamaOpd)
 		if err != nil {
 			log.Println("Error executing statement:", err)
-			return
+			return web.Opd{}, err
 		}
 	}
 
-	if err := tx.Commit(); err != nil {
-		log.Println("Error committing transaction:", err)
-		return
-	}
-
 	log.Println("Data successfully fetched and saved.")
+	return web.Opd{}, nil
 }

@@ -48,13 +48,13 @@ func ToProsesBisnisResponse(prosesbisnis domain.ProsesBisnis) web.ProsesBisnisRe
 			Id: nullInt32ToInt(prosesbisnis.RabLevel3ID),
 		},
 		RabLevel4: &web.ProsBisPohonKinerjaRespons{
-			ID: nullInt32ToInt(prosesbisnis.RabLevel4ID),
+			ID: nullInt32ToInt(prosesbisnis.StrategicId),
 		},
 		RabLevel5: &web.ProsBisPohonKinerjaRespons{
-			ID: nullInt32ToInt(prosesbisnis.RabLevel5ID),
+			ID: nullInt32ToInt(prosesbisnis.TacticalId),
 		},
 		RabLevel6: &web.ProsBisPohonKinerjaRespons{
-			ID: nullInt32ToInt(prosesbisnis.RabLevel6ID),
+			ID: nullInt32ToInt(prosesbisnis.OperationalId),
 		},
 		Tahun: prosesbisnis.Tahun,
 	}
@@ -90,6 +90,43 @@ func ToBidangUrusanResponse(bidang domain.BidangUrusan) web.BidangUrusanRespons 
 		Id:               bidang.ID,
 		KodeBidangUrusan: bidang.KodeBidangUrusan,
 		BidangUrusan:     bidang.BidangUrusan,
+	}
+}
+
+func ToLayananSpbeRespons(layananSpbe domain.LayananSPBE) web.LayananSpbeRespons {
+	return web.LayananSpbeRespons{
+		Id:          layananSpbe.Id,
+		NamaLayanan: layananSpbe.NamaLayanan,
+		KodeLayanan: layananSpbe.KodeLayanan,
+		TujuanLayananId: &web.LayananspbePohonRespons{
+			ID: nullInt32ToInt(layananSpbe.TujuanLayananId),
+		},
+		FungsiLayanan:     layananSpbe.FungsiLayanan,
+		Tahun:             layananSpbe.Tahun,
+		KodeOPD:           layananSpbe.KodeOPD,
+		KementrianTerkait: layananSpbe.KementrianTerkait,
+		MetodeLayanan:     layananSpbe.MetodeLayanan,
+		RalLevel1id: &web.LayananSpbeReferensiArsitekturRespons{
+			Id: nullInt32ToInt(layananSpbe.RalLevel1id),
+		},
+		RalLevel2id: &web.LayananSpbeReferensiArsitekturRespons{
+			Id: nullInt32ToInt(layananSpbe.RalLevel2id),
+		},
+		RalLevel3id: &web.LayananSpbeReferensiArsitekturRespons{
+			Id: nullInt32ToInt(layananSpbe.RalLevel3id),
+		},
+		RalLevel4id: &web.LayananSpbeReferensiArsitekturRespons{
+			Id: nullInt32ToInt(layananSpbe.RalLevel4id),
+		},
+		StrategicId: &web.LayananspbePohonRespons{
+			ID: nullInt32ToInt(layananSpbe.StrategicId),
+		},
+		TacticalId: &web.LayananspbePohonRespons{
+			ID: nullInt32ToInt(layananSpbe.TacticalId),
+		},
+		OperationalId: &web.LayananspbePohonRespons{
+			ID: nullInt32ToInt(layananSpbe.OperationalId),
+		},
 	}
 }
 

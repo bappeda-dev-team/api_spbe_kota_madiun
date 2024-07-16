@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func GenerateRandomKodeProsesBisnis() string {
+func GenerateRandomKode() string {
 	rand.NewSource(time.Now().UnixNano())
 
 	min := 1000

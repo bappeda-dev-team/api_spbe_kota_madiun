@@ -30,3 +30,16 @@ func (controller *BidangUrusanControllerImpl) FindAll(writer http.ResponseWriter
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
+
+func (controller *BidangUrusanControllerImpl) FetchBidangUrusan(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	bidangService, err := controller.BidangUrusanService.FetchUrusan(request.Context())
+	helper.PanicIfError(err)
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "Success Fetch bidang urusan",
+		Data:   bidangService,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}

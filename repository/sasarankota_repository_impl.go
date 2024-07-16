@@ -22,7 +22,7 @@ func NewSasaranKotaRepository() SasaranKotaRepository {
 	return &SasaranKotaRepositoryImpl{}
 }
 
-func (repository *SasaranKotaRepositoryImpl)InsertApi(ctx context.Context, tx *sql.Tx) (web.SasaranKotaApi, error){
+func (repository *SasaranKotaRepositoryImpl) InsertApi(ctx context.Context, tx *sql.Tx) (web.SasaranKotaApi, error) {
 	log.Println("Starting FetchKodeOpd")
 	apiURL := "https://kak.madiunkota.go.id/api/skp/sasaran_kota"
 	method := "POST"
@@ -87,7 +87,6 @@ func (repository *SasaranKotaRepositoryImpl)InsertApi(ctx context.Context, tx *s
 	return web.SasaranKotaApi{}, nil
 }
 
-
 func (repository *SasaranKotaRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, sasarankotaId int) (domain.SasaranKota, error) {
 	script := "select id, sasaran, strategi_kota, tujuan_kota, tahun, created_at, updated_at from sasaran_kota where id = ?"
 	rows, err := tx.QueryContext(ctx, script, sasarankotaId)
@@ -107,7 +106,7 @@ func (repository *SasaranKotaRepositoryImpl) FindById(ctx context.Context, tx *s
 		log.Printf("Successfully retrieved Sasaran Kota: %+v", sasarankotaId)
 		return sasaran, nil
 	} else {
-		return sasaran, errors.New("Sasaran kota is not found")
+		return sasaran, errors.New("sasaran kota is not found")
 	}
 }
 

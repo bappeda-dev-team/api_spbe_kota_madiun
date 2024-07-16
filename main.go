@@ -6,11 +6,9 @@ import (
 	"api_spbe_kota_madiun/helper"
 	"api_spbe_kota_madiun/repository"
 	"api_spbe_kota_madiun/service"
-	"context"
 	"fmt"
 	"net/http"
 	"os"
-	"sync"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/rs/cors"
@@ -46,20 +44,29 @@ func main() {
 	bidangurusanService := service.NewBidangUrusanService(bidangurusanRepository, db)
 	bidangurusanController := controller.NewBidangUrusanController(bidangurusanService)
 
-	router := app.NewRouter(referensiarsitekturController, prosesbisnisController, sasarankotaController, pohonkinerjaController, bidangurusanController)
+	//layanan spbe
+	layananspbeRepository := repository.NewLayananSPBERepository()
+	layananspbeService := service.NewLayananSpbeService(layananspbeRepository, pohonkinerjaRepository, referensiarsitekturRepository, db, validate)
+	layananspbeController := controller.NewLayananSPBEController(layananspbeService)
+
+	//fetch opd
+	opdRepository := repository.NewOpdRepository()
+	opdService := service.NewOpdService(opdRepository, db)
+	opdController := controller.NewOpdController(opdService)
+
+	// fetch urusan
+	urusanRepository := repository.NewUrusanRepository()
+	urusanService := service.NewUrusanService(urusanRepository, db)
+	urusanController := controller.NewUrusanController(urusanService)
+
+	router := app.NewRouter(referensiarsitekturController, prosesbisnisController, sasarankotaController, pohonkinerjaController, bidangurusanController, opdController, urusanController, layananspbeController)
+
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
 		AllowedHeaders:   []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		AllowCredentials: true,
 	})
-
-	var wg sync.WaitGroup
-	wg.Add(3)
-	ctx := context.Background()
-	go app.FetchPohonKinerja(ctx, db, &wg)
-	// go app.FetchKodeOpd(ctx, db, &wg)
-	// go app.FetchSaranKota(ctx, db, &wg)
 
 	handler := c.Handler(router)
 	// ambil host dan port di env
@@ -77,6 +84,8 @@ func main() {
 	server := http.Server{
 		Addr:    addr,
 		Handler: handler,
+		//with auth
+		// Handler: middleware.NewAuthMiddleware(handler),
 	}
 	fmt.Println("running", server.Addr)
 

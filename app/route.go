@@ -11,7 +11,7 @@ type RouteController struct {
 }
 
 func NewRouter(referensiarsitekturController controller.ReferensiArsitekturController,
-	prosesbisnisController controller.ProsesBisnisController, sasarankotaController controller.SasaranKotaController, pohonkinerja controller.PohonKinerjaController, bidangurusan controller.BidangUrusanController) *httprouter.Router {
+	prosesbisnisController controller.ProsesBisnisController, sasarankotaController controller.SasaranKotaController, pohonkinerja controller.PohonKinerjaController, bidangurusan controller.BidangUrusanController, opdController controller.OpdController, urusanController controller.UrusanController, layananspbeController controller.LayananSpbeController) *httprouter.Router {
 	router := httprouter.New()
 
 	//referensi arsitektur router
@@ -44,8 +44,23 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	//bidangurusan
 	router.GET("/v1/bidangurusan", bidangurusan.FindAll)
 
+	//layanan spbe
+	router.GET("/v1/layananspbe", layananspbeController.FindByKodeOPD)
+	router.GET("/v1/layananspbe/:kodeOPD", layananspbeController.FindByKodeOPD)
+	router.GET("/v1/layananspbebytahun/:tahun", layananspbeController.FindByKodeOPD)
+	router.GET("/v1/layananspbe/:kodeOPD/:tahun", layananspbeController.FindByKodeOPD)
+	router.GET("/v1/layananspbebyid/:layananspbeId", layananspbeController.FindById)
+	router.POST("/v1/createlayananspbe", layananspbeController.Insert)
+	router.PUT("/v1/updatelayananspbe/:layananspbeId", layananspbeController.Update)
+	router.DELETE("/v1/deletelayananspbe/:layananspbeId", layananspbeController.Delete)
+	router.GET("/v1/Gaplayananspbe", layananspbeController.FindByNull)
+
 	//fetch api
 	router.GET("/sasarankotafetch", sasarankotaController.Insert)
+	router.GET("/pohonkinerjafetch", pohonkinerja.FetchApiPohon)
+	router.GET("/opdafetch", opdController.FetchApiOpd)
+	router.GET("/urusanfetch", urusanController.FetchApiUrusan)
+	router.GET("/bidangurusanfetch", bidangurusan.FetchBidangUrusan)
 
 	router.PanicHandler = exception.ErrorHandler
 

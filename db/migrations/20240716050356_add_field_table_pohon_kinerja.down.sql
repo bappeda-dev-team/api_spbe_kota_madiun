@@ -1,0 +1,1 @@
+ALTER TABLE pohon_kinerja DROP COLUMN parent;

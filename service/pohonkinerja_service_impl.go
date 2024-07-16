@@ -44,7 +44,7 @@ func (service *PohonKinerjaServiceImpl) FindAll(ctx context.Context) []web.Pohon
 	return helper.ToPohonResponses(pohon)
 }
 
-func (service *PohonKinerjaServiceImpl)InsertApi(ctx context.Context) (web.PohonKinerjaApi, error){
+func (service *PohonKinerjaServiceImpl) InsertApi(ctx context.Context) (web.PohonKinerjaApi, error) {
 	tx, err := service.DB.BeginTx(ctx, nil)
 	if err != nil {
 		log.Println("Error starting transaction:", err)
@@ -63,7 +63,7 @@ func (service *PohonKinerjaServiceImpl)InsertApi(ctx context.Context) (web.Pohon
 	result, err := service.PohonKinerjaRepository.InsertApi(ctx, tx)
 	if err != nil {
 		log.Println("Error fetching and inserting API data:", err)
-		return web.SasaranKotaApi{}, err
+		return web.PohonKinerjaApi{}, err
 	}
 
 	return result, nil
