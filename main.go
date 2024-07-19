@@ -49,6 +49,16 @@ func main() {
 	layananspbeService := service.NewLayananSpbeService(layananspbeRepository, pohonkinerjaRepository, referensiarsitekturRepository, db, validate)
 	layananspbeController := controller.NewLayananSPBEController(layananspbeService)
 
+	//data dan informasi
+	datainformasiRepository := repository.NewDataDanInformasiRepository()
+	datainformasiService := service.NewDataDanInformasiService(datainformasiRepository, pohonkinerjaRepository, referensiarsitekturRepository, db, validate)
+	datainformasiController := controller.NewDataDanInformasiController(datainformasiService)
+
+	//aplikasi
+	aplikasiRepository := repository.NewAplikasiRepository()
+	aplikasiService := service.NewAplikasiService(aplikasiRepository, pohonkinerjaRepository, referensiarsitekturRepository, db, validate)
+	aplikasiController := controller.NewAplikasiController(aplikasiService)
+
 	//fetch opd
 	opdRepository := repository.NewOpdRepository()
 	opdService := service.NewOpdService(opdRepository, db)
@@ -59,7 +69,7 @@ func main() {
 	urusanService := service.NewUrusanService(urusanRepository, db)
 	urusanController := controller.NewUrusanController(urusanService)
 
-	router := app.NewRouter(referensiarsitekturController, prosesbisnisController, sasarankotaController, pohonkinerjaController, bidangurusanController, opdController, urusanController, layananspbeController)
+	router := app.NewRouter(referensiarsitekturController, prosesbisnisController, sasarankotaController, pohonkinerjaController, bidangurusanController, opdController, urusanController, layananspbeController, datainformasiController, aplikasiController)
 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},

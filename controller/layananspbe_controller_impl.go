@@ -112,7 +112,7 @@ func (controller *LayananSpbeControllerImpl) Update(writer http.ResponseWriter, 
 
 	webResponse := web.WebResponse{
 		Code:   200,
-		Status: "Success update proses bisnis",
+		Status: "Success update layanan spbe",
 		Data:   layananspbeResponse,
 	}
 

@@ -11,7 +11,7 @@ type RouteController struct {
 }
 
 func NewRouter(referensiarsitekturController controller.ReferensiArsitekturController,
-	prosesbisnisController controller.ProsesBisnisController, sasarankotaController controller.SasaranKotaController, pohonkinerja controller.PohonKinerjaController, bidangurusan controller.BidangUrusanController, opdController controller.OpdController, urusanController controller.UrusanController, layananspbeController controller.LayananSpbeController) *httprouter.Router {
+	prosesbisnisController controller.ProsesBisnisController, sasarankotaController controller.SasaranKotaController, pohonkinerja controller.PohonKinerjaController, bidangurusan controller.BidangUrusanController, opdController controller.OpdController, urusanController controller.UrusanController, layananspbeController controller.LayananSpbeController, datainformasiController controller.DataDanInformasiController, aplikasiController controller.AplikasiController) *httprouter.Router {
 	router := httprouter.New()
 
 	//referensi arsitektur router
@@ -54,6 +54,26 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.PUT("/v1/updatelayananspbe/:layananspbeId", layananspbeController.Update)
 	router.DELETE("/v1/deletelayananspbe/:layananspbeId", layananspbeController.Delete)
 	router.GET("/v1/Gaplayananspbe", layananspbeController.FindByNull)
+
+	//data dan informasi
+	router.GET("/v1/datainformasi", datainformasiController.FindByKodeOPD)
+	router.GET("/v1/datainformasi/:kodeOPD", datainformasiController.FindByKodeOPD)
+	router.GET("/v1/datainformasibytahun/:tahun", datainformasiController.FindByKodeOPD)
+	router.GET("/v1/datainformasi/:kodeOPD/:tahun", datainformasiController.FindByKodeOPD)
+	router.GET("/v1/datainformasibyid/:dataId", datainformasiController.FindById)
+	router.POST("/v1/createdatainformasi", datainformasiController.Insert)
+	router.PUT("/v1/updatedatainformasi/:dataId", datainformasiController.Update)
+	router.DELETE("/v1/deletedatainformasi/:dataId", datainformasiController.Delete)
+
+	//aplikasi
+	router.GET("/v1/aplikasi", aplikasiController.FindByKodeOPD)
+	router.GET("/v1/aplikasi/:kodeOPD", aplikasiController.FindByKodeOPD)
+	router.GET("/v1/aplikasibytahun/:tahun", aplikasiController.FindByKodeOPD)
+	router.GET("/v1/aplikasi/:kodeOPD/:tahun", aplikasiController.FindByKodeOPD)
+	router.GET("/v1/aplikasibyid/:aplikasiId", aplikasiController.FindById)
+	router.POST("/v1/createaplikasi", aplikasiController.Insert)
+	router.PUT("/v1/updateaplikasi/:aplikasiId", aplikasiController.Update)
+	router.DELETE("/v1/deleteaplikasi/:aplikasiId", aplikasiController.Delete)
 
 	//fetch api
 	router.GET("/sasarankotafetch", sasarankotaController.Insert)

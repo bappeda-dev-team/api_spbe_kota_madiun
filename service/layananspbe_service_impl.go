@@ -39,7 +39,6 @@ func (service *LayananSpbeServiceImpl) FindByKodeOpd(ctx context.Context, kodeOP
 
 	layananspbeList, err := service.LayananspbeRepository.FindByKodeOpd(ctx, tx, kodeOPD, tahun)
 	helper.PanicIfError(err)
-	helper.PanicIfError(err)
 
 	var responses []web.LayananSpbeRespons
 	for _, layananspbe := range layananspbeList {

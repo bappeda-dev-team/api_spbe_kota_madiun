@@ -130,6 +130,84 @@ func ToLayananSpbeRespons(layananSpbe domain.LayananSPBE) web.LayananSpbeRespons
 	}
 }
 
+func ToDataDanInformasiRespons(data domain.DataDanInformasi) web.DataDanInformasiRespons {
+	return web.DataDanInformasiRespons{
+		Id:                     data.Id,
+		NamaData:               data.NamaData,
+		SifatData:              data.SifatData,
+		JenisData:              data.JenisData,
+		ProdusenData:           data.ProdusenData,
+		PjData:                 data.PjData,
+		KodeOPD:                data.KodeOPD,
+		InformasiTerkaitInput:  data.InformasiTerkaitInput,
+		InformasiTerkaitOutput: data.InformasiTerkaitOutput,
+		Interoprabilitas:       data.Interoprabilitas,
+		Tahun:                  data.Tahun,
+		CreatedAt:              data.CreatedAt.Format("2006-01-02 15:04:05"),
+		UpdatedAt:              data.UpdatedAt.Format("2006-01-02 15:04:05"),
+		RadLevel1id: &web.DataDanInformasiReferensiArsitekturRespons{
+			Id: nullInt32ToInt(data.RadLevel1id),
+		},
+		RadLevel2id: &web.DataDanInformasiReferensiArsitekturRespons{
+			Id: nullInt32ToInt(data.RadLevel2id),
+		},
+		RadLevel3id: &web.DataDanInformasiReferensiArsitekturRespons{
+			Id: nullInt32ToInt(data.RadLevel3id),
+		},
+		RadLevel4id: &web.DataDanInformasiReferensiArsitekturRespons{
+			Id: nullInt32ToInt(data.RadLevel4id),
+		},
+		StrategicId: &web.DataDanInformasiPohonResponns{
+			ID: nullInt32ToInt(data.StrategicId),
+		},
+		TacticalId: &web.DataDanInformasiPohonResponns{
+			ID: nullInt32ToInt(data.TacticalId),
+		},
+		OperationalId: &web.DataDanInformasiPohonResponns{
+			ID: nullInt32ToInt(data.OperationalId),
+		},
+	}
+}
+
+func ToAplikasiRespons(aplikasi domain.Aplikasi) web.AplikasiRespons {
+	return web.AplikasiRespons{
+		Id:                     aplikasi.Id,
+		NamaAplikasi:           aplikasi.NamaAplikasi,
+		FungsiAplikasi:         aplikasi.FungsiAplikasi,
+		JenisAplikasi:          aplikasi.JenisAplikasi,
+		ProdusenAplikasi:       aplikasi.ProdusenAplikasi,
+		PjAplikasi:             aplikasi.PjAplikasi,
+		KodeOPD:                aplikasi.KodeOPD,
+		InformasiTerkaitInput:  aplikasi.InformasiTerkaitInput,
+		InformasiTerkaitOutput: aplikasi.InformasiTerkaitOutput,
+		Interoprabilitas:       aplikasi.Interoprabilitas,
+		Tahun:                  aplikasi.Tahun,
+		CreatedAt:              aplikasi.CreatedAt.Format("2006-01-02 15:04:05"),
+		UpdatedAt:              aplikasi.UpdatedAt.Format("2006-01-02 15:04:05"),
+		RaaLevel1id: &web.AplikasiReferensiArsitekturRespons{
+			Id: nullInt32ToInt(aplikasi.RaaLevel1id),
+		},
+		RaaLevel2id: &web.AplikasiReferensiArsitekturRespons{
+			Id: nullInt32ToInt(aplikasi.RaaLevel2id),
+		},
+		RaaLevel3id: &web.AplikasiReferensiArsitekturRespons{
+			Id: nullInt32ToInt(aplikasi.RaaLevel3id),
+		},
+		RaaLevel4id: &web.AplikasiReferensiArsitekturRespons{
+			Id: nullInt32ToInt(aplikasi.RaaLevel4id),
+		},
+		StrategicId: &web.AplikasiPohonRespons{
+			ID: nullInt32ToInt(aplikasi.StrategicId),
+		},
+		TacticalId: &web.AplikasiPohonRespons{
+			ID: nullInt32ToInt(aplikasi.TacticalId),
+		},
+		OperationalId: &web.AplikasiPohonRespons{
+			ID: nullInt32ToInt(aplikasi.OperationalId),
+		},
+	}
+}
+
 // get all
 func ToSasaranResponses(sasaran []domain.SasaranKota) []web.SasaranKotaRespons {
 	var sasaranKotaResponses []web.SasaranKotaRespons
