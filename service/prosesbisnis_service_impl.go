@@ -434,129 +434,56 @@ func (service *ProsesBisnisServiceImpl) Delete(ctx context.Context, prosesbisnis
 	service.ProsesBisnisRepository.Delete(ctx, tx, prosesBisnis)
 }
 
-func (service *ProsesBisnisServiceImpl) FindByNull(ctx context.Context) ([]web.ProsesBisnisRespons, error) {
+func (service *ProsesBisnisServiceImpl) GetProsesBisnisGrouped(ctx context.Context, kodeOpd string, tahun int) (web.ProsesBisnisGroupedResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
-		return nil, err
+		return web.ProsesBisnisGroupedResponse{}, err
 	}
 	defer helper.CommitOrRollback(tx)
 
-	prosesBisnisList, err := service.ProsesBisnisRepository.FindByNull(ctx, tx)
+	prosesBisnisList, err := service.ProsesBisnisRepository.GapProsesBisnis(ctx, tx, kodeOpd, tahun)
 	if err != nil {
-		return nil, err
+		return web.ProsesBisnisGroupedResponse{}, err
 	}
 
-	var responseList []web.ProsesBisnisRespons
-	for _, prosesBisnis := range prosesBisnisList {
-		response := web.ProsesBisnisRespons{
-			ID:               prosesBisnis.ID,
-			NamaProsesBisnis: prosesBisnis.NamaProsesBisnis,
-			KodeOPD:          prosesBisnis.KodeOPD,
-			KodeProsesBisnis: prosesBisnis.KodeProsesBisnis,
-			Tahun:            prosesBisnis.Tahun,
-			CreatedAt:        prosesBisnis.CreatedAt.Format("2006-01-02 15:04:05"),
-			UpdatedAt:        prosesBisnis.UpdatedAt.Format("2006-01-02 15:04:05"),
-		}
-
-		if prosesBisnis.SasaranKotaId.Valid {
-			sasarankotaData, err := service.SasaranKotaRepository.FindById(ctx, tx, int(prosesBisnis.SasaranKotaId.Int32))
-			if err != nil {
-				return nil, err
-			}
-			response.SasaranKota = &web.ProsbisSasaranKotaRespons{
-				ID:      sasarankotaData.ID,
-				Sasaran: sasarankotaData.Sasaran,
-			}
-		}
-
-		if prosesBisnis.BidangUrusanId.Valid {
-			bidangurusanData, err := service.BidangUrusanRepository.FindById(ctx, tx, int(prosesBisnis.BidangUrusanId.Int32))
-			if err != nil {
-				return nil, err
-			}
-			response.BidangUrusan = &web.ProsBisBidangUrusanRespons{
-				Id:           bidangurusanData.ID,
-				BidangUrusan: bidangurusanData.BidangUrusan,
-			}
-		}
-
-		if prosesBisnis.RabLevel1ID.Valid {
-			rabLevel1Data, err := service.ReferensiArsitekturRepository.FindById(ctx, tx, int(prosesBisnis.RabLevel1ID.Int32))
-			if err != nil {
-				return nil, err
-			}
-			response.RabLevel1 = &web.ProsBisReferensiArsitekturRespons{
-				Id:              rabLevel1Data.IdReferensi,
-				Kode_referensi:  rabLevel1Data.Kode_referensi,
-				Nama_referensi:  rabLevel1Data.Nama_referensi,
-				Level_referensi: rabLevel1Data.Level_referensi,
-			}
-		}
-
-		if prosesBisnis.RabLevel2ID.Valid {
-			rabLevel2Data, err := service.ReferensiArsitekturRepository.FindById(ctx, tx, int(prosesBisnis.RabLevel2ID.Int32))
-			if err != nil {
-				return nil, err
-			}
-			response.RabLevel2 = &web.ProsBisReferensiArsitekturRespons{
-				Id:              rabLevel2Data.IdReferensi,
-				Kode_referensi:  rabLevel2Data.Kode_referensi,
-				Nama_referensi:  rabLevel2Data.Nama_referensi,
-				Level_referensi: rabLevel2Data.Level_referensi,
-			}
-		}
-
-		if prosesBisnis.RabLevel3ID.Valid {
-			rabLevel3Data, err := service.ReferensiArsitekturRepository.FindById(ctx, tx, int(prosesBisnis.RabLevel3ID.Int32))
-			if err != nil {
-				return nil, err
-			}
-			response.RabLevel3 = &web.ProsBisReferensiArsitekturRespons{
-				Id:              rabLevel3Data.IdReferensi,
-				Kode_referensi:  rabLevel3Data.Kode_referensi,
-				Nama_referensi:  rabLevel3Data.Nama_referensi,
-				Level_referensi: rabLevel3Data.Level_referensi,
-			}
-		}
-
-		if prosesBisnis.StrategicId.Valid {
-			rabLevel4Data, err := service.PohonKinerjaRepository.FindById(ctx, tx, int(prosesBisnis.StrategicId.Int32))
-			if err != nil {
-				return nil, err
-			}
-			response.RabLevel4 = &web.ProsBisPohonKinerjaRespons{
-				ID:         rabLevel4Data.ID,
-				NamaPohon:  rabLevel4Data.NamaPohon,
-				LevelPohon: rabLevel4Data.LevelPohon,
-			}
-		}
-
-		if prosesBisnis.TacticalId.Valid {
-			rabLevel5Data, err := service.PohonKinerjaRepository.FindById(ctx, tx, int(prosesBisnis.TacticalId.Int32))
-			if err != nil {
-				return nil, err
-			}
-			response.RabLevel5 = &web.ProsBisPohonKinerjaRespons{
-				ID:         rabLevel5Data.ID,
-				NamaPohon:  rabLevel5Data.NamaPohon,
-				LevelPohon: rabLevel5Data.LevelPohon,
-			}
-		}
-
-		if prosesBisnis.OperationalId.Valid {
-			rabLevel6Data, err := service.PohonKinerjaRepository.FindById(ctx, tx, int(prosesBisnis.OperationalId.Int32))
-			if err != nil {
-				return nil, err
-			}
-			response.RabLevel6 = &web.ProsBisPohonKinerjaRespons{
-				ID:         rabLevel6Data.ID,
-				NamaPohon:  rabLevel6Data.NamaPohon,
-				LevelPohon: rabLevel6Data.LevelPohon,
-			}
-		}
-
-		responseList = append(responseList, response)
+	finalResponse := web.ProsesBisnisGroupedResponse{
+		Data: []web.ProsesBisnisData{},
 	}
 
-	return responseList, nil
+	for _, pb := range prosesBisnisList {
+		prosesBisnisResponse := web.ProsesBisnisResponse{
+			NamaProsesBisnis: pb.NamaProsesBisnis,
+			KodeProsesBisnis: pb.KodeProsesBisnis,
+			KodeOpd:          pb.KodeOpd,
+			Tahun:            pb.Tahun,
+			Layanans:         []web.Layanan{},
+			DataDanInformasi: []web.DataDanInformasi{},
+			Aplikasi:         []web.Aplikasi{},
+		}
+
+		for _, layanan := range pb.Layanan {
+			if layanan.NamaLayanan.Valid {
+				prosesBisnisResponse.Layanans = append(prosesBisnisResponse.Layanans, web.Layanan{NamaLayanan: layanan.NamaLayanan.String})
+			}
+		}
+
+		for _, data := range pb.DataDanInformasi {
+			if data.NamaData.Valid {
+				prosesBisnisResponse.DataDanInformasi = append(prosesBisnisResponse.DataDanInformasi, web.DataDanInformasi{NamaData: data.NamaData.String})
+			}
+		}
+
+		for _, aplikasi := range pb.Aplikasi {
+			if aplikasi.NamaAplikasi.Valid {
+				prosesBisnisResponse.Aplikasi = append(prosesBisnisResponse.Aplikasi, web.Aplikasi{NamaAplikasi: aplikasi.NamaAplikasi.String})
+			}
+		}
+
+		// Add to final response
+		finalResponse.Data = append(finalResponse.Data, web.ProsesBisnisData{
+			ProsesBisnis: []web.ProsesBisnisResponse{prosesBisnisResponse},
+		})
+	}
+
+	return finalResponse, nil
 }

@@ -132,22 +132,3 @@ func (controller *LayananSpbeControllerImpl) Delete(writer http.ResponseWriter, 
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
-func (controller *LayananSpbeControllerImpl) FindByNull(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	layananspbeService, err := controller.layananSpbeService.FindByNull(request.Context())
-	if err != nil {
-		webResponse := web.WebResponse{
-			Code:   500,
-			Status: "Internal Server Error",
-			Data:   nil,
-		}
-		helper.WriteToResponseBody(writer, webResponse)
-		return
-	}
-	webResponse := web.WebResponse{
-		Code:   200,
-		Status: "Success get null data layanan spbe",
-		Data:   layananspbeService,
-	}
-
-	helper.WriteToResponseBody(writer, webResponse)
-}

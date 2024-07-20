@@ -12,5 +12,4 @@ type LayananSpbeController interface {
 	Insert(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
-	FindByNull(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 }

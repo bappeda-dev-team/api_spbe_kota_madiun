@@ -12,5 +12,4 @@ type LayananSPBERepository interface {
 	Insert(ctx context.Context, tx *sql.Tx, layananspbe domain.LayananSPBE) domain.LayananSPBE
 	Update(ctx context.Context, tx *sql.Tx, layananspbe domain.LayananSPBE) domain.LayananSPBE
 	Delete(ctx context.Context, tx *sql.Tx, layananspbe domain.LayananSPBE)
-	FindByNull(ctx context.Context, tx *sql.Tx) ([]domain.LayananSPBE, error)
 }
