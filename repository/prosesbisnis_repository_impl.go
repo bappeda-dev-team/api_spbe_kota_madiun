@@ -107,7 +107,6 @@ func (repository *ProsesBisnisRepositoryImpl) Delete(ctx context.Context, tx *sq
 }
 
 func (repository *ProsesBisnisRepositoryImpl) GapProsesBisnis(ctx context.Context, tx *sql.Tx, kodeOpd string, tahun int) ([]domain.GapProsesBisnis, error) {
-	// Mulai dengan query dasar
 	query := `
 	  SELECT
         pb.id,
@@ -137,7 +136,6 @@ func (repository *ProsesBisnisRepositoryImpl) GapProsesBisnis(ctx context.Contex
         AND (l.tactical_id IS NOT NULL OR d.tactical_id IS NOT NULL OR a.tactical_id IS NOT NULL)
 	`
 
-	// Tambahkan filter opsional ke query
 	var args []interface{}
 	if kodeOpd != "" {
 		query += " AND pb.kode_opd = ?"
@@ -148,10 +146,8 @@ func (repository *ProsesBisnisRepositoryImpl) GapProsesBisnis(ctx context.Contex
 		args = append(args, tahun)
 	}
 
-	// Tambahkan ORDER BY
 	query += " ORDER BY pb.kode_opd, pb.id;"
 
-	// Eksekusi query
 	rows, err := tx.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
@@ -227,7 +223,7 @@ func (repository *ProsesBisnisRepositoryImpl) GapProsesBisnis(ctx context.Contex
 				})
 		} else {
 			pb.Aplikasi = append(pb.Aplikasi, domain.GapAplikasi{
-				NamaAplikasi: sql.NullString{}, // or with a default value if needed
+				NamaAplikasi: sql.NullString{},
 			})
 		}
 	}

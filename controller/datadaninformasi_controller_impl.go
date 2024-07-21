@@ -76,7 +76,6 @@ func (controller *DataDanInformasiControllerImpl) FindById(writer http.ResponseW
 		return
 	}
 
-	// Mengirimkan respons dengan data proses bisnis
 	webResponse := web.WebResponse{
 		Code:   http.StatusOK,
 		Status: "Success get data by id",

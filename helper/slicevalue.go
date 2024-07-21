@@ -31,27 +31,3 @@ func ContainAplikasi(aplikasi []web.GapAplikasi, app web.GapAplikasi) bool {
 	}
 	return false
 }
-
-// func IsValueInSlice(value interface{}, slice interface{}) bool {
-// 	switch s := slice.(type) {
-// 	case []web.GapLayanan:
-// 		for _, item := range s {
-// 			if item.NamaLayanan == value {
-// 				return true
-// 			}
-// 		}
-// 	case []web.GapDataDanInformasi:
-// 		for _, item := range s {
-// 			if item.NamaData == value {
-// 				return true
-// 			}
-// 		}
-// 	case []web.GapAplikasi:
-// 		for _, item := range s {
-// 			if item.NamaAplikasi == value {
-// 				return true
-// 			}
-// 		}
-// 	}
-// 	return false
-// }

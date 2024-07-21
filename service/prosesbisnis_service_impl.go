@@ -458,7 +458,6 @@ func (service *ProsesBisnisServiceImpl) GetProsesBisnisGrouped(ctx context.Conte
 
 		webPb := kodeOpdMap[pb.KodeOpd]
 
-		// Initialize slices if empty
 		if len(webPb.Layanans) == 0 {
 			webPb.Layanans = []web.GapLayanan{}
 		}
@@ -469,12 +468,11 @@ func (service *ProsesBisnisServiceImpl) GetProsesBisnisGrouped(ctx context.Conte
 			webPb.Aplikasi = []web.GapAplikasi{}
 		}
 
-		// Add unique values to slices
 		if pb.Layanan != nil {
 			for _, l := range pb.Layanan {
 				var webNullString web.NullString
 
-				if l.NamaLayanan.Valid { // Check if l.NamaLayanan has a value
+				if l.NamaLayanan.Valid {
 					webNullString.String = l.NamaLayanan.String
 					webNullString.Valid = true
 				}
@@ -489,7 +487,7 @@ func (service *ProsesBisnisServiceImpl) GetProsesBisnisGrouped(ctx context.Conte
 			for _, d := range pb.DataDanInformasi {
 				var webNullString web.NullString
 
-				if d.NamaData.Valid { // Check if l.NamaLayanan has a value
+				if d.NamaData.Valid {
 					webNullString.String = d.NamaData.String
 					webNullString.Valid = true
 				}
@@ -505,7 +503,7 @@ func (service *ProsesBisnisServiceImpl) GetProsesBisnisGrouped(ctx context.Conte
 
 				var webNullString web.NullString
 
-				if a.NamaAplikasi.Valid { // Check if l.NamaLayanan has a value
+				if a.NamaAplikasi.Valid {
 					webNullString.String = a.NamaAplikasi.String
 					webNullString.Valid = true
 				}

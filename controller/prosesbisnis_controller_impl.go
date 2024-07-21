@@ -78,7 +78,6 @@ func (controller *ProsesBisnisControllerImpl) FindById(writer http.ResponseWrite
 		return
 	}
 
-	// Mengirimkan respons dengan data proses bisnis
 	webResponse := web.WebResponse{
 		Code:   http.StatusOK,
 		Status: "Success get proses bisnis by id",
@@ -148,7 +147,7 @@ func (controller *ProsesBisnisControllerImpl) GetProsesBisnisGrouped(writer http
 
 	prosesBisnisResponse, err := controller.ProsesBisnisService.GetProsesBisnisGrouped(request.Context(), kodeOPD, tahun)
 	if err != nil {
-		log.Printf("Error getting proses bisnis grouped: %v", err)
+		log.Printf("Error getting Gap ESPBE: %v", err)
 		webResponse := web.WebResponse{
 			Code:   500,
 			Status: "Internal Server Error",
