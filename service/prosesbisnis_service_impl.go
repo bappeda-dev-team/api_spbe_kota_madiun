@@ -434,129 +434,95 @@ func (service *ProsesBisnisServiceImpl) Delete(ctx context.Context, prosesbisnis
 	service.ProsesBisnisRepository.Delete(ctx, tx, prosesBisnis)
 }
 
-func (service *ProsesBisnisServiceImpl) FindByNull(ctx context.Context) ([]web.ProsesBisnisRespons, error) {
+func (service *ProsesBisnisServiceImpl) GetProsesBisnisGrouped(ctx context.Context, kodeOpd string, tahun int) ([]web.GapProsesBisnis, error) {
 	tx, err := service.DB.Begin()
-	if err != nil {
-		return nil, err
-	}
+	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	prosesBisnisList, err := service.ProsesBisnisRepository.FindByNull(ctx, tx)
-	if err != nil {
-		return nil, err
+	prosesBisnisList, err := service.ProsesBisnisRepository.GapProsesBisnis(ctx, tx, kodeOpd, tahun)
+	helper.PanicIfError(err)
+
+	var webProsesBisnisList []web.GapProsesBisnis
+	kodeOpdMap := make(map[string]*web.GapProsesBisnis)
+
+	for _, pb := range prosesBisnisList {
+		if _, exists := kodeOpdMap[pb.KodeOpd]; !exists {
+			kodeOpdMap[pb.KodeOpd] = &web.GapProsesBisnis{
+				ID:               pb.ID,
+				KodeOpd:          pb.KodeOpd,
+				Tahun:            pb.Tahun,
+				NamaProsesBisnis: pb.NamaProsesBisnis,
+				KodeProsesBisnis: pb.KodeProsesBisnis,
+			}
+		}
+
+		webPb := kodeOpdMap[pb.KodeOpd]
+
+		// Initialize slices if empty
+		if len(webPb.Layanans) == 0 {
+			webPb.Layanans = []web.GapLayanan{}
+		}
+		if len(webPb.DataDanInformasi) == 0 {
+			webPb.DataDanInformasi = []web.GapDataDanInformasi{}
+		}
+		if len(webPb.Aplikasi) == 0 {
+			webPb.Aplikasi = []web.GapAplikasi{}
+		}
+
+		// Add unique values to slices
+		if pb.Layanan != nil {
+			for _, l := range pb.Layanan {
+				var webNullString web.NullString
+
+				if l.NamaLayanan.Valid { // Check if l.NamaLayanan has a value
+					webNullString.String = l.NamaLayanan.String
+					webNullString.Valid = true
+				}
+
+				tempLayanan := web.GapLayanan{NamaLayanan: webNullString}
+				if !helper.ContainsLayanan(webPb.Layanans, tempLayanan) {
+					webPb.Layanans = append(webPb.Layanans, web.GapLayanan{NamaLayanan: webNullString})
+				}
+			}
+		}
+		if pb.DataDanInformasi != nil {
+			for _, d := range pb.DataDanInformasi {
+				var webNullString web.NullString
+
+				if d.NamaData.Valid { // Check if l.NamaLayanan has a value
+					webNullString.String = d.NamaData.String
+					webNullString.Valid = true
+				}
+
+				tempData := web.GapDataDanInformasi{NamaData: webNullString}
+				if !helper.ContainData(webPb.DataDanInformasi, tempData) {
+					webPb.DataDanInformasi = append(webPb.DataDanInformasi, web.GapDataDanInformasi{NamaData: webNullString})
+				}
+			}
+		}
+		if pb.Aplikasi != nil {
+			for _, a := range pb.Aplikasi {
+
+				var webNullString web.NullString
+
+				if a.NamaAplikasi.Valid { // Check if l.NamaLayanan has a value
+					webNullString.String = a.NamaAplikasi.String
+					webNullString.Valid = true
+				}
+
+				temAplikasi := web.GapAplikasi{NamaAplikasi: webNullString}
+				if !helper.ContainAplikasi(webPb.Aplikasi, temAplikasi) {
+					webPb.Aplikasi = append(webPb.Aplikasi, web.GapAplikasi{NamaAplikasi: webNullString})
+				}
+
+			}
+
+		}
 	}
 
-	var responseList []web.ProsesBisnisRespons
-	for _, prosesBisnis := range prosesBisnisList {
-		response := web.ProsesBisnisRespons{
-			ID:               prosesBisnis.ID,
-			NamaProsesBisnis: prosesBisnis.NamaProsesBisnis,
-			KodeOPD:          prosesBisnis.KodeOPD,
-			KodeProsesBisnis: prosesBisnis.KodeProsesBisnis,
-			Tahun:            prosesBisnis.Tahun,
-			CreatedAt:        prosesBisnis.CreatedAt.Format("2006-01-02 15:04:05"),
-			UpdatedAt:        prosesBisnis.UpdatedAt.Format("2006-01-02 15:04:05"),
-		}
-
-		if prosesBisnis.SasaranKotaId.Valid {
-			sasarankotaData, err := service.SasaranKotaRepository.FindById(ctx, tx, int(prosesBisnis.SasaranKotaId.Int32))
-			if err != nil {
-				return nil, err
-			}
-			response.SasaranKota = &web.ProsbisSasaranKotaRespons{
-				ID:      sasarankotaData.ID,
-				Sasaran: sasarankotaData.Sasaran,
-			}
-		}
-
-		if prosesBisnis.BidangUrusanId.Valid {
-			bidangurusanData, err := service.BidangUrusanRepository.FindById(ctx, tx, int(prosesBisnis.BidangUrusanId.Int32))
-			if err != nil {
-				return nil, err
-			}
-			response.BidangUrusan = &web.ProsBisBidangUrusanRespons{
-				Id:           bidangurusanData.ID,
-				BidangUrusan: bidangurusanData.BidangUrusan,
-			}
-		}
-
-		if prosesBisnis.RabLevel1ID.Valid {
-			rabLevel1Data, err := service.ReferensiArsitekturRepository.FindById(ctx, tx, int(prosesBisnis.RabLevel1ID.Int32))
-			if err != nil {
-				return nil, err
-			}
-			response.RabLevel1 = &web.ProsBisReferensiArsitekturRespons{
-				Id:              rabLevel1Data.IdReferensi,
-				Kode_referensi:  rabLevel1Data.Kode_referensi,
-				Nama_referensi:  rabLevel1Data.Nama_referensi,
-				Level_referensi: rabLevel1Data.Level_referensi,
-			}
-		}
-
-		if prosesBisnis.RabLevel2ID.Valid {
-			rabLevel2Data, err := service.ReferensiArsitekturRepository.FindById(ctx, tx, int(prosesBisnis.RabLevel2ID.Int32))
-			if err != nil {
-				return nil, err
-			}
-			response.RabLevel2 = &web.ProsBisReferensiArsitekturRespons{
-				Id:              rabLevel2Data.IdReferensi,
-				Kode_referensi:  rabLevel2Data.Kode_referensi,
-				Nama_referensi:  rabLevel2Data.Nama_referensi,
-				Level_referensi: rabLevel2Data.Level_referensi,
-			}
-		}
-
-		if prosesBisnis.RabLevel3ID.Valid {
-			rabLevel3Data, err := service.ReferensiArsitekturRepository.FindById(ctx, tx, int(prosesBisnis.RabLevel3ID.Int32))
-			if err != nil {
-				return nil, err
-			}
-			response.RabLevel3 = &web.ProsBisReferensiArsitekturRespons{
-				Id:              rabLevel3Data.IdReferensi,
-				Kode_referensi:  rabLevel3Data.Kode_referensi,
-				Nama_referensi:  rabLevel3Data.Nama_referensi,
-				Level_referensi: rabLevel3Data.Level_referensi,
-			}
-		}
-
-		if prosesBisnis.StrategicId.Valid {
-			rabLevel4Data, err := service.PohonKinerjaRepository.FindById(ctx, tx, int(prosesBisnis.StrategicId.Int32))
-			if err != nil {
-				return nil, err
-			}
-			response.RabLevel4 = &web.ProsBisPohonKinerjaRespons{
-				ID:         rabLevel4Data.ID,
-				NamaPohon:  rabLevel4Data.NamaPohon,
-				LevelPohon: rabLevel4Data.LevelPohon,
-			}
-		}
-
-		if prosesBisnis.TacticalId.Valid {
-			rabLevel5Data, err := service.PohonKinerjaRepository.FindById(ctx, tx, int(prosesBisnis.TacticalId.Int32))
-			if err != nil {
-				return nil, err
-			}
-			response.RabLevel5 = &web.ProsBisPohonKinerjaRespons{
-				ID:         rabLevel5Data.ID,
-				NamaPohon:  rabLevel5Data.NamaPohon,
-				LevelPohon: rabLevel5Data.LevelPohon,
-			}
-		}
-
-		if prosesBisnis.OperationalId.Valid {
-			rabLevel6Data, err := service.PohonKinerjaRepository.FindById(ctx, tx, int(prosesBisnis.OperationalId.Int32))
-			if err != nil {
-				return nil, err
-			}
-			response.RabLevel6 = &web.ProsBisPohonKinerjaRespons{
-				ID:         rabLevel6Data.ID,
-				NamaPohon:  rabLevel6Data.NamaPohon,
-				LevelPohon: rabLevel6Data.LevelPohon,
-			}
-		}
-
-		responseList = append(responseList, response)
+	for _, webPb := range kodeOpdMap {
+		webProsesBisnisList = append(webProsesBisnisList, *webPb)
 	}
 
-	return responseList, nil
+	return webProsesBisnisList, nil
 }

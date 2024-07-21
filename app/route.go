@@ -31,7 +31,6 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.POST("/v1/createprosesbisnis", prosesbisnisController.Insert)
 	router.PUT("/v1/updateprosesbisnis/:prosesbisnisId", prosesbisnisController.Update)
 	router.DELETE("/v1/deleteprosesbisnis/:prosesbisnisId", prosesbisnisController.Delete)
-	router.GET("/v1/GapProsesBisnis", prosesbisnisController.FindByNull)
 
 	//sasaran kota
 	router.GET("/v1/sasarankota/:sasarankotaId", sasarankotaController.FindById)
@@ -53,7 +52,6 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.POST("/v1/createlayananspbe", layananspbeController.Insert)
 	router.PUT("/v1/updatelayananspbe/:layananspbeId", layananspbeController.Update)
 	router.DELETE("/v1/deletelayananspbe/:layananspbeId", layananspbeController.Delete)
-	router.GET("/v1/Gaplayananspbe", layananspbeController.FindByNull)
 
 	//data dan informasi
 	router.GET("/v1/datainformasi", datainformasiController.FindByKodeOPD)
@@ -81,6 +79,10 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.GET("/opdafetch", opdController.FetchApiOpd)
 	router.GET("/urusanfetch", urusanController.FetchApiUrusan)
 	router.GET("/bidangurusanfetch", bidangurusan.FetchBidangUrusan)
+
+	//GAP SPBE
+	router.GET("/v1/GapSPBE", prosesbisnisController.GetProsesBisnisGrouped)
+	router.GET("/v1/gapSPBE/:kodeOPD", prosesbisnisController.GetProsesBisnisGrouped)
 
 	router.PanicHandler = exception.ErrorHandler
 

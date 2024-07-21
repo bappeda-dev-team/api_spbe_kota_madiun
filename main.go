@@ -19,18 +19,20 @@ func main() {
 	db := app.GetConnection()
 	validate := validator.New()
 
-	//referensi arsitektur
+	//repository
 	referensiarsitekturRepository := repository.NewReferensiArsitekturRepository()
-	referesiarsitekturService := service.NewReferensiArsitekturService(referensiarsitekturRepository, db, validate)
-	referensiarsitekturController := controller.NewReferensiarstitekturController(referesiarsitekturService)
-
-	//proses bisnis
 	prosesbisnisRepository := repository.NewProsesBisnisRepository()
 	pohonkinerjaRepository := repository.NewPohonKinerjaRepository()
 	sasarankotaRepository := repository.NewSasaranKotaRepository()
 	bidangurusanRepository := repository.NewBidangUrusanRepository()
-	prosesbisnisService := service.NewProsesBisnisService(referensiarsitekturRepository, sasarankotaRepository, bidangurusanRepository, prosesbisnisRepository, pohonkinerjaRepository, db, validate)
-	prosesbisnisController := controller.NewProsesBisnisController(prosesbisnisService)
+	layananspbeRepository := repository.NewLayananSPBERepository()
+	datainformasiRepository := repository.NewDataDanInformasiRepository()
+	opdRepository := repository.NewOpdRepository()
+	urusanRepository := repository.NewUrusanRepository()
+
+	//referensi arsitektur
+	referesiarsitekturService := service.NewReferensiArsitekturService(referensiarsitekturRepository, db, validate)
+	referensiarsitekturController := controller.NewReferensiarstitekturController(referesiarsitekturService)
 
 	//sasaran kota
 	sasarankotaService := service.NewSasaranKotaService(sasarankotaRepository, db)
@@ -45,12 +47,10 @@ func main() {
 	bidangurusanController := controller.NewBidangUrusanController(bidangurusanService)
 
 	//layanan spbe
-	layananspbeRepository := repository.NewLayananSPBERepository()
 	layananspbeService := service.NewLayananSpbeService(layananspbeRepository, pohonkinerjaRepository, referensiarsitekturRepository, db, validate)
 	layananspbeController := controller.NewLayananSPBEController(layananspbeService)
 
 	//data dan informasi
-	datainformasiRepository := repository.NewDataDanInformasiRepository()
 	datainformasiService := service.NewDataDanInformasiService(datainformasiRepository, pohonkinerjaRepository, referensiarsitekturRepository, db, validate)
 	datainformasiController := controller.NewDataDanInformasiController(datainformasiService)
 
@@ -59,13 +59,15 @@ func main() {
 	aplikasiService := service.NewAplikasiService(aplikasiRepository, pohonkinerjaRepository, referensiarsitekturRepository, db, validate)
 	aplikasiController := controller.NewAplikasiController(aplikasiService)
 
+	//prosbis
+	prosesbisnisService := service.NewProsesBisnisService(referensiarsitekturRepository, sasarankotaRepository, bidangurusanRepository, prosesbisnisRepository, pohonkinerjaRepository, db, validate)
+	prosesbisnisController := controller.NewProsesBisnisController(prosesbisnisService)
+
 	//fetch opd
-	opdRepository := repository.NewOpdRepository()
 	opdService := service.NewOpdService(opdRepository, db)
 	opdController := controller.NewOpdController(opdService)
 
 	// fetch urusan
-	urusanRepository := repository.NewUrusanRepository()
 	urusanService := service.NewUrusanService(urusanRepository, db)
 	urusanController := controller.NewUrusanController(urusanService)
 

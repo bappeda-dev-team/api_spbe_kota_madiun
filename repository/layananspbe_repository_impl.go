@@ -124,20 +124,3 @@ func (repository *LayananSPBERepositoryImpl) Delete(ctx context.Context, tx *sql
 	helper.PanicIfError(err)
 
 }
-func (repository *LayananSPBERepositoryImpl) FindByNull(ctx context.Context, tx *sql.Tx) ([]domain.LayananSPBE, error) {
-	script := "SELECT id, nama_layanan, kode_layanan, tujuan_layanan_id, fungsi_layanan, tahun, kode_opd, kementrian_terkait, metode_layanan, created_at, updated_at, ral_level_1_id, ral_level_2_id, ral_level_3_id, ral_level_4_id, strategic_id, tactical_id, operational_id FROM layanan_spbe WHERE operational_id is null or nama_layanan is null or kode_layanan is null or tujuan_layanan_id is null or fungsi_layanan is null or tahun is null or kode_opd is null or kementrian_terkait is null or metode_layanan is null or created_at is null or updated_at is null or ral_level_1_id is null or ral_level_2_id is null or ral_level_3_id is null or ral_level_4_id is null or ral_level_5_id is null, ral_level_6_id is null, ral_level_7_id is null "
-
-	rows, err := tx.QueryContext(ctx, script)
-	helper.PanicIfError(err)
-	defer rows.Close()
-
-	var layananspbeList []domain.LayananSPBE
-	for rows.Next() {
-		var layananspbe domain.LayananSPBE
-		err := rows.Scan(&layananspbe.Id, &layananspbe.NamaLayanan, &layananspbe.KodeLayanan, &layananspbe.TujuanLayananId, &layananspbe.FungsiLayanan, &layananspbe.Tahun, &layananspbe.KodeOPD, &layananspbe.KementrianTerkait, &layananspbe.MetodeLayanan, &layananspbe.CreatedAt, &layananspbe.UpdatedAt, &layananspbe.RalLevel1id, &layananspbe.RalLevel2id, &layananspbe.RalLevel3id, &layananspbe.RalLevel4id, &layananspbe.StrategicId, &layananspbe.TacticalId, &layananspbe.OperationalId)
-		helper.PanicIfError(err)
-		layananspbeList = append(layananspbeList, layananspbe)
-	}
-
-	return layananspbeList, nil
-}

@@ -11,5 +11,4 @@ type LayananSpbeService interface {
 	Insert(ctx context.Context, request web.LayananSpbeCreateRequest) web.LayananSpbeRespons
 	Update(ctx context.Context, request web.LayananSpbeUpdateRequest) web.LayananSpbeRespons
 	Delete(ctx context.Context, layananspbeId int)
-	FindByNull(ctx context.Context) ([]web.LayananSpbeRespons, error)
 }

@@ -11,5 +11,5 @@ type ProsesBisnisService interface {
 	Insert(ctx context.Context, request web.ProsesBisnisCreateRequest) web.ProsesBisnisRespons
 	Update(ctx context.Context, request web.ProsesBisnisUpdateRequest) web.ProsesBisnisRespons
 	Delete(ctx context.Context, prosesbisnisId int)
-	FindByNull(ctx context.Context) ([]web.ProsesBisnisRespons, error)
+	GetProsesBisnisGrouped(ctx context.Context, kodeOPD string, tahun int) ([]web.GapProsesBisnis, error)
 }

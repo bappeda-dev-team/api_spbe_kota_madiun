@@ -36,7 +36,7 @@ func (repository *DataDanInformasiRepositoryImpl) FindByKodeOpd(ctx context.Cont
 	var datainformasiList []domain.DataDanInformasi
 	for rows.Next() {
 		var data domain.DataDanInformasi
-		err := rows.Scan(&data.Id, &data.NamaData, &data.SifatData, &data.JenisData, &data.ProdusenData, &data.ProdusenData, &data.PjData, &data.InformasiTerkaitInput, &data.InformasiTerkaitOutput, &data.KodeOPD, &data.Tahun, &data.Interoprabilitas, &data.CreatedAt, &data.UpdatedAt, &data.RadLevel1id, &data.RadLevel2id, &data.RadLevel3id, &data.RadLevel4id, &data.StrategicId, &data.TacticalId, &data.OperationalId)
+		err := rows.Scan(&data.Id, &data.NamaData, &data.SifatData, &data.JenisData, &data.ProdusenData, &data.PjData, &data.InformasiTerkaitInput, &data.InformasiTerkaitOutput, &data.Interoprabilitas, &data.KodeOPD, &data.Tahun, &data.CreatedAt, &data.UpdatedAt, &data.RadLevel1id, &data.RadLevel2id, &data.RadLevel3id, &data.RadLevel4id, &data.StrategicId, &data.TacticalId, &data.OperationalId)
 		helper.PanicIfError(err)
 		datainformasiList = append(datainformasiList, data)
 	}
