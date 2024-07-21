@@ -44,8 +44,7 @@ func (service *SasaranKotaServiceImpl) FindAll(ctx context.Context) []web.Sasara
 	return helper.ToSasaranResponses(sasaran)
 }
 
-
-func (service *SasaranKotaServiceImpl) InsertApi(ctx context.Context) (web.SasaranKotaApi, error){
+func (service *SasaranKotaServiceImpl) InsertApi(ctx context.Context) (web.SasaranKotaApi, error) {
 	tx, err := service.DB.BeginTx(ctx, nil)
 	if err != nil {
 		log.Println("Error starting transaction:", err)
