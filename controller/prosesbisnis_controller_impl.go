@@ -4,6 +4,7 @@ import (
 	"api_spbe_kota_madiun/helper"
 	"api_spbe_kota_madiun/model/web"
 	"api_spbe_kota_madiun/service"
+	"log"
 
 	"net/http"
 	"strconv"
@@ -77,7 +78,6 @@ func (controller *ProsesBisnisControllerImpl) FindById(writer http.ResponseWrite
 		return
 	}
 
-	// Mengirimkan respons dengan data proses bisnis
 	webResponse := web.WebResponse{
 		Code:   http.StatusOK,
 		Status: "Success get proses bisnis by id",
@@ -133,17 +133,34 @@ func (controller *ProsesBisnisControllerImpl) Delete(writer http.ResponseWriter,
 	helper.WriteToResponseBody(writer, webResponse)
 }
 
-func (controller *ProsesBisnisControllerImpl) FindByNull(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	prosesBisnisService, err := controller.ProsesBisnisService.FindByNull(request.Context())
+func (controller *ProsesBisnisControllerImpl) GetProsesBisnisGrouped(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	kodeOPD := params.ByName("kodeOPD")
+	tahunStr := params.ByName("tahun")
+
+	var tahun int
+	var err error
+
+	if tahunStr != "" {
+		tahun, err = strconv.Atoi(tahunStr)
+		helper.PanicIfError(err)
+	}
+
+	prosesBisnisResponse, err := controller.ProsesBisnisService.GetProsesBisnisGrouped(request.Context(), kodeOPD, tahun)
 	if err != nil {
-		http.Error(writer, "Failed to fetch data", http.StatusInternalServerError)
+		log.Printf("Error getting Gap ESPBE: %v", err)
+		webResponse := web.WebResponse{
+			Code:   500,
+			Status: "Internal Server Error",
+			Data:   nil,
+		}
+		helper.WriteToResponseBody(writer, webResponse)
 		return
 	}
 
 	webResponse := web.WebResponse{
 		Code:   200,
-		Status: "Success get all Bidang Urusan",
-		Data:   prosesBisnisService,
+		Status: "Success get GAP ESPBE",
+		Data:   prosesBisnisResponse,
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)

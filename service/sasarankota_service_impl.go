@@ -7,6 +7,7 @@ import (
 	"api_spbe_kota_madiun/repository"
 	"context"
 	"database/sql"
+	"log"
 )
 
 type SasaranKotaServiceImpl struct {
@@ -41,4 +42,29 @@ func (service *SasaranKotaServiceImpl) FindAll(ctx context.Context) []web.Sasara
 
 	sasaran := service.SasaranKotaRepository.FindAll(ctx, tx)
 	return helper.ToSasaranResponses(sasaran)
+}
+
+func (service *SasaranKotaServiceImpl) InsertApi(ctx context.Context) (web.SasaranKotaApi, error) {
+	tx, err := service.DB.BeginTx(ctx, nil)
+	if err != nil {
+		log.Println("Error starting transaction:", err)
+		return web.SasaranKotaApi{}, err
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			tx.Rollback()
+		} else {
+			err = tx.Commit()
+		}
+	}()
+	result, err := service.SasaranKotaRepository.InsertApi(ctx, tx)
+	if err != nil {
+		log.Println("Error fetching and inserting API data:", err)
+		return web.SasaranKotaApi{}, err
+	}
+
+	return result, nil
 }

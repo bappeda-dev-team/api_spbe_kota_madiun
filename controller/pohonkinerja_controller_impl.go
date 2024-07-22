@@ -47,3 +47,18 @@ func (controller *PohonKinerjaControllerImpl) FindAll(writer http.ResponseWriter
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
+
+func (controller *PohonKinerjaControllerImpl) FetchApiPohon(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	pohonKinerjaApiResponse, err := controller.PohonKinerjaService.InsertApi(request.Context())
+	if err != nil {
+		helper.PanicIfError(err)
+	}
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "Success fetching and inserting Pohon Kinerja",
+		Data:   pohonKinerjaApiResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}

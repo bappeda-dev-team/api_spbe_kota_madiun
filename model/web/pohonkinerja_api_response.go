@@ -2,6 +2,7 @@ package web
 
 type PohonKinerjaApi struct {
 	ID         int    `json:"id"`
+	Parent     string `json:"parent"`
 	JenisPohon string `json:"jenis_pohon"`
 	LevelPohon int    `json:"level_pohon"`
 	Strategi   string `json:"strategi"`

@@ -1,0 +1,1 @@
+ALTER TABLE pohon_kinerja ADD COLUMN parent VARCHAR(255);

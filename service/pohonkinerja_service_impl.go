@@ -7,6 +7,7 @@ import (
 	"api_spbe_kota_madiun/repository"
 	"context"
 	"database/sql"
+	"log"
 )
 
 type PohonKinerjaServiceImpl struct {
@@ -41,4 +42,29 @@ func (service *PohonKinerjaServiceImpl) FindAll(ctx context.Context) []web.Pohon
 
 	pohon := service.PohonKinerjaRepository.FindAll(ctx, tx)
 	return helper.ToPohonResponses(pohon)
+}
+
+func (service *PohonKinerjaServiceImpl) InsertApi(ctx context.Context) (web.PohonKinerjaApi, error) {
+	tx, err := service.DB.BeginTx(ctx, nil)
+	if err != nil {
+		log.Println("Error starting transaction:", err)
+		return web.PohonKinerjaApi{}, err
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			tx.Rollback()
+		} else {
+			err = tx.Commit()
+		}
+	}()
+	result, err := service.PohonKinerjaRepository.InsertApi(ctx, tx)
+	if err != nil {
+		log.Println("Error fetching and inserting API data:", err)
+		return web.PohonKinerjaApi{}, err
+	}
+
+	return result, nil
 }

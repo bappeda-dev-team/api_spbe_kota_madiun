@@ -1,1 +1,1 @@
-ALTER TABLE proses_bisnis DROP FOREIGN KEY fk_sasaran_kota_id;
+ALTER TABLE proses_bisnis DROP FOREIGN KEY proses_bisnis_ibfk_1;

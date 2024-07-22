@@ -7,4 +7,5 @@ import (
 
 type BidangUrusanService interface {
 	FindAll(ctx context.Context) []web.BidangUrusanRespons
+	FetchUrusan(ctx context.Context) (web.BidangUrusanOPD, error)
 }

@@ -87,6 +87,11 @@ open cmd dan ketikkan:
 go install -tags 'mysql' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 ```
 
+- add create migration
+``` sh
+migrate create -ext sql -dir db/migrations create_new_table
+```
+
 ### Run server
 - running untuk macos
 ``` sh
