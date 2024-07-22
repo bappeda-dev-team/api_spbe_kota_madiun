@@ -17,11 +17,9 @@ COPY . .
 
 RUN go mod tidy
 
-RUN go build -o api cmd/main.go
+RUN go build -o api main.go
 
 ENTRYPOINT ["/app/api"]
 
 CMD ["app/api"]
 
-
-MAINTAINER RyanB1303 <ryan.brilliant.nirwana@gmail.com>
