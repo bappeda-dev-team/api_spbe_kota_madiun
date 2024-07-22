@@ -193,9 +193,6 @@ func ToAplikasiRespons(aplikasi domain.Aplikasi) web.AplikasiRespons {
 		RaaLevel3id: &web.AplikasiReferensiArsitekturRespons{
 			Id: nullInt32ToInt(aplikasi.RaaLevel3id),
 		},
-		RaaLevel4id: &web.AplikasiReferensiArsitekturRespons{
-			Id: nullInt32ToInt(aplikasi.RaaLevel4id),
-		},
 		StrategicId: &web.AplikasiPohonRespons{
 			ID: nullInt32ToInt(aplikasi.StrategicId),
 		},

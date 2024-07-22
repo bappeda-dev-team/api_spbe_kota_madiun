@@ -18,7 +18,7 @@ func NewAplikasiRepository() AplikasiRepository {
 
 func (repository *AplikasiRepositoryImpl) FindByKodeOpd(ctx context.Context, tx *sql.Tx, kodeOPD string, tahun int) ([]domain.Aplikasi, error) {
 	script := `
-		SELECT id, nama_aplikasi, fungsi_aplikasi, jenis_aplikasi, produsen_aplikasi, pj_aplikasi, informasi_terkait_input, informasi_terkait_output, interoprabilitas, kode_opd, tahun, created_at, updated_at, raa_level_1_id, raa_level_2_id, raa_level_3_id, raa_level_4_id, strategic_id, tactical_id, operational_id
+		SELECT id, nama_aplikasi, fungsi_aplikasi, jenis_aplikasi, produsen_aplikasi, pj_aplikasi, informasi_terkait_input, informasi_terkait_output, interoprabilitas, kode_opd, tahun, created_at, updated_at, raa_level_1_id, raa_level_2_id, raa_level_3_id, strategic_id, tactical_id, operational_id
 		FROM aplikasi
 		WHERE 1=1
 	`
@@ -57,7 +57,6 @@ func (repository *AplikasiRepositoryImpl) FindByKodeOpd(ctx context.Context, tx 
 			&aplikasi.RaaLevel1id,
 			&aplikasi.RaaLevel2id,
 			&aplikasi.RaaLevel3id,
-			&aplikasi.RaaLevel4id,
 			&aplikasi.StrategicId,
 			&aplikasi.TacticalId,
 			&aplikasi.OperationalId,
@@ -76,7 +75,7 @@ func (repository *AplikasiRepositoryImpl) FindByKodeOpd(ctx context.Context, tx 
 }
 
 func (repository *AplikasiRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, aplikasiId int) (domain.Aplikasi, error) {
-	script := "SELECT id, nama_aplikasi, fungsi_aplikasi, jenis_aplikasi, produsen_aplikasi, pj_aplikasi, informasi_terkait_input, informasi_terkait_output, interoprabilitas, kode_opd, tahun, created_at, updated_at, raa_level_1_id, raa_level_2_id, raa_level_3_id, raa_level_4_id, strategic_id, tactical_id, operational_id FROM aplikasi WHERE id = ?"
+	script := "SELECT id, nama_aplikasi, fungsi_aplikasi, jenis_aplikasi, produsen_aplikasi, pj_aplikasi, informasi_terkait_input, informasi_terkait_output, interoprabilitas, kode_opd, tahun, created_at, updated_at, raa_level_1_id, raa_level_2_id, raa_level_3_id, strategic_id, tactical_id, operational_id FROM aplikasi WHERE id = ?"
 	rows, err := tx.QueryContext(ctx, script, aplikasiId)
 	helper.PanicIfError(err)
 	defer rows.Close()
@@ -101,7 +100,6 @@ func (repository *AplikasiRepositoryImpl) FindById(ctx context.Context, tx *sql.
 			&aplikasi.RaaLevel1id,
 			&aplikasi.RaaLevel2id,
 			&aplikasi.RaaLevel3id,
-			&aplikasi.RaaLevel4id,
 			&aplikasi.StrategicId,
 			&aplikasi.TacticalId,
 			&aplikasi.OperationalId,
@@ -118,7 +116,7 @@ func (repository *AplikasiRepositoryImpl) Insert(ctx context.Context, tx *sql.Tx
 	aplikasi.CreatedAt = currentTime
 	aplikasi.UpdatedAt = currentTime
 
-	script := "INSERT INTO aplikasi (nama_aplikasi, fungsi_aplikasi, jenis_aplikasi, produsen_aplikasi, pj_aplikasi, informasi_terkait_input, informasi_terkait_output, interoprabilitas, kode_opd, tahun, created_at, updated_at, raa_level_1_id, raa_level_2_id, raa_level_3_id, raa_level_4_id, strategic_id, tactical_id, operational_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	script := "INSERT INTO aplikasi (nama_aplikasi, fungsi_aplikasi, jenis_aplikasi, produsen_aplikasi, pj_aplikasi, informasi_terkait_input, informasi_terkait_output, interoprabilitas, kode_opd, tahun, created_at, updated_at, raa_level_1_id, raa_level_2_id, raa_level_3_id, strategic_id, tactical_id, operational_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 
 	result, err := tx.ExecContext(ctx, script,
 		aplikasi.NamaAplikasi,
@@ -136,7 +134,6 @@ func (repository *AplikasiRepositoryImpl) Insert(ctx context.Context, tx *sql.Tx
 		aplikasi.RaaLevel1id,
 		aplikasi.RaaLevel2id,
 		aplikasi.RaaLevel3id,
-		aplikasi.RaaLevel4id,
 		aplikasi.StrategicId,
 		aplikasi.TacticalId,
 		aplikasi.OperationalId,
@@ -170,7 +167,6 @@ func (repository *AplikasiRepositoryImpl) Update(ctx context.Context, tx *sql.Tx
 			raa_level_1_id = ?, 
 			raa_level_2_id = ?, 
 			raa_level_3_id = ?, 
-			raa_level_4_id = ?, 
 			strategic_id = ?, 
 			tactical_id = ?, 
 			operational_id = ? 
@@ -192,7 +188,6 @@ func (repository *AplikasiRepositoryImpl) Update(ctx context.Context, tx *sql.Tx
 		aplikasi.RaaLevel1id,
 		aplikasi.RaaLevel2id,
 		aplikasi.RaaLevel3id,
-		aplikasi.RaaLevel4id,
 		aplikasi.StrategicId,
 		aplikasi.TacticalId,
 		aplikasi.OperationalId,

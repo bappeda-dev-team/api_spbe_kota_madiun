@@ -15,7 +15,6 @@ type AplikasiUpdateRespons struct {
 	RaaLevel1id            int    `json:"raa_level_1_id"`
 	RaaLevel2id            int    `json:"raa_level_2_id"`
 	RaaLevel3id            int    `json:"raa_level_3_id"`
-	RaaLevel4id            int    `json:"raa_level_4_id"`
 	StrategicId            int    `json:"strategic_id"`
 	TacticalId             int    `json:"tactical_id"`
 	OperationalId          int    `json:"operational_id"`
