@@ -413,8 +413,8 @@ func (service *ProsesBisnisServiceImpl) Update(ctx context.Context, request web.
 	prosesBisnis.RabLevel1ID = sql.NullInt32{Int32: int32(request.RabLevel1ID), Valid: request.RabLevel1ID != 0}
 	prosesBisnis.RabLevel2ID = sql.NullInt32{Int32: int32(request.RabLevel2ID), Valid: request.RabLevel2ID != 0}
 	prosesBisnis.RabLevel3ID = sql.NullInt32{Int32: int32(request.RabLevel3ID), Valid: request.RabLevel3ID != 0}
-	prosesBisnis.TacticalId = sql.NullInt32{Int32: int32(request.RabLevel4ID), Valid: request.RabLevel4ID != 0}
-	prosesBisnis.StrategicId = sql.NullInt32{Int32: int32(request.RabLevel5ID), Valid: request.RabLevel5ID != 0}
+	prosesBisnis.StrategicId = sql.NullInt32{Int32: int32(request.RabLevel4ID), Valid: request.RabLevel4ID != 0}
+	prosesBisnis.TacticalId = sql.NullInt32{Int32: int32(request.RabLevel5ID), Valid: request.RabLevel5ID != 0}
 	prosesBisnis.OperationalId = sql.NullInt32{Int32: int32(request.RabLevel6ID), Valid: request.RabLevel6ID != 0}
 	prosesBisnis.Tahun = request.Tahun
 	prosesBisnis.UpdatedAt = request.UpdatedAt
