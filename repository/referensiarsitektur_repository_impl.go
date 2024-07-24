@@ -87,9 +87,112 @@ func (repository *ReferensiArsitekturRepositoryImpl) FindById(ctx context.Contex
 	}
 }
 
+// func (repository *ReferensiArsitekturRepositoryImpl) FindByKodeRef(ctx context.Context, tx *sql.Tx, kodeReferensi string) ([]domain.ReferensiArsitektur, error) {
+// 	var exists bool
+// 	err := tx.QueryRowContext(ctx, "select exists(select 1 from referensi_arsitekturs where kode_referensi = ?)", kodeReferensi).Scan(&exists)
+// 	helper.PanicIfError(err)
+
+// 	if !exists {
+// 		log.Println("Data not found for kodeReferensi:", kodeReferensi)
+// 		return nil, errors.New("data not found")
+// 	}
+
+// 	kodeBody := strings.Split(kodeReferensi, ".")
+// 	var placeholders []string
+
+// 	for i := range kodeBody {
+// 		placeholders = append(placeholders, strings.Join(kodeBody[:i+1], "."))
+// 	}
+
+// 	script := "select id, kode_referensi, nama_referensi, level_referensi, jenis_referensi, created_at, updated_at, tahun from referensi_arsitekturs where kode_referensi in ("
+// 	for i := range placeholders {
+// 		if i > 0 {
+// 			script += ", "
+// 		}
+// 		script += "?"
+// 	}
+// 	script += ") order by level_referensi asc"
+
+// 	rows, err := tx.QueryContext(ctx, script, helper.ConvertStringsToInterfaces(placeholders)...)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	defer rows.Close()
+
+// 	var referensiList []domain.ReferensiArsitektur
+// 	for rows.Next() {
+// 		referensi := domain.ReferensiArsitektur{}
+// 		err := rows.Scan(&referensi.IdReferensi, &referensi.Kode_referensi, &referensi.Nama_referensi, &referensi.Level_referensi, &referensi.Jenis_referensi, &referensi.Created_at, &referensi.Updated_at, &referensi.Tahun)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		referensiList = append(referensiList, referensi)
+// 	}
+
+// 	if len(referensiList) == 0 {
+// 		log.Println("No hierarchical data found for kodeReferensi:", kodeReferensi)
+// 		return nil, errors.New("data not found")
+// 	}
+
+// 	return referensiList, nil
+// }
+
+//kode 2
+// func (repository *ReferensiArsitekturRepositoryImpl) FindByKodeRef(ctx context.Context, tx *sql.Tx, kodeReferensi string) ([]domain.ReferensiArsitektur, error) {
+// 	var exists bool
+// 	err := tx.QueryRowContext(ctx, "SELECT EXISTS(SELECT 1 FROM referensi_arsitekturs WHERE kode_referensi = ?)", kodeReferensi).Scan(&exists)
+// 	helper.PanicIfError(err)
+
+// 	if !exists {
+// 		log.Println("Data not found for kodeReferensi:", kodeReferensi)
+// 		return nil, errors.New("data not found")
+// 	}
+
+// 	// Build the initial hierarchy
+// 	kodeBody := strings.Split(kodeReferensi, ".")
+// 	var placeholders []string
+// 	var params []interface{}
+
+// 	for i := range kodeBody {
+// 		placeholder := strings.Join(kodeBody[:i+1], ".")
+// 		placeholders = append(placeholders, "?")
+// 		params = append(params, placeholder)
+// 	}
+
+// 	// Add wildcard for children
+// 	placeholders = append(placeholders, "?")
+// 	params = append(params, kodeReferensi+".%")
+
+// 	script := "SELECT id, kode_referensi, nama_referensi, level_referensi, jenis_referensi, created_at, updated_at, tahun FROM referensi_arsitekturs WHERE kode_referensi IN (" + strings.Join(placeholders[:len(placeholders)-1], ", ") + ") OR kode_referensi LIKE ? ORDER BY level_referensi ASC"
+
+// 	rows, err := tx.QueryContext(ctx, script, params...)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	defer rows.Close()
+
+// 	var referensiList []domain.ReferensiArsitektur
+// 	for rows.Next() {
+// 		referensi := domain.ReferensiArsitektur{}
+// 		err := rows.Scan(&referensi.IdReferensi, &referensi.Kode_referensi, &referensi.Nama_referensi, &referensi.Level_referensi, &referensi.Jenis_referensi, &referensi.Created_at, &referensi.Updated_at, &referensi.Tahun)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		referensiList = append(referensiList, referensi)
+// 	}
+
+// 	if len(referensiList) == 0 {
+// 		log.Println("No hierarchical data found for kodeReferensi:", kodeReferensi)
+// 		return nil, errors.New("data not found")
+// 	}
+
+// 	return referensiList, nil
+// }
+
+// kode 3
 func (repository *ReferensiArsitekturRepositoryImpl) FindByKodeRef(ctx context.Context, tx *sql.Tx, kodeReferensi string) ([]domain.ReferensiArsitektur, error) {
 	var exists bool
-	err := tx.QueryRowContext(ctx, "select exists(select 1 from referensi_arsitekturs where kode_referensi = ?)", kodeReferensi).Scan(&exists)
+	err := tx.QueryRowContext(ctx, "SELECT EXISTS(SELECT 1 FROM referensi_arsitekturs WHERE kode_referensi = ?)", kodeReferensi).Scan(&exists)
 	helper.PanicIfError(err)
 
 	if !exists {
@@ -97,23 +200,29 @@ func (repository *ReferensiArsitekturRepositoryImpl) FindByKodeRef(ctx context.C
 		return nil, errors.New("data not found")
 	}
 
+	// Build the hierarchy query to include all parent references
 	kodeBody := strings.Split(kodeReferensi, ".")
 	var placeholders []string
+	var params []interface{}
 
 	for i := range kodeBody {
-		placeholders = append(placeholders, strings.Join(kodeBody[:i+1], "."))
+		placeholder := strings.Join(kodeBody[:i+1], ".")
+		placeholders = append(placeholders, "?")
+		params = append(params, placeholder)
 	}
 
-	script := "select id, kode_referensi, nama_referensi, level_referensi, jenis_referensi, created_at, updated_at, tahun from referensi_arsitekturs where kode_referensi in ("
-	for i := range placeholders {
-		if i > 0 {
-			script += ", "
-		}
-		script += "?"
-	}
-	script += ") order by level_referensi asc"
+	// Add wildcard for children
+	params = append(params, kodeReferensi+".%")
 
-	rows, err := tx.QueryContext(ctx, script, helper.ConvertStringsToInterfaces(placeholders)...)
+	script := `
+		SELECT id, kode_referensi, nama_referensi, level_referensi, jenis_referensi, created_at, updated_at, tahun
+		FROM referensi_arsitekturs
+		WHERE kode_referensi IN (` + strings.Join(placeholders, ", ") + `) 
+		OR kode_referensi LIKE ?
+		ORDER BY level_referensi ASC
+	`
+
+	rows, err := tx.QueryContext(ctx, script, params...)
 	if err != nil {
 		return nil, err
 	}

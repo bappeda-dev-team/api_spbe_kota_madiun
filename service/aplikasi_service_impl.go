@@ -72,7 +72,7 @@ func (service *AplikasiServiceImpl) FindByKodeOpd(ctx context.Context, kodeOPD s
 			}
 		}
 
-		var raaLevel1, raaLevel2, raaLevel3, raaLevel4 *web.AplikasiReferensiArsitekturRespons
+		var raaLevel1, raaLevel2, raaLevel3 *web.AplikasiReferensiArsitekturRespons
 		if aplikasi.RaaLevel1id.Valid {
 			raaLevel1Data, err := service.ReferensiArsitekturRepository.FindById(ctx, tx, int(aplikasi.RaaLevel1id.Int32))
 			helper.PanicIfError(err)
@@ -103,16 +103,6 @@ func (service *AplikasiServiceImpl) FindByKodeOpd(ctx context.Context, kodeOPD s
 				Level_referensi: raaLevel3Data.Level_referensi,
 			}
 		}
-		if aplikasi.RaaLevel4id.Valid {
-			raaLevel4Data, err := service.ReferensiArsitekturRepository.FindById(ctx, tx, int(aplikasi.RaaLevel4id.Int32))
-			helper.PanicIfError(err)
-			raaLevel4 = &web.AplikasiReferensiArsitekturRespons{
-				Id:              raaLevel4Data.IdReferensi,
-				Kode_referensi:  raaLevel4Data.Kode_referensi,
-				Nama_referensi:  raaLevel4Data.Nama_referensi,
-				Level_referensi: raaLevel4Data.Level_referensi,
-			}
-		}
 
 		response := web.AplikasiRespons{
 			Id:                     aplikasi.Id,
@@ -131,7 +121,6 @@ func (service *AplikasiServiceImpl) FindByKodeOpd(ctx context.Context, kodeOPD s
 			RaaLevel1id:            raaLevel1,
 			RaaLevel2id:            raaLevel2,
 			RaaLevel3id:            raaLevel3,
-			RaaLevel4id:            raaLevel4,
 			StrategicId:            strategicid,
 			TacticalId:             tacticalid,
 			OperationalId:          operational,
@@ -186,7 +175,7 @@ func (service *AplikasiServiceImpl) FindById(ctx context.Context, aplikasiId int
 		}
 	}
 
-	var raaLevel1, raaLevel2, raaLevel3, raaLevel4 *web.AplikasiReferensiArsitekturRespons
+	var raaLevel1, raaLevel2, raaLevel3 *web.AplikasiReferensiArsitekturRespons
 	if aplikasi.RaaLevel1id.Valid {
 		raaLevel1Data, err := service.ReferensiArsitekturRepository.FindById(ctx, tx, int(aplikasi.RaaLevel1id.Int32))
 		helper.PanicIfError(err)
@@ -217,16 +206,6 @@ func (service *AplikasiServiceImpl) FindById(ctx context.Context, aplikasiId int
 			Level_referensi: raaLevel3Data.Level_referensi,
 		}
 	}
-	if aplikasi.RaaLevel4id.Valid {
-		raaLevel4Data, err := service.ReferensiArsitekturRepository.FindById(ctx, tx, int(aplikasi.RaaLevel4id.Int32))
-		helper.PanicIfError(err)
-		raaLevel4 = &web.AplikasiReferensiArsitekturRespons{
-			Id:              raaLevel4Data.IdReferensi,
-			Kode_referensi:  raaLevel4Data.Kode_referensi,
-			Nama_referensi:  raaLevel4Data.Nama_referensi,
-			Level_referensi: raaLevel4Data.Level_referensi,
-		}
-	}
 
 	response := web.AplikasiRespons{
 		Id:                     aplikasi.Id,
@@ -245,7 +224,6 @@ func (service *AplikasiServiceImpl) FindById(ctx context.Context, aplikasiId int
 		RaaLevel1id:            raaLevel1,
 		RaaLevel2id:            raaLevel2,
 		RaaLevel3id:            raaLevel3,
-		RaaLevel4id:            raaLevel4,
 		StrategicId:            strategicid,
 		TacticalId:             tacticalid,
 		OperationalId:          operational,
@@ -288,10 +266,6 @@ func (service *AplikasiServiceImpl) Insert(ctx context.Context, request web.Apli
 			Int32: int32(0),
 			Valid: false,
 		},
-		RaaLevel4id: sql.NullInt32{
-			Int32: int32(0),
-			Valid: false,
-		},
 		StrategicId: sql.NullInt32{
 			Int32: int32(0),
 			Valid: false,
@@ -323,13 +297,6 @@ func (service *AplikasiServiceImpl) Insert(ctx context.Context, request web.Apli
 	if request.RaaLevel3id != nil {
 		aplikasi.RaaLevel3id = sql.NullInt32{
 			Int32: int32(*request.RaaLevel3id),
-			Valid: true,
-		}
-	}
-
-	if request.RaaLevel4id != nil {
-		aplikasi.RaaLevel4id = sql.NullInt32{
-			Int32: int32(*request.RaaLevel4id),
 			Valid: true,
 		}
 	}
@@ -383,7 +350,6 @@ func (service *AplikasiServiceImpl) Update(ctx context.Context, request web.Apli
 	aplikasi.RaaLevel1id = sql.NullInt32{Int32: int32(request.RaaLevel1id), Valid: request.RaaLevel1id != 0}
 	aplikasi.RaaLevel2id = sql.NullInt32{Int32: int32(request.RaaLevel2id), Valid: request.RaaLevel2id != 0}
 	aplikasi.RaaLevel3id = sql.NullInt32{Int32: int32(request.RaaLevel3id), Valid: request.RaaLevel3id != 0}
-	aplikasi.RaaLevel4id = sql.NullInt32{Int32: int32(request.RaaLevel4id), Valid: request.RaaLevel4id != 0}
 	aplikasi.StrategicId = sql.NullInt32{Int32: int32(request.StrategicId), Valid: request.StrategicId != 0}
 	aplikasi.TacticalId = sql.NullInt32{Int32: int32(request.TacticalId), Valid: request.TacticalId != 0}
 	aplikasi.OperationalId = sql.NullInt32{Int32: int32(request.OperationalId), Valid: request.OperationalId != 0}

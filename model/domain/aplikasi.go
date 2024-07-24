@@ -22,7 +22,6 @@ type Aplikasi struct {
 	RaaLevel1id            sql.NullInt32
 	RaaLevel2id            sql.NullInt32
 	RaaLevel3id            sql.NullInt32
-	RaaLevel4id            sql.NullInt32
 	StrategicId            sql.NullInt32
 	TacticalId             sql.NullInt32
 	OperationalId          sql.NullInt32

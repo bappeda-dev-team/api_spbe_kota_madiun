@@ -130,8 +130,45 @@ func (service *ReferensiArsitekturServiceImpl) GetDataHierarchy(ctx context.Cont
 	}
 
 	return responseList, nil
-
 }
+
+// func (service *ReferensiArsitekturServiceImpl) GetDataHierarchy(ctx context.Context, kodeReferensi string) ([]web.ReferensiArsitekturResponse, error) {
+// 	tx, err := service.DB.Begin()
+// 	helper.PanicIfError(err)
+// 	defer helper.CommitOrRollback(tx)
+
+// 	referensiList, err := service.ReferensiArsitekturRepository.FindByKodeRef(ctx, tx, kodeReferensi)
+// 	if err != nil {
+// 		if err.Error() == "data not found" {
+// 			log.Println("Service: Data not found for kodeReferensi:", kodeReferensi)
+// 			return nil, err
+// 		}
+// 		return nil, err
+// 	}
+
+// 	if len(referensiList) == 0 {
+// 		log.Println("Service: Data not found for kodeReferensi:", kodeReferensi)
+// 		return nil, errors.New("data not found")
+// 	}
+
+// 	var responseList []web.ReferensiArsitekturResponse
+// 	for _, referensi := range referensiList {
+// 		response := web.ReferensiArsitekturResponse{
+// 			Id:              referensi.IdReferensi,
+// 			Kode_referensi:  referensi.Kode_referensi,
+// 			Nama_referensi:  referensi.Nama_referensi,
+// 			Level_referensi: referensi.Level_referensi,
+// 			Jenis_referensi: referensi.Jenis_referensi,
+// 			Created_at:      referensi.Created_at,
+// 			Updated_at:      referensi.Updated_at,
+// 			Tahun:           referensi.Tahun,
+// 		}
+// 		responseList = append(responseList, response)
+// 	}
+
+// 	return responseList, nil
+
+// }
 
 func (service *ReferensiArsitekturServiceImpl) FindById(ctx context.Context, referensiarsitekturId int) web.ReferensiArsitekturResponse {
 	tx, err := service.DB.Begin()

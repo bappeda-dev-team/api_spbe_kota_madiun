@@ -17,7 +17,6 @@ type AplikasiRespons struct {
 	RaaLevel1id            *AplikasiReferensiArsitekturRespons
 	RaaLevel2id            *AplikasiReferensiArsitekturRespons
 	RaaLevel3id            *AplikasiReferensiArsitekturRespons
-	RaaLevel4id            *AplikasiReferensiArsitekturRespons
 	StrategicId            *AplikasiPohonRespons
 	TacticalId             *AplikasiPohonRespons
 	OperationalId          *AplikasiPohonRespons
