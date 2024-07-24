@@ -443,30 +443,23 @@ func (service *ProsesBisnisServiceImpl) GetProsesBisnisGrouped(ctx context.Conte
 	helper.PanicIfError(err)
 
 	var webProsesBisnisList []web.GapProsesBisnis
-	kodeOpdMap := make(map[string]*web.GapProsesBisnis)
+	idMap := make(map[int]*web.GapProsesBisnis) // Use a map keyed by ID instead of kode_opd
 
 	for _, pb := range prosesBisnisList {
-		if _, exists := kodeOpdMap[pb.KodeOpd]; !exists {
-			kodeOpdMap[pb.KodeOpd] = &web.GapProsesBisnis{
+		if _, exists := idMap[pb.ID]; !exists {
+			idMap[pb.ID] = &web.GapProsesBisnis{
 				ID:               pb.ID,
 				KodeOpd:          pb.KodeOpd,
 				Tahun:            pb.Tahun,
 				NamaProsesBisnis: pb.NamaProsesBisnis,
 				KodeProsesBisnis: pb.KodeProsesBisnis,
+				Layanans:         []web.GapLayanan{},
+				DataDanInformasi: []web.GapDataDanInformasi{},
+				Aplikasi:         []web.GapAplikasi{},
 			}
 		}
 
-		webPb := kodeOpdMap[pb.KodeOpd]
-
-		if len(webPb.Layanans) == 0 {
-			webPb.Layanans = []web.GapLayanan{}
-		}
-		if len(webPb.DataDanInformasi) == 0 {
-			webPb.DataDanInformasi = []web.GapDataDanInformasi{}
-		}
-		if len(webPb.Aplikasi) == 0 {
-			webPb.Aplikasi = []web.GapAplikasi{}
-		}
+		webPb := idMap[pb.ID]
 
 		if pb.Layanan != nil {
 			for _, l := range pb.Layanan {
@@ -479,10 +472,11 @@ func (service *ProsesBisnisServiceImpl) GetProsesBisnisGrouped(ctx context.Conte
 
 				tempLayanan := web.GapLayanan{NamaLayanan: webNullString}
 				if !helper.ContainsLayanan(webPb.Layanans, tempLayanan) {
-					webPb.Layanans = append(webPb.Layanans, web.GapLayanan{NamaLayanan: webNullString})
+					webPb.Layanans = append(webPb.Layanans, tempLayanan)
 				}
 			}
 		}
+
 		if pb.DataDanInformasi != nil {
 			for _, d := range pb.DataDanInformasi {
 				var webNullString web.NullString
@@ -494,13 +488,13 @@ func (service *ProsesBisnisServiceImpl) GetProsesBisnisGrouped(ctx context.Conte
 
 				tempData := web.GapDataDanInformasi{NamaData: webNullString}
 				if !helper.ContainData(webPb.DataDanInformasi, tempData) {
-					webPb.DataDanInformasi = append(webPb.DataDanInformasi, web.GapDataDanInformasi{NamaData: webNullString})
+					webPb.DataDanInformasi = append(webPb.DataDanInformasi, tempData)
 				}
 			}
 		}
+
 		if pb.Aplikasi != nil {
 			for _, a := range pb.Aplikasi {
-
 				var webNullString web.NullString
 
 				if a.NamaAplikasi.Valid {
@@ -510,17 +504,106 @@ func (service *ProsesBisnisServiceImpl) GetProsesBisnisGrouped(ctx context.Conte
 
 				temAplikasi := web.GapAplikasi{NamaAplikasi: webNullString}
 				if !helper.ContainAplikasi(webPb.Aplikasi, temAplikasi) {
-					webPb.Aplikasi = append(webPb.Aplikasi, web.GapAplikasi{NamaAplikasi: webNullString})
+					webPb.Aplikasi = append(webPb.Aplikasi, temAplikasi)
 				}
-
 			}
-
 		}
 	}
 
-	for _, webPb := range kodeOpdMap {
+	for _, webPb := range idMap {
 		webProsesBisnisList = append(webProsesBisnisList, *webPb)
 	}
 
 	return webProsesBisnisList, nil
 }
+
+// func (service *ProsesBisnisServiceImpl) GetProsesBisnisGrouped(ctx context.Context, kodeOpd string, tahun int) ([]web.GapProsesBisnis, error) {
+// 	tx, err := service.DB.Begin()
+// 	helper.PanicIfError(err)
+// 	defer helper.CommitOrRollback(tx)
+
+// 	prosesBisnisList, err := service.ProsesBisnisRepository.GapProsesBisnis(ctx, tx, kodeOpd, tahun)
+// 	helper.PanicIfError(err)
+
+// 	var webProsesBisnisList []web.GapProsesBisnis
+// 	kodeOpdMap := make(map[string]*web.GapProsesBisnis)
+
+// 	for _, pb := range prosesBisnisList {
+// 		if _, exists := kodeOpdMap[pb.KodeOpd]; !exists {
+// 			kodeOpdMap[pb.KodeOpd] = &web.GapProsesBisnis{
+// 				ID:               pb.ID,
+// 				KodeOpd:          pb.KodeOpd,
+// 				Tahun:            pb.Tahun,
+// 				NamaProsesBisnis: pb.NamaProsesBisnis,
+// 				KodeProsesBisnis: pb.KodeProsesBisnis,
+// 			}
+// 		}
+
+// 		webPb := kodeOpdMap[pb.KodeOpd]
+
+// 		if len(webPb.Layanans) == 0 {
+// 			webPb.Layanans = []web.GapLayanan{}
+// 		}
+// 		if len(webPb.DataDanInformasi) == 0 {
+// 			webPb.DataDanInformasi = []web.GapDataDanInformasi{}
+// 		}
+// 		if len(webPb.Aplikasi) == 0 {
+// 			webPb.Aplikasi = []web.GapAplikasi{}
+// 		}
+
+// 		if pb.Layanan != nil {
+// 			for _, l := range pb.Layanan {
+// 				var webNullString web.NullString
+
+// 				if l.NamaLayanan.Valid {
+// 					webNullString.String = l.NamaLayanan.String
+// 					webNullString.Valid = true
+// 				}
+
+// 				tempLayanan := web.GapLayanan{NamaLayanan: webNullString}
+// 				if !helper.ContainsLayanan(webPb.Layanans, tempLayanan) {
+// 					webPb.Layanans = append(webPb.Layanans, web.GapLayanan{NamaLayanan: webNullString})
+// 				}
+// 			}
+// 		}
+// 		if pb.DataDanInformasi != nil {
+// 			for _, d := range pb.DataDanInformasi {
+// 				var webNullString web.NullString
+
+// 				if d.NamaData.Valid {
+// 					webNullString.String = d.NamaData.String
+// 					webNullString.Valid = true
+// 				}
+
+// 				tempData := web.GapDataDanInformasi{NamaData: webNullString}
+// 				if !helper.ContainData(webPb.DataDanInformasi, tempData) {
+// 					webPb.DataDanInformasi = append(webPb.DataDanInformasi, web.GapDataDanInformasi{NamaData: webNullString})
+// 				}
+// 			}
+// 		}
+// 		if pb.Aplikasi != nil {
+// 			for _, a := range pb.Aplikasi {
+
+// 				var webNullString web.NullString
+
+// 				if a.NamaAplikasi.Valid {
+// 					webNullString.String = a.NamaAplikasi.String
+// 					webNullString.Valid = true
+// 				}
+
+// 				temAplikasi := web.GapAplikasi{NamaAplikasi: webNullString}
+// 				if !helper.ContainAplikasi(webPb.Aplikasi, temAplikasi) {
+// 					webPb.Aplikasi = append(webPb.Aplikasi, web.GapAplikasi{NamaAplikasi: webNullString})
+// 				}
+
+// 			}
+
+// 		}
+// 	}
+
+// 	for _, webPb := range kodeOpdMap {
+// 		webProsesBisnisList = append(webProsesBisnisList, *webPb)
+// 	}
+
+// 	return webProsesBisnisList, nil
+// }
