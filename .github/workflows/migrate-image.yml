@@ -9,8 +9,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v3
       - name: Build migrations image
-        uses: actions/checkout@v3
         run: |
           docker login --username bappeda-dev-team --password ${{ secrets.GH_TOKEN }} ghcr.io
           docker build . --file MigrationDockerfile --tag ghcr.io/bappeda-dev-team/espbe-migration-kota-madiun-backend:latest
