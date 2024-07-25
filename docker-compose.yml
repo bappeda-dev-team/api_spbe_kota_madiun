@@ -1,6 +1,6 @@
 services:
   db-mysql:
-    image: mysql:8
+    image: mysql:8.0.39
     environment:
       - MYSQL_ROOT_PASSWORD=espbe-mysql
       - MYSQL_DATABASE=db_spbe
