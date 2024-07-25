@@ -131,9 +131,7 @@ func (repository *ProsesBisnisRepositoryImpl) GapProsesBisnis(ctx context.Contex
         aplikasi a ON (a.strategic_id = pb.strategic_id AND a.tactical_id = pb.tactical_id AND a.operational_id = pb.operational_id  AND l.kode_opd = pb.kode_opd)
         OR (a.strategic_id = pb.strategic_id AND a.tactical_id = pb.tactical_id  AND l.kode_opd = pb.kode_opd)
         OR (a.strategic_id = pb.strategic_id  AND a.kode_opd = pb.kode_opd)
-    WHERE
-        (l.strategic_id IS NOT NULL OR d.strategic_id IS NOT NULL OR a.strategic_id IS NOT NULL)
-        AND (l.tactical_id IS NOT NULL OR d.tactical_id IS NOT NULL OR a.tactical_id IS NOT NULL)
+    WHERE 1=1
 	`
 
 	var args []interface{}
