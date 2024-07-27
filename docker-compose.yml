@@ -1,6 +1,6 @@
 services:
   db-mysql:
-    image: mysql:8
+    image: mysql:8.0.39
     environment:
       - MYSQL_ROOT_PASSWORD=espbe-mysql
       - MYSQL_DATABASE=db_spbe
@@ -32,10 +32,11 @@ services:
       - "8080:8080"
     restart: unless-stopped
   migrate:
-    image: migrate/migrate
+    build:
+      context: .
+      dockerfile: MigrationDockerfile
+    image: spbe-migration:latest
     profiles: [migrate]
-    volumes:
-      - ./db/migrations:/migrations
     depends_on:
       db-mysql:
         condition: service_started
