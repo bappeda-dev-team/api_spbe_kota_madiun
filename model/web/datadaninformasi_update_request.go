@@ -6,6 +6,8 @@ type DataDanInformasiUpdateRequest struct {
 	SifatData              string `json:"sifat_data"`
 	JenisData              string `json:"jenis_data"`
 	ProdusenData           string `json:"produsen_data"`
+	UraianData             string `json:"uraian_data"`
+	ValiditasData          string `json:"validitas_data"`
 	PjData                 string `json:"pj_data"`
 	KodeOPD                string `json:"kode_opd"`
 	InformasiTerkaitInput  string `json:"informasi_terkait_input"`

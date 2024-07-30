@@ -137,6 +137,8 @@ func ToDataDanInformasiRespons(data domain.DataDanInformasi) web.DataDanInformas
 		SifatData:              data.SifatData,
 		JenisData:              data.JenisData,
 		ProdusenData:           data.ProdusenData,
+		UraianData:             data.UraianData,
+		ValiditasData:          data.ValiditasData,
 		PjData:                 data.PjData,
 		KodeOPD:                data.KodeOPD,
 		InformasiTerkaitInput:  data.InformasiTerkaitInput,
