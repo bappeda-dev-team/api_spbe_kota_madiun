@@ -7,6 +7,7 @@ import (
 	"api_spbe_kota_madiun/repository"
 	"context"
 	"database/sql"
+	"log"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -290,8 +291,19 @@ func (service *ProsesBisnisServiceImpl) Insert(ctx context.Context, request web.
 	currentTime := time.Now()
 	kodeprosbis := helper.GenerateRandomKode()
 
+	var namaProsesBisnis string
+	if request.RabLevel6ID != nil {
+		pohonKinerja, err := service.PohonKinerjaRepository.FindById(ctx, tx, *request.RabLevel6ID)
+		if err != nil {
+			helper.PanicIfError(err)
+		}
+		namaProsesBisnis = pohonKinerja.NamaPohon
+	} else {
+		namaProsesBisnis = request.NamaProsesBisnis
+	}
+
 	prosesBisnis := domain.ProsesBisnis{
-		NamaProsesBisnis: request.NamaProsesBisnis,
+		NamaProsesBisnis: namaProsesBisnis,
 
 		SasaranKotaId: sql.NullInt32{
 			Int32: int32(0),
@@ -394,16 +406,37 @@ func (service *ProsesBisnisServiceImpl) Insert(ctx context.Context, request web.
 
 func (service *ProsesBisnisServiceImpl) Update(ctx context.Context, request web.ProsesBisnisUpdateRequest) web.ProsesBisnisRespons {
 	err := service.Validate.Struct(request)
-	helper.PanicIfError(err)
+	if err != nil {
+		log.Printf("Validation error: %v", err)
+		helper.PanicIfError(err)
+	}
 
 	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
+	if err != nil {
+		log.Printf("Error starting transaction: %v", err)
+		helper.PanicIfError(err)
+	}
 	defer helper.CommitOrRollback(tx)
 
 	prosesBisnis, err := service.ProsesBisnisRepository.FindById(ctx, tx, request.Id)
-	helper.PanicIfError(err)
+	if err != nil {
+		log.Printf("Error finding Proses Bisnis: %v", err)
+		helper.PanicIfError(err)
+	}
 
-	prosesBisnis.NamaProsesBisnis = request.NamaProsesBisnis
+	if request.RabLevel6ID != 0 {
+		pohonKinerja, err := service.PohonKinerjaRepository.FindById(ctx, tx, request.RabLevel6ID)
+		if err != nil {
+			if err.Error() == "pohon Kinerja is not found" {
+				log.Printf("Pohon Kinerja dengan ID %d tidak ditemukan", request.RabLevel6ID)
+			} else {
+				log.Printf("Error fetching Pohon Kinerja: %v", err)
+			}
+		} else {
+			prosesBisnis.NamaProsesBisnis = pohonKinerja.NamaPohon
+		}
+	}
+
 	prosesBisnis.SasaranKotaId = sql.NullInt32{Int32: int32(request.SasaranKotaId), Valid: request.SasaranKotaId != 0}
 	if prosesBisnis.KodeProsesBisnis == "" {
 		prosesBisnis.KodeProsesBisnis = helper.GenerateRandomKode()
@@ -443,7 +476,7 @@ func (service *ProsesBisnisServiceImpl) GetProsesBisnisGrouped(ctx context.Conte
 	helper.PanicIfError(err)
 
 	var webProsesBisnisList []web.GapProsesBisnis
-	idMap := make(map[int]*web.GapProsesBisnis) // Use a map keyed by ID instead of kode_opd
+	idMap := make(map[int]*web.GapProsesBisnis)
 
 	for _, pb := range prosesBisnisList {
 		if _, exists := idMap[pb.ID]; !exists {
@@ -516,94 +549,3 @@ func (service *ProsesBisnisServiceImpl) GetProsesBisnisGrouped(ctx context.Conte
 
 	return webProsesBisnisList, nil
 }
-
-// func (service *ProsesBisnisServiceImpl) GetProsesBisnisGrouped(ctx context.Context, kodeOpd string, tahun int) ([]web.GapProsesBisnis, error) {
-// 	tx, err := service.DB.Begin()
-// 	helper.PanicIfError(err)
-// 	defer helper.CommitOrRollback(tx)
-
-// 	prosesBisnisList, err := service.ProsesBisnisRepository.GapProsesBisnis(ctx, tx, kodeOpd, tahun)
-// 	helper.PanicIfError(err)
-
-// 	var webProsesBisnisList []web.GapProsesBisnis
-// 	kodeOpdMap := make(map[string]*web.GapProsesBisnis)
-
-// 	for _, pb := range prosesBisnisList {
-// 		if _, exists := kodeOpdMap[pb.KodeOpd]; !exists {
-// 			kodeOpdMap[pb.KodeOpd] = &web.GapProsesBisnis{
-// 				ID:               pb.ID,
-// 				KodeOpd:          pb.KodeOpd,
-// 				Tahun:            pb.Tahun,
-// 				NamaProsesBisnis: pb.NamaProsesBisnis,
-// 				KodeProsesBisnis: pb.KodeProsesBisnis,
-// 			}
-// 		}
-
-// 		webPb := kodeOpdMap[pb.KodeOpd]
-
-// 		if len(webPb.Layanans) == 0 {
-// 			webPb.Layanans = []web.GapLayanan{}
-// 		}
-// 		if len(webPb.DataDanInformasi) == 0 {
-// 			webPb.DataDanInformasi = []web.GapDataDanInformasi{}
-// 		}
-// 		if len(webPb.Aplikasi) == 0 {
-// 			webPb.Aplikasi = []web.GapAplikasi{}
-// 		}
-
-// 		if pb.Layanan != nil {
-// 			for _, l := range pb.Layanan {
-// 				var webNullString web.NullString
-
-// 				if l.NamaLayanan.Valid {
-// 					webNullString.String = l.NamaLayanan.String
-// 					webNullString.Valid = true
-// 				}
-
-// 				tempLayanan := web.GapLayanan{NamaLayanan: webNullString}
-// 				if !helper.ContainsLayanan(webPb.Layanans, tempLayanan) {
-// 					webPb.Layanans = append(webPb.Layanans, web.GapLayanan{NamaLayanan: webNullString})
-// 				}
-// 			}
-// 		}
-// 		if pb.DataDanInformasi != nil {
-// 			for _, d := range pb.DataDanInformasi {
-// 				var webNullString web.NullString
-
-// 				if d.NamaData.Valid {
-// 					webNullString.String = d.NamaData.String
-// 					webNullString.Valid = true
-// 				}
-
-// 				tempData := web.GapDataDanInformasi{NamaData: webNullString}
-// 				if !helper.ContainData(webPb.DataDanInformasi, tempData) {
-// 					webPb.DataDanInformasi = append(webPb.DataDanInformasi, web.GapDataDanInformasi{NamaData: webNullString})
-// 				}
-// 			}
-// 		}
-// 		if pb.Aplikasi != nil {
-// 			for _, a := range pb.Aplikasi {
-
-// 				var webNullString web.NullString
-
-// 				if a.NamaAplikasi.Valid {
-// 					webNullString.String = a.NamaAplikasi.String
-// 					webNullString.Valid = true
-// 				}
-
-// 				temAplikasi := web.GapAplikasi{NamaAplikasi: webNullString}
-// 				if !helper.ContainAplikasi(webPb.Aplikasi, temAplikasi) {
-// 					webPb.Aplikasi = append(webPb.Aplikasi, web.GapAplikasi{NamaAplikasi: webNullString})
-// 				}
-
-// 			}
-
-// 		}
-// 	}
-
-// 	for _, webPb := range kodeOpdMap {
-// 		webProsesBisnisList = append(webProsesBisnisList, *webPb)
-// 	}
-
-// 	return webProsesBisnisList, nil
-// }
