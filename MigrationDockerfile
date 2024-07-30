@@ -1,0 +1,12 @@
+ARG GO_VERSION=1.22.2
+
+FROM migrate/migrate as base
+
+# app lives here
+WORKDIR /migrations
+
+
+# Throw-away build stage to reduce size of final image
+FROM base as build
+
+COPY ./db/migrations .

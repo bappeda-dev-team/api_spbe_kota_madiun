@@ -19,6 +19,7 @@ func GetConnection() *sql.DB {
 
 	// !! diganti dengan DB_URL agar bisa konek di docker-compose
 	// contoh: "root@tcp(localhost:3306)/db_spbe?parseTime=true"
+
 	// dbUser := os.Getenv("DB_USER")
 	// dbPort := os.Getenv("DB_PORT")
 	// dbName := os.Getenv("DB_NAME")
