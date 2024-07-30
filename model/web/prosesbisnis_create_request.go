@@ -5,7 +5,7 @@ import (
 )
 
 type ProsesBisnisCreateRequest struct {
-	NamaProsesBisnis string `json:"nama_proses_bisnis" validate:"required"`
+	NamaProsesBisnis string `json:"nama_proses_bisnis"`
 	SasaranKotaId    *int   `json:"sasaran_kota_id"`
 	KodeOPD          string `json:"kode_opd" validate:"required"`
 	BidangUrusanId   *int   `json:"bidang_urusan_id" `
