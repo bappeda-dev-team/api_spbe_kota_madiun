@@ -29,7 +29,7 @@ func GetConnection() *sql.DB {
 	// 	dbHost = "localhost"
 	// }
 
-	connStr := fmt.Sprintf("%s@tcp(%s:%s)/%s?parseTime=true", dbUser, dbHost, dbPort, dbName)
+	//connStr := fmt.Sprintf("%s@tcp(%s:%s)/%s?parseTime=true", dbUser, dbHost, dbPort, dbName)
 	connStr := os.Getenv("DB_URL")
 
 	db, err := sql.Open("mysql", connStr)
