@@ -122,6 +122,8 @@ func (service *DataDanInformasiServiceImpl) FindByKodeOpd(ctx context.Context, k
 			SifatData:              dataDanInformasi.SifatData,
 			JenisData:              dataDanInformasi.JenisData,
 			ProdusenData:           dataDanInformasi.ProdusenData,
+			UraianData:             dataDanInformasi.UraianData,
+			ValiditasData:          dataDanInformasi.ValiditasData,
 			PjData:                 dataDanInformasi.PjData,
 			KodeOPD:                dataDanInformasi.KodeOPD,
 			InformasiTerkaitInput:  dataDanInformasi.InformasiTerkaitInput,
@@ -236,6 +238,8 @@ func (service *DataDanInformasiServiceImpl) FindById(ctx context.Context, dataId
 		SifatData:              dataDanInformasi.SifatData,
 		JenisData:              dataDanInformasi.JenisData,
 		ProdusenData:           dataDanInformasi.ProdusenData,
+		UraianData:             dataDanInformasi.UraianData,
+		ValiditasData:          dataDanInformasi.ValiditasData,
 		PjData:                 dataDanInformasi.PjData,
 		KodeOPD:                dataDanInformasi.KodeOPD,
 		InformasiTerkaitInput:  dataDanInformasi.InformasiTerkaitInput,
@@ -271,6 +275,8 @@ func (service *DataDanInformasiServiceImpl) Insert(ctx context.Context, request 
 		SifatData:              request.SifatData,
 		JenisData:              request.JenisData,
 		ProdusenData:           request.ProdusenData,
+		UraianData:             request.UraianData,
+		ValiditasData:          request.ValiditasData,
 		PjData:                 request.PjData,
 		KodeOPD:                request.KodeOPD,
 		InformasiTerkaitInput:  request.InformasiTerkaitInput,
@@ -376,6 +382,8 @@ func (service *DataDanInformasiServiceImpl) Update(ctx context.Context, request 
 	dataInformasi.SifatData = request.SifatData
 	dataInformasi.JenisData = request.JenisData
 	dataInformasi.ProdusenData = request.ProdusenData
+	dataInformasi.UraianData = request.UraianData
+	dataInformasi.ValiditasData = request.ValiditasData
 	dataInformasi.PjData = request.PjData
 	dataInformasi.KodeOPD = request.KodeOPD
 	dataInformasi.InformasiTerkaitInput = request.InformasiTerkaitInput

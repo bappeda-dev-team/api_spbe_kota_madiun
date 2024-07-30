@@ -6,6 +6,8 @@ type DataDanInformasiRespons struct {
 	SifatData              string
 	JenisData              string
 	ProdusenData           string
+	UraianData             string
+	ValiditasData          string
 	PjData                 string
 	KodeOPD                string
 	InformasiTerkaitInput  string
