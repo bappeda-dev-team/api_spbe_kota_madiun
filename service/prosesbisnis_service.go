@@ -12,5 +12,5 @@ type ProsesBisnisService interface {
 	Update(ctx context.Context, request web.ProsesBisnisUpdateRequest) web.ProsesBisnisRespons
 	Delete(ctx context.Context, prosesbisnisId int)
 	GetProsesBisnisGrouped(ctx context.Context, kodeOPD string, tahun int) ([]web.GapProsesBisnis, error)
-	// GetProsesBisnisNoGap(ctx context.Context, kodeOPD string, tahun int) ([]web.ProsesBisnisRespons, error)
+	GetProsesBisnisNoGap(ctx context.Context, kodeOPD string, tahun int) ([]web.GapProsesBisnis, error)
 }

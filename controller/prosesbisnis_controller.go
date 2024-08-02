@@ -13,4 +13,5 @@ type ProsesBisnisController interface {
 	Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	GetProsesBisnisGrouped(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
+	GetProsesBisnisNoGap(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 }

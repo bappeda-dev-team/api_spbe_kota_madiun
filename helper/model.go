@@ -249,34 +249,34 @@ func ToDomainSPBEResponses(domains []domain.DomainSPBE) []web.DomainSPBEResponse
 	return domainSPBEResponses
 }
 
-func ToKebutuhanSPBERespons(kebutuhanSPBE domain.KebutuhanSPBE) web.KebutuhanSPBEResponse {
-	var jenisKebutuhanResponses []web.JenisKebutuhanResponse
-	for _, jk := range kebutuhanSPBE.JenisKebutuhan {
-		var kondisiAwalResponses []web.KondisiAwalResponse
-		for _, ka := range jk.KondisiAwal {
-			kondisiAwalResponses = append(kondisiAwalResponses, web.KondisiAwalResponse{
-				Id:               ka.Id,
-				JenisKebutuhanId: ka.JenisKebutuhanId,
-				Keterangan:       ka.Keterangan,
-				Tahun:            ka.Tahun,
-			})
-		}
-		jenisKebutuhanResponses = append(jenisKebutuhanResponses, web.JenisKebutuhanResponse{
-			Id:          jk.Id,
-			KebutuhanId: jk.KebutuhanId,
-			Kebutuhan:   jk.Kebutuhan,
-			KondisiAwal: kondisiAwalResponses,
-		})
-	}
-	return web.KebutuhanSPBEResponse{
-		ID:             kebutuhanSPBE.ID,
-		KodeOpd:        kebutuhanSPBE.KodeOpd,
-		Tahun:          kebutuhanSPBE.Tahun,
-		NamaDomain:     kebutuhanSPBE.NamaDomain,
-		IdProsesbisnis: kebutuhanSPBE.IdProsesbisnis,
-		JenisKebutuhan: jenisKebutuhanResponses,
-	}
-}
+// func ToKebutuhanSPBERespons(kebutuhanSPBE domain.KebutuhanSPBE) web.KebutuhanSPBEResponse {
+// 	var jenisKebutuhanResponses []web.JenisKebutuhanResponse
+// 	for _, jk := range kebutuhanSPBE.JenisKebutuhan {
+// 		var kondisiAwalResponses []web.KondisiAwalResponse
+// 		for _, ka := range jk.KondisiAwal {
+// 			kondisiAwalResponses = append(kondisiAwalResponses, web.KondisiAwalResponse{
+// 				Id:               ka.Id,
+// 				JenisKebutuhanId: ka.JenisKebutuhanId,
+// 				Keterangan:       ka.Keterangan,
+// 				Tahun:            ka.Tahun,
+// 			})
+// 		}
+// 		jenisKebutuhanResponses = append(jenisKebutuhanResponses, web.JenisKebutuhanResponse{
+// 			Id:          jk.Id,
+// 			KebutuhanId: jk.KebutuhanId,
+// 			Kebutuhan:   jk.Kebutuhan,
+// 			KondisiAwal: kondisiAwalResponses,
+// 		})
+// 	}
+// 	return web.KebutuhanSPBEResponse{
+// 		ID:             kebutuhanSPBE.ID,
+// 		KodeOpd:        kebutuhanSPBE.KodeOpd,
+// 		Tahun:          kebutuhanSPBE.Tahun,
+// 		NamaDomain:     kebutuhanSPBE.NamaDomain,
+// 		IdProsesbisnis: kebutuhanSPBE.IdProsesbisnis,
+// 		JenisKebutuhan: jenisKebutuhanResponses,
+// 	}
+// }
 
 func ToKebutuhanSPBEResponse(kebutuhanSPBE domain.KebutuhanSPBE) web.KebutuhanSPBEResponse {
 	return web.KebutuhanSPBEResponse{

@@ -247,22 +247,24 @@ func (repository *ProsesBisnisRepositoryImpl) NoGapProsesBisnis(ctx context.Cont
         a.nama_aplikasi
     FROM
         proses_bisnis pb
-    INNER JOIN
+    LEFT JOIN
         layanan_spbe l ON (l.strategic_id = pb.strategic_id AND l.tactical_id = pb.tactical_id AND l.operational_id = pb.operational_id  AND l.kode_opd = pb.kode_opd)
         OR (l.strategic_id = pb.strategic_id AND l.tactical_id = pb.tactical_id  AND l.kode_opd = pb.kode_opd)
         OR (l.strategic_id = pb.strategic_id  AND l.kode_opd = pb.kode_opd)
-    INNER JOIN
-        data_dan_informasi d ON (d.strategic_id = pb.strategic_id AND d.tactical_id = pb.tactical_id AND d.operational_id = pb.operational_id  AND d.kode_opd = pb.kode_opd)
-        OR (d.strategic_id = pb.strategic_id AND d.tactical_id = pb.tactical_id  AND d.kode_opd = pb.kode_opd)
+    LEFT JOIN
+        data_dan_informasi d ON (d.strategic_id = pb.strategic_id AND d.tactical_id = pb.tactical_id AND d.operational_id = pb.operational_id  AND l.kode_opd = pb.kode_opd)
+        OR (d.strategic_id = pb.strategic_id AND d.tactical_id = pb.tactical_id  AND l.kode_opd = pb.kode_opd)
         OR (d.strategic_id = pb.strategic_id  AND d.kode_opd = pb.kode_opd)
-    INNER JOIN
-        aplikasi a ON (a.strategic_id = pb.strategic_id AND a.tactical_id = pb.tactical_id AND a.operational_id = pb.operational_id  AND a.kode_opd = pb.kode_opd)
-        OR (a.strategic_id = pb.strategic_id AND a.tactical_id = pb.tactical_id  AND a.kode_opd = pb.kode_opd)
+    LEFT JOIN
+        aplikasi a ON (a.strategic_id = pb.strategic_id AND a.tactical_id = pb.tactical_id AND a.operational_id = pb.operational_id  AND l.kode_opd = pb.kode_opd)
+        OR (a.strategic_id = pb.strategic_id AND a.tactical_id = pb.tactical_id  AND l.kode_opd = pb.kode_opd)
         OR (a.strategic_id = pb.strategic_id  AND a.kode_opd = pb.kode_opd)
     WHERE 1=1
-        AND l.nama_layanan IS NOT NULL
-        AND d.nama_data IS NOT NULL
-        AND a.nama_aplikasi IS NOT NULL
+    AND l.nama_layanan IS NOT NULL
+    AND d.nama_data IS NOT NULL
+    AND a.nama_aplikasi IS NOT NULL
+
+
 	`
 
 	var args []interface{}

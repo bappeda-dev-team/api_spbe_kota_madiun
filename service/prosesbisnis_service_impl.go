@@ -549,3 +549,81 @@ func (service *ProsesBisnisServiceImpl) GetProsesBisnisGrouped(ctx context.Conte
 
 	return webProsesBisnisList, nil
 }
+
+func (service *ProsesBisnisServiceImpl) GetProsesBisnisNoGap(ctx context.Context, kodeOPD string, tahun int) ([]web.GapProsesBisnis, error) {
+	tx, err := service.DB.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer helper.CommitOrRollback(tx)
+
+	prosesBisnisList, err := service.ProsesBisnisRepository.NoGapProsesBisnis(ctx, tx, kodeOPD, tahun)
+	if err != nil {
+		return nil, err
+	}
+
+	var webProsesBisnisList []web.GapProsesBisnis
+	idMap := make(map[int]*web.GapProsesBisnis)
+
+	for _, pb := range prosesBisnisList {
+		webPb, exists := idMap[pb.ID]
+		if !exists {
+			webPb = &web.GapProsesBisnis{
+				ID:               pb.ID,
+				KodeOpd:          pb.KodeOpd,
+				Tahun:            pb.Tahun,
+				NamaProsesBisnis: pb.NamaProsesBisnis,
+				KodeProsesBisnis: pb.KodeProsesBisnis,
+			}
+			idMap[pb.ID] = webPb
+		}
+
+		if pb.Layanan != nil {
+			for _, l := range pb.Layanan {
+				var webNullString web.NullString
+				if l.NamaLayanan.Valid {
+					webNullString.String = l.NamaLayanan.String
+					webNullString.Valid = true
+				}
+				tempLayanan := web.GapLayanan{NamaLayanan: webNullString}
+				if !helper.ContainsLayanan(webPb.Layanans, tempLayanan) {
+					webPb.Layanans = append(webPb.Layanans, tempLayanan)
+				}
+			}
+		}
+
+		if pb.DataDanInformasi != nil {
+			for _, d := range pb.DataDanInformasi {
+				var webNullString web.NullString
+				if d.NamaData.Valid {
+					webNullString.String = d.NamaData.String
+					webNullString.Valid = true
+				}
+				tempData := web.GapDataDanInformasi{NamaData: webNullString}
+				if !helper.ContainData(webPb.DataDanInformasi, tempData) {
+					webPb.DataDanInformasi = append(webPb.DataDanInformasi, tempData)
+				}
+			}
+		}
+
+		if pb.Aplikasi != nil {
+			for _, a := range pb.Aplikasi {
+				var webNullString web.NullString
+				if a.NamaAplikasi.Valid {
+					webNullString.String = a.NamaAplikasi.String
+					webNullString.Valid = true
+				}
+				tempAplikasi := web.GapAplikasi{NamaAplikasi: webNullString}
+				if !helper.ContainAplikasi(webPb.Aplikasi, tempAplikasi) {
+					webPb.Aplikasi = append(webPb.Aplikasi, tempAplikasi)
+				}
+			}
+		}
+	}
+
+	for _, webPb := range idMap {
+		webProsesBisnisList = append(webProsesBisnisList, *webPb)
+	}
+
+	return webProsesBisnisList, nil
+}

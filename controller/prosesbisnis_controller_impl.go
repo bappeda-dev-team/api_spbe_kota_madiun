@@ -165,3 +165,36 @@ func (controller *ProsesBisnisControllerImpl) GetProsesBisnisGrouped(writer http
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
+
+func (controller *ProsesBisnisControllerImpl) GetProsesBisnisNoGap(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	kodeOPD := params.ByName("kodeOPD")
+	tahunStr := params.ByName("tahun")
+
+	var tahun int
+	var err error
+
+	if tahunStr != "" {
+		tahun, err = strconv.Atoi(tahunStr)
+		helper.PanicIfError(err)
+	}
+
+	prosesBisnisResponse, err := controller.ProsesBisnisService.GetProsesBisnisNoGap(request.Context(), kodeOPD, tahun)
+	if err != nil {
+		log.Printf("Error mendapatkan Proses Bisnis No Gap: %v", err)
+		webResponse := web.WebResponse{
+			Code:   500,
+			Status: "Kesalahan Internal Server",
+			Data:   nil,
+		}
+		helper.WriteToResponseBody(writer, webResponse)
+		return
+	}
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "Berhasil mendapatkan Proses Bisnis No Gap",
+		Data:   prosesBisnisResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
