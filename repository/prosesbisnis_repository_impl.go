@@ -233,3 +233,122 @@ func (repository *ProsesBisnisRepositoryImpl) GapProsesBisnis(ctx context.Contex
 
 	return prosesBisnisList, nil
 }
+
+func (repository *ProsesBisnisRepositoryImpl) NoGapProsesBisnis(ctx context.Context, tx *sql.Tx, kodeOpd string, tahun int) ([]domain.GapProsesBisnis, error) {
+	query := `
+	   SELECT
+        pb.id,
+        pb.kode_opd,
+        pb.tahun,
+        pb.nama_proses_bisnis,
+        pb.kode_proses_bisnis,
+        l.nama_layanan,
+        d.nama_data,
+        a.nama_aplikasi
+    FROM
+        proses_bisnis pb
+    INNER JOIN
+        layanan_spbe l ON (l.strategic_id = pb.strategic_id AND l.tactical_id = pb.tactical_id AND l.operational_id = pb.operational_id  AND l.kode_opd = pb.kode_opd)
+        OR (l.strategic_id = pb.strategic_id AND l.tactical_id = pb.tactical_id  AND l.kode_opd = pb.kode_opd)
+        OR (l.strategic_id = pb.strategic_id  AND l.kode_opd = pb.kode_opd)
+    INNER JOIN
+        data_dan_informasi d ON (d.strategic_id = pb.strategic_id AND d.tactical_id = pb.tactical_id AND d.operational_id = pb.operational_id  AND d.kode_opd = pb.kode_opd)
+        OR (d.strategic_id = pb.strategic_id AND d.tactical_id = pb.tactical_id  AND d.kode_opd = pb.kode_opd)
+        OR (d.strategic_id = pb.strategic_id  AND d.kode_opd = pb.kode_opd)
+    INNER JOIN
+        aplikasi a ON (a.strategic_id = pb.strategic_id AND a.tactical_id = pb.tactical_id AND a.operational_id = pb.operational_id  AND a.kode_opd = pb.kode_opd)
+        OR (a.strategic_id = pb.strategic_id AND a.tactical_id = pb.tactical_id  AND a.kode_opd = pb.kode_opd)
+        OR (a.strategic_id = pb.strategic_id  AND a.kode_opd = pb.kode_opd)
+    WHERE 1=1
+        AND l.nama_layanan IS NOT NULL
+        AND d.nama_data IS NOT NULL
+        AND a.nama_aplikasi IS NOT NULL
+	`
+
+	var args []interface{}
+	if kodeOpd != "" {
+		query += " AND pb.kode_opd = ?"
+		args = append(args, kodeOpd)
+	}
+	if tahun != 0 {
+		query += " AND pb.tahun = ?"
+		args = append(args, tahun)
+	}
+
+	query += " ORDER BY pb.kode_opd, pb.id;"
+
+	rows, err := tx.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	prosesBisnisMap := make(map[int]*domain.GapProsesBisnis)
+
+	for rows.Next() {
+		var id int
+		var kodeOpd string
+		var tahun int
+		var namaProsesBisnis, kodeProsesBisnis string
+		var namaLayanan, namaData, namaAplikasi sql.NullString
+
+		if err := rows.Scan(
+			&id,
+			&kodeOpd,
+			&tahun,
+			&namaProsesBisnis,
+			&kodeProsesBisnis,
+			&namaLayanan,
+			&namaData,
+			&namaAplikasi,
+		); err != nil {
+			return nil, err
+		}
+
+		pb, exists := prosesBisnisMap[id]
+		if !exists {
+			pb = &domain.GapProsesBisnis{
+				ID:               id,
+				KodeOpd:          kodeOpd,
+				Tahun:            tahun,
+				NamaProsesBisnis: namaProsesBisnis,
+				KodeProsesBisnis: kodeProsesBisnis,
+			}
+			prosesBisnisMap[id] = pb
+		}
+
+		if namaLayanan.Valid {
+			pb.Layanan = append(pb.Layanan, domain.GapLayanan{
+				NamaLayanan: sql.NullString{
+					String: namaLayanan.String,
+					Valid:  true,
+				},
+			})
+		}
+		if namaData.Valid {
+			pb.DataDanInformasi = append(
+				pb.DataDanInformasi, domain.GapDataDanInformasi{
+					NamaData: sql.NullString{
+						String: namaData.String,
+						Valid:  true,
+					},
+				})
+		}
+		if namaAplikasi.Valid {
+			pb.Aplikasi = append(
+				pb.Aplikasi, domain.GapAplikasi{
+					NamaAplikasi: sql.NullString{
+						String: namaAplikasi.String,
+						Valid:  true,
+					},
+				})
+		}
+	}
+
+	var prosesBisnisList []domain.GapProsesBisnis
+	for _, pb := range prosesBisnisMap {
+		prosesBisnisList = append(prosesBisnisList, *pb)
+	}
+
+	return prosesBisnisList, nil
+}

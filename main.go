@@ -29,6 +29,8 @@ func main() {
 	datainformasiRepository := repository.NewDataDanInformasiRepository()
 	opdRepository := repository.NewOpdRepository()
 	urusanRepository := repository.NewUrusanRepository()
+	domainspbeRepository := repository.NewDomainSPBERepository()
+	kebutuhanSPBERepository := repository.NewKebutuhanSPBERepository()
 
 	//referensi arsitektur
 	referesiarsitekturService := service.NewReferensiArsitekturService(referensiarsitekturRepository, db, validate)
@@ -63,6 +65,14 @@ func main() {
 	prosesbisnisService := service.NewProsesBisnisService(referensiarsitekturRepository, sasarankotaRepository, bidangurusanRepository, prosesbisnisRepository, pohonkinerjaRepository, db, validate)
 	prosesbisnisController := controller.NewProsesBisnisController(prosesbisnisService)
 
+	//domainspbe
+	domainspbeService := service.NewDomainSPBEService(domainspbeRepository, db, validate)
+	domainspbeController := controller.NewDomainSPBEController(domainspbeService)
+
+	//kebutuhan spbe
+	kebutuhanSPBEService := service.NewKebutuhanSPBEService(kebutuhanSPBERepository, db)
+	kebutuhanSPBEController := controller.NewKebutuhanSPBEController(kebutuhanSPBEService)
+
 	//fetch opd
 	opdService := service.NewOpdService(opdRepository, db)
 	opdController := controller.NewOpdController(opdService)
@@ -71,7 +81,7 @@ func main() {
 	urusanService := service.NewUrusanService(urusanRepository, db)
 	urusanController := controller.NewUrusanController(urusanService)
 
-	router := app.NewRouter(referensiarsitekturController, prosesbisnisController, sasarankotaController, pohonkinerjaController, bidangurusanController, opdController, urusanController, layananspbeController, datainformasiController, aplikasiController)
+	router := app.NewRouter(referensiarsitekturController, prosesbisnisController, sasarankotaController, pohonkinerjaController, bidangurusanController, opdController, urusanController, layananspbeController, datainformasiController, aplikasiController, domainspbeController, kebutuhanSPBEController)
 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},

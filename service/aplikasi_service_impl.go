@@ -322,6 +322,13 @@ func (service *AplikasiServiceImpl) Insert(ctx context.Context, request web.Apli
 		}
 	}
 
+	// Jika TacticalId terisi, ambil nama pohonnya dan isi FungsiAplikasi
+	if aplikasi.TacticalId.Valid {
+		tacticalData, err := service.PohonkinerjaRepository.FindById(ctx, tx, int(aplikasi.TacticalId.Int32))
+		helper.PanicIfError(err)
+		aplikasi.FungsiAplikasi = tacticalData.NamaPohon
+	}
+
 	aplikasData := service.AplikasiRepository.Insert(ctx, tx, aplikasi)
 	return helper.ToAplikasiRespons(aplikasData)
 }
@@ -354,9 +361,16 @@ func (service *AplikasiServiceImpl) Update(ctx context.Context, request web.Apli
 	aplikasi.TacticalId = sql.NullInt32{Int32: int32(request.TacticalId), Valid: request.TacticalId != 0}
 	aplikasi.OperationalId = sql.NullInt32{Int32: int32(request.OperationalId), Valid: request.OperationalId != 0}
 
+	if aplikasi.TacticalId.Valid {
+		tacticalData, err := service.PohonkinerjaRepository.FindById(ctx, tx, int(aplikasi.TacticalId.Int32))
+		helper.PanicIfError(err)
+		aplikasi.FungsiAplikasi = tacticalData.NamaPohon
+	}
+
 	aplikasi = service.AplikasiRepository.Update(ctx, tx, aplikasi)
 	return helper.ToAplikasiRespons(aplikasi)
 }
+
 func (service *AplikasiServiceImpl) Delete(ctx context.Context, aplikasiId int) {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
