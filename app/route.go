@@ -11,7 +11,7 @@ type RouteController struct {
 }
 
 func NewRouter(referensiarsitekturController controller.ReferensiArsitekturController,
-	prosesbisnisController controller.ProsesBisnisController, sasarankotaController controller.SasaranKotaController, pohonkinerja controller.PohonKinerjaController, bidangurusan controller.BidangUrusanController, opdController controller.OpdController, urusanController controller.UrusanController, layananspbeController controller.LayananSpbeController, datainformasiController controller.DataDanInformasiController, aplikasiController controller.AplikasiController) *httprouter.Router {
+	prosesbisnisController controller.ProsesBisnisController, sasarankotaController controller.SasaranKotaController, pohonkinerja controller.PohonKinerjaController, bidangurusan controller.BidangUrusanController, opdController controller.OpdController, urusanController controller.UrusanController, layananspbeController controller.LayananSpbeController, datainformasiController controller.DataDanInformasiController, aplikasiController controller.AplikasiController, domainspbeController controller.DomainSPBEController, kebutuhanSPBEController controller.KebutuhanSPBEController) *httprouter.Router {
 	router := httprouter.New()
 
 	//referensi arsitektur router
@@ -27,6 +27,9 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.GET("/v1/prosesbisnis/:kodeOPD", prosesbisnisController.FindByKodeOPD)
 	router.GET("/v1/prosesbisnisbytahun/:tahun", prosesbisnisController.FindByKodeOPD)
 	router.GET("/v1/prosesbisnis/:kodeOPD/:tahun", prosesbisnisController.FindByKodeOPD)
+	router.GET("/v1/prosesbisnisnogap", prosesbisnisController.GetProsesBisnisNoGap)
+	router.GET("/v1/prosesbisnisnogap/:kodeOPD", prosesbisnisController.GetProsesBisnisNoGap)
+	router.GET("/v1/prosesbisnisnogap/:kodeOPD/:tahun", prosesbisnisController.GetProsesBisnisNoGap)
 	router.GET("/v1/prosesbisnisbyid/:prosesbisnisId", prosesbisnisController.FindById)
 	router.POST("/v1/createprosesbisnis", prosesbisnisController.Insert)
 	router.PUT("/v1/updateprosesbisnis/:prosesbisnisId", prosesbisnisController.Update)
@@ -72,6 +75,23 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.POST("/v1/createaplikasi", aplikasiController.Insert)
 	router.PUT("/v1/updateaplikasi/:aplikasiId", aplikasiController.Update)
 	router.DELETE("/v1/deleteaplikasi/:aplikasiId", aplikasiController.Delete)
+
+	//domainspbe
+	router.GET("/v1/domainspbe", domainspbeController.FindAll)
+	router.GET("/v1/domainspbe/:domainSPBEId", domainspbeController.FindById)
+	router.POST("/v1/createdomainspbe", domainspbeController.Insert)
+	router.PUT("/v1/updatedomainspbe/:domainSPBEId", domainspbeController.Update)
+	router.DELETE("/v1/deletedomainspbe/:domainSPBEId", domainspbeController.Delete)
+
+	//kebutuhanspbe
+	router.GET("/v1/kebutuhanspbe", kebutuhanSPBEController.FindByKodeOpdAndTahun)
+	router.GET("/v1/kebutuhanspbe/:kodeOpd", kebutuhanSPBEController.FindByKodeOpdAndTahun)
+	router.GET("/v1/kebutuhanspbebytahun/:tahun", kebutuhanSPBEController.FindByKodeOpdAndTahun)
+	router.GET("/v1/kebutuhanspbe/:kodeOpd/:tahun", kebutuhanSPBEController.FindByKodeOpdAndTahun)
+	router.GET("/v1/kebutuhanspbebyid/:kebutuhanSPBEId", kebutuhanSPBEController.FindById)
+	router.POST("/v1/createkebutuhanspbe", kebutuhanSPBEController.Create)
+	router.PUT("/v1/updatekebutuhanspbe/:kebutuhanSPBEId", kebutuhanSPBEController.Update)
+	router.DELETE("/v1/deletekebutuhanspbe/:kebutuhanSPBEId", kebutuhanSPBEController.Delete)
 
 	//fetch api
 	router.GET("/sasarankotafetch", sasarankotaController.Insert)

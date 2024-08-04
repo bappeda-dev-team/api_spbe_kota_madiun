@@ -18,3 +18,16 @@ func GenerateRandomKode() string {
 
 	return randomKodeProsesBisnis
 }
+
+func GenerateRandomKodeDomain() string {
+	rand.NewSource(time.Now().UnixNano())
+
+	min := 10000
+	max := 99999
+
+	randomInt := rand.Intn(max-min) + min
+
+	randomKodeDomain := "d-" + strconv.Itoa(randomInt)
+
+	return randomKodeDomain
+}

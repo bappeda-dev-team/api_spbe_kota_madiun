@@ -13,4 +13,5 @@ type ProsesBisnisRepository interface {
 	Update(ctx context.Context, tx *sql.Tx, prosesBisnis domain.ProsesBisnis) domain.ProsesBisnis
 	Delete(ctx context.Context, tx *sql.Tx, prosesBisnis domain.ProsesBisnis)
 	GapProsesBisnis(ctx context.Context, tx *sql.Tx, kodeOpd string, tahun int) ([]domain.GapProsesBisnis, error)
+	NoGapProsesBisnis(ctx context.Context, tx *sql.Tx, kodeOpd string, tahun int) ([]domain.GapProsesBisnis, error)
 }

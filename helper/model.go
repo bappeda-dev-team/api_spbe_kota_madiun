@@ -26,6 +26,15 @@ func ToReferenceResponses(reference []domain.ReferensiArsitektur) []web.Referens
 	return referenceResponses
 }
 
+func ToDomainSPBEResponse(domainSPBE domain.DomainSPBE) web.DomainSPBEResponse {
+	return web.DomainSPBEResponse{
+		Id:         domainSPBE.Id,
+		NamaDomain: domainSPBE.NamaDomain,
+		KodeDomain: domainSPBE.KodeDomain,
+		Tahun:      domainSPBE.Tahun,
+	}
+}
+
 func ToProsesBisnisResponse(prosesbisnis domain.ProsesBisnis) web.ProsesBisnisRespons {
 	return web.ProsesBisnisRespons{
 		ID:               prosesbisnis.ID,
@@ -230,6 +239,88 @@ func ToPohonResponses(pohon []domain.PohonKinerja) []web.PohonKinerjaRespons {
 		pohonRespons = append(pohonRespons, ToPohonKinerjaResponse(pohonKinerja))
 	}
 	return pohonRespons
+}
+
+func ToDomainSPBEResponses(domains []domain.DomainSPBE) []web.DomainSPBEResponse {
+	var domainSPBEResponses []web.DomainSPBEResponse
+	for _, domain := range domains {
+		domainSPBEResponses = append(domainSPBEResponses, ToDomainSPBEResponse(domain))
+	}
+	return domainSPBEResponses
+}
+
+// func ToKebutuhanSPBERespons(kebutuhanSPBE domain.KebutuhanSPBE) web.KebutuhanSPBEResponse {
+// 	var jenisKebutuhanResponses []web.JenisKebutuhanResponse
+// 	for _, jk := range kebutuhanSPBE.JenisKebutuhan {
+// 		var kondisiAwalResponses []web.KondisiAwalResponse
+// 		for _, ka := range jk.KondisiAwal {
+// 			kondisiAwalResponses = append(kondisiAwalResponses, web.KondisiAwalResponse{
+// 				Id:               ka.Id,
+// 				JenisKebutuhanId: ka.JenisKebutuhanId,
+// 				Keterangan:       ka.Keterangan,
+// 				Tahun:            ka.Tahun,
+// 			})
+// 		}
+// 		jenisKebutuhanResponses = append(jenisKebutuhanResponses, web.JenisKebutuhanResponse{
+// 			Id:          jk.Id,
+// 			KebutuhanId: jk.KebutuhanId,
+// 			Kebutuhan:   jk.Kebutuhan,
+// 			KondisiAwal: kondisiAwalResponses,
+// 		})
+// 	}
+// 	return web.KebutuhanSPBEResponse{
+// 		ID:             kebutuhanSPBE.ID,
+// 		KodeOpd:        kebutuhanSPBE.KodeOpd,
+// 		Tahun:          kebutuhanSPBE.Tahun,
+// 		NamaDomain:     kebutuhanSPBE.NamaDomain,
+// 		IdProsesbisnis: kebutuhanSPBE.IdProsesbisnis,
+// 		JenisKebutuhan: jenisKebutuhanResponses,
+// 	}
+// }
+
+func ToKebutuhanSPBEResponse(kebutuhanSPBE domain.KebutuhanSPBE) web.KebutuhanSPBEResponse {
+	return web.KebutuhanSPBEResponse{
+		ID:             kebutuhanSPBE.ID,
+		KodeOpd:        kebutuhanSPBE.KodeOpd,
+		Tahun:          kebutuhanSPBE.Tahun,
+		NamaDomain:     kebutuhanSPBE.NamaDomain,
+		IdProsesbisnis: kebutuhanSPBE.IdProsesbisnis,
+		JenisKebutuhan: ToJenisKebutuhanResponses(kebutuhanSPBE.JenisKebutuhan),
+	}
+}
+
+func ToJenisKebutuhanResponses(jenisKebutuhan []domain.JenisKebutuhan) []web.JenisKebutuhanResponse {
+	var jenisKebutuhanResponses []web.JenisKebutuhanResponse
+	for _, jk := range jenisKebutuhan {
+		jenisKebutuhanResponses = append(jenisKebutuhanResponses, ToJenisKebutuhanResponse(jk))
+	}
+	return jenisKebutuhanResponses
+}
+
+func ToJenisKebutuhanResponse(jenisKebutuhan domain.JenisKebutuhan) web.JenisKebutuhanResponse {
+	return web.JenisKebutuhanResponse{
+		Id:          jenisKebutuhan.Id,
+		KebutuhanId: jenisKebutuhan.KebutuhanId,
+		Kebutuhan:   jenisKebutuhan.Kebutuhan,
+		KondisiAwal: ToKondisiAwalResponses(jenisKebutuhan.KondisiAwal),
+	}
+}
+
+func ToKondisiAwalResponses(kondisiAwal []domain.KondisiAwal) []web.KondisiAwalResponse {
+	var kondisiAwalResponses []web.KondisiAwalResponse
+	for _, ka := range kondisiAwal {
+		kondisiAwalResponses = append(kondisiAwalResponses, ToKondisiAwalResponse(ka))
+	}
+	return kondisiAwalResponses
+}
+
+func ToKondisiAwalResponse(kondisiAwal domain.KondisiAwal) web.KondisiAwalResponse {
+	return web.KondisiAwalResponse{
+		Id:               kondisiAwal.Id,
+		JenisKebutuhanId: kondisiAwal.JenisKebutuhanId,
+		Keterangan:       kondisiAwal.Keterangan,
+		Tahun:            kondisiAwal.Tahun,
+	}
 }
 
 func nullInt32ToInt(n sql.NullInt32) int {
