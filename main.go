@@ -70,7 +70,7 @@ func main() {
 	domainspbeController := controller.NewDomainSPBEController(domainspbeService)
 
 	//kebutuhan spbe
-	kebutuhanSPBEService := service.NewKebutuhanSPBEService(kebutuhanSPBERepository, db)
+	kebutuhanSPBEService := service.NewKebutuhanSPBEService(kebutuhanSPBERepository, prosesbisnisRepository, db)
 	kebutuhanSPBEController := controller.NewKebutuhanSPBEController(kebutuhanSPBEService)
 
 	//fetch opd

@@ -28,4 +28,6 @@ CREATE TABLE aplikasi(
     CONSTRAINT fk_tactical_aplikasi FOREIGN KEY (tactical_id) REFERENCES pohon_kinerja (id),
     CONSTRAINT fk_operational_aplikasi FOREIGN KEY (operational_id) REFERENCES pohon_kinerja (id),
     CONSTRAINT fk_kode_opd_aplikasi FOREIGN KEY (kode_opd) REFERENCES opd (kode_opd)
-)ENGINE=InnoDB;
+)ENGINE=InnoDB
+DEFAULT CHARSET=latin1
+COLLATE=latin1_swedish_ci;

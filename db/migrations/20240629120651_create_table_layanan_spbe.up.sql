@@ -24,4 +24,6 @@ CREATE TABLE layanan_spbe
     CONSTRAINT fk_ral_level_5 FOREIGN KEY (ral_level_5_id) REFERENCES referensi_arsitekturs (id),
     CONSTRAINT fk_tujuan_layanan FOREIGN KEY (tujuan_layanan_id) REFERENCES pohon_kinerja (id),
     CONSTRAINT fk_layanan_spbe_kode_opd FOREIGN KEY (kode_opd) REFERENCES opd (kode_opd)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB
+DEFAULT CHARSET=latin1
+COLLATE=latin1_swedish_ci;

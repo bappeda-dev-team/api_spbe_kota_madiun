@@ -24,4 +24,6 @@ CREATE TABLE proses_bisnis
     CONSTRAINT fk_rab_level_6 FOREIGN KEY (rab_level_6_id) REFERENCES pohon_kinerja (id),
     CONSTRAINT fk_proses_bisnis_kode_opd FOREIGN KEY (kode_opd) REFERENCES opd (kode_opd),
     CONSTRAINT fk_sasaran_kota FOREIGN KEY (sasaran_kota) REFERENCES sasaran_kota (sasaran)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB
+DEFAULT CHARSET=latin1
+COLLATE=latin1_swedish_ci;

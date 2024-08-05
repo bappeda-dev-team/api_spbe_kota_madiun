@@ -8,4 +8,6 @@ CREATE TABLE users_roles
     PRIMARY KEY (id),
     CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users (id),
     CONSTRAINT fk_role_id FOREIGN KEY (role_id) REFERENCES role (id)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB
+DEFAULT CHARSET=latin1
+COLLATE=latin1_swedish_ci;

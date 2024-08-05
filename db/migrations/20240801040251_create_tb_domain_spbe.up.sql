@@ -6,4 +6,6 @@ CREATE TABLE domain_spbe
     tahun INT,
     PRIMARY KEY (id),
     INDEX (nama_domain)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB
+DEFAULT CHARSET=latin1
+COLLATE=latin1_swedish_ci;

@@ -10,4 +10,6 @@ CREATE TABLE urusan_bidang_opd
     CONSTRAINT fk_kode_urusan FOREIGN KEY(kode_urusan) REFERENCES urusan(kode_urusan),
     CONSTRAINT fk_bidang_urusan FOREIGN KEY(bidang_urusan) REFERENCES bidang_urusan(kode_bidang_urusan),
     CONSTRAINT fk_kode_opd FOREIGN KEY (kode_opd) REFERENCES opd(kode_opd)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB
+DEFAULT CHARSET=latin1
+COLLATE=latin1_swedish_ci;
