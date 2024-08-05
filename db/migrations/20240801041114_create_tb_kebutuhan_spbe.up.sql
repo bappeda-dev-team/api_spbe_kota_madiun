@@ -1,7 +1,7 @@
 CREATE TABLE kebutuhan_spbe
 (
     id INT NOT NULL AUTO_INCREMENT,
-    nama_domain VARCHAR(255) NOT NULL NOT NULL,
+    nama_domain VARCHAR(255) NOT NULL,
     kode_opd VARCHAR(255),
     tahun INT NOT NULL,
     id_prosesbisnis INT NOT NULL,
