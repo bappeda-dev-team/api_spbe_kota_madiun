@@ -280,11 +280,13 @@ func ToDomainSPBEResponses(domains []domain.DomainSPBE) []web.DomainSPBEResponse
 
 func ToKebutuhanSPBEResponse(kebutuhanSPBE domain.KebutuhanSPBE) web.KebutuhanSPBEResponse {
 	return web.KebutuhanSPBEResponse{
-		ID:             kebutuhanSPBE.ID,
-		KodeOpd:        kebutuhanSPBE.KodeOpd,
-		Tahun:          kebutuhanSPBE.Tahun,
-		NamaDomain:     kebutuhanSPBE.NamaDomain,
-		IdProsesbisnis: kebutuhanSPBE.IdProsesbisnis,
+		ID:         kebutuhanSPBE.ID,
+		KodeOpd:    kebutuhanSPBE.KodeOpd,
+		Tahun:      kebutuhanSPBE.Tahun,
+		NamaDomain: kebutuhanSPBE.NamaDomain,
+		ProsesBisnis: web.ProsesBisnisResponse{
+			ID: kebutuhanSPBE.IdProsesbisnis,
+		},
 		JenisKebutuhan: ToJenisKebutuhanResponses(kebutuhanSPBE.JenisKebutuhan),
 	}
 }
