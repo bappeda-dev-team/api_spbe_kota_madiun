@@ -28,4 +28,6 @@ CREATE TABLE data_dan_informasi (
     CONSTRAINT fk_tactical_data FOREIGN KEY (tactical_id) REFERENCES pohon_kinerja (id),
     CONSTRAINT fk_operational_data FOREIGN KEY (operational_id) REFERENCES pohon_kinerja (id),
     CONSTRAINT fk_kode_opd_data FOREIGN KEY (kode_opd) REFERENCES opd (kode_opd)
-)ENGINE=InnoDB;
+)ENGINE=InnoDB
+DEFAULT CHARSET=latin1
+COLLATE=latin1_swedish_ci;

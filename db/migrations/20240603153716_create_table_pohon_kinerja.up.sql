@@ -10,4 +10,6 @@ CREATE TABLE pohon_kinerja
     kode_opd VARCHAR(255),
     PRIMARY KEY (id),
     CONSTRAINT fk_pohon_kinerja_kode_opd FOREIGN KEY (kode_opd) REFERENCES opd (kode_opd)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB
+DEFAULT CHARSET=latin1
+COLLATE=latin1_swedish_ci;

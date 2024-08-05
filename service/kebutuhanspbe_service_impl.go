@@ -11,12 +11,14 @@ import (
 
 type KebutuhanSPBEServiceImpl struct {
 	KebutuhanSPBERepository repository.KebutuhanSPBERepository
+	ProsesBisnisRepository  repository.ProsesBisnisRepository
 	DB                      *sql.DB
 }
 
-func NewKebutuhanSPBEService(kebutuhanSPBERepository repository.KebutuhanSPBERepository, DB *sql.DB) KebutuhanSPBEService {
+func NewKebutuhanSPBEService(kebutuhanSPBERepository repository.KebutuhanSPBERepository, prosesBisnisRepository repository.ProsesBisnisRepository, DB *sql.DB) KebutuhanSPBEService {
 	return &KebutuhanSPBEServiceImpl{
 		KebutuhanSPBERepository: kebutuhanSPBERepository,
+		ProsesBisnisRepository:  prosesBisnisRepository,
 		DB:                      DB,
 	}
 }
@@ -159,13 +161,16 @@ func (service *KebutuhanSPBEServiceImpl) FindById(ctx context.Context, kebutuhan
 		})
 	}
 
+	prosesBisnis, err := service.ProsesBisnisRepository.FindById(ctx, tx, kebutuhanSPBE.IdProsesbisnis)
+	helper.PanicIfError(err)
+
 	response := web.KebutuhanSPBEResponse{
-		ID:             kebutuhanSPBE.ID,
-		KodeOpd:        kebutuhanSPBE.KodeOpd,
-		Tahun:          kebutuhanSPBE.Tahun,
-		NamaDomain:     kebutuhanSPBE.NamaDomain,
-		IdProsesbisnis: kebutuhanSPBE.IdProsesbisnis,
-		JenisKebutuhan: jenisKebutuhanResponses,
+		ID:               kebutuhanSPBE.ID,
+		KodeOpd:          kebutuhanSPBE.KodeOpd,
+		Tahun:            kebutuhanSPBE.Tahun,
+		NamaDomain:       kebutuhanSPBE.NamaDomain,
+		NamaProsesBisnis: prosesBisnis.NamaProsesBisnis,
+		JenisKebutuhan:   jenisKebutuhanResponses,
 	}
 
 	return response, nil
@@ -215,13 +220,16 @@ func (service *KebutuhanSPBEServiceImpl) FindByKodeOpdAndTahun(ctx context.Conte
 			})
 		}
 
+		prosesBisnis, err := service.ProsesBisnisRepository.FindById(ctx, tx, kebutuhanSPBE.IdProsesbisnis)
+		helper.PanicIfError(err)
+
 		responses = append(responses, web.KebutuhanSPBEResponse{
-			ID:             kebutuhanSPBE.ID,
-			KodeOpd:        kebutuhanSPBE.KodeOpd,
-			Tahun:          kebutuhanSPBE.Tahun,
-			NamaDomain:     kebutuhanSPBE.NamaDomain,
-			IdProsesbisnis: kebutuhanSPBE.IdProsesbisnis,
-			JenisKebutuhan: jenisKebutuhanResponses,
+			ID:               kebutuhanSPBE.ID,
+			KodeOpd:          kebutuhanSPBE.KodeOpd,
+			Tahun:            kebutuhanSPBE.Tahun,
+			NamaDomain:       kebutuhanSPBE.NamaDomain,
+			NamaProsesBisnis: prosesBisnis.NamaProsesBisnis,
+			JenisKebutuhan:   jenisKebutuhanResponses,
 		})
 	}
 

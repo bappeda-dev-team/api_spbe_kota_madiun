@@ -10,5 +10,5 @@ CREATE TABLE kebutuhan_spbe
     CONSTRAINT fk_kebutuhan_spbe_kode_opd FOREIGN KEY (kode_opd) REFERENCES opd (kode_opd),
     CONSTRAINT fk_kebutuhan_spbe_id_prosesbisnis FOREIGN KEY (id_prosesbisnis) REFERENCES proses_bisnis (id)
 ) ENGINE=InnoDB
-    DEFAULT CHARSET=latin1
-    COLLATE latin1_swedish_ci;
+DEFAULT CHARSET=latin1
+COLLATE=latin1_swedish_ci;

@@ -5,4 +5,6 @@ CREATE TABLE jenis_kebutuhan
     kebutuhan TEXT NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT fk_kebutuhan_id FOREIGN KEY (kebutuhan_id) REFERENCES kebutuhan_spbe (id)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB
+DEFAULT CHARSET=latin1
+COLLATE=latin1_swedish_ci;
