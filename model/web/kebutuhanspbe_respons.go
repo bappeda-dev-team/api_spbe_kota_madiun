@@ -1,13 +1,17 @@
 package web
 
 type KebutuhanSPBEResponse struct {
-	ID               int                      `json:"id"`
-	KodeOpd          string                   `json:"kode_opd"`
-	Tahun            int                      `json:"tahun"`
-	NamaDomain       string                   `json:"nama_domain"`
-	IdProsesbisnis   int                      `json:"id_prosesbisnis,omitempty"`
-	NamaProsesBisnis string                   `json:"nama_proses_bisnis"`
-	JenisKebutuhan   []JenisKebutuhanResponse `json:"jenis_kebutuhan"`
+	ID             int                      `json:"id"`
+	KodeOpd        string                   `json:"kode_opd"`
+	Tahun          int                      `json:"tahun"`
+	NamaDomain     string                   `json:"nama_domain"`
+	ProsesBisnis   ProsesBisnisResponse     `json:"proses_bisnis"`
+	JenisKebutuhan []JenisKebutuhanResponse `json:"jenis_kebutuhan"`
+}
+
+type ProsesBisnisResponse struct {
+	ID               int    `json:"id"`
+	NamaProsesBisnis string `json:"nama_proses_bisnis"`
 }
 
 type JenisKebutuhanResponse struct {

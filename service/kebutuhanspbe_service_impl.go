@@ -165,12 +165,15 @@ func (service *KebutuhanSPBEServiceImpl) FindById(ctx context.Context, kebutuhan
 	helper.PanicIfError(err)
 
 	response := web.KebutuhanSPBEResponse{
-		ID:               kebutuhanSPBE.ID,
-		KodeOpd:          kebutuhanSPBE.KodeOpd,
-		Tahun:            kebutuhanSPBE.Tahun,
-		NamaDomain:       kebutuhanSPBE.NamaDomain,
-		NamaProsesBisnis: prosesBisnis.NamaProsesBisnis,
-		JenisKebutuhan:   jenisKebutuhanResponses,
+		ID:         kebutuhanSPBE.ID,
+		KodeOpd:    kebutuhanSPBE.KodeOpd,
+		Tahun:      kebutuhanSPBE.Tahun,
+		NamaDomain: kebutuhanSPBE.NamaDomain,
+		ProsesBisnis: web.ProsesBisnisResponse{
+			ID:               prosesBisnis.ID,
+			NamaProsesBisnis: prosesBisnis.NamaProsesBisnis,
+		},
+		JenisKebutuhan: jenisKebutuhanResponses,
 	}
 
 	return response, nil
@@ -224,12 +227,15 @@ func (service *KebutuhanSPBEServiceImpl) FindByKodeOpdAndTahun(ctx context.Conte
 		helper.PanicIfError(err)
 
 		responses = append(responses, web.KebutuhanSPBEResponse{
-			ID:               kebutuhanSPBE.ID,
-			KodeOpd:          kebutuhanSPBE.KodeOpd,
-			Tahun:            kebutuhanSPBE.Tahun,
-			NamaDomain:       kebutuhanSPBE.NamaDomain,
-			NamaProsesBisnis: prosesBisnis.NamaProsesBisnis,
-			JenisKebutuhan:   jenisKebutuhanResponses,
+			ID:         kebutuhanSPBE.ID,
+			KodeOpd:    kebutuhanSPBE.KodeOpd,
+			Tahun:      kebutuhanSPBE.Tahun,
+			NamaDomain: kebutuhanSPBE.NamaDomain,
+			ProsesBisnis: web.ProsesBisnisResponse{
+				ID:               prosesBisnis.ID,
+				NamaProsesBisnis: prosesBisnis.NamaProsesBisnis,
+			},
+			JenisKebutuhan: jenisKebutuhanResponses,
 		})
 	}
 
