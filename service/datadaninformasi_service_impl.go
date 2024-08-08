@@ -129,6 +129,7 @@ func (service *DataDanInformasiServiceImpl) FindByKodeOpd(ctx context.Context, k
 			InformasiTerkaitInput:  dataDanInformasi.InformasiTerkaitInput,
 			InformasiTerkaitOutput: dataDanInformasi.InformasiTerkaitOutput,
 			Interoprabilitas:       dataDanInformasi.Interoprabilitas,
+			Keterangan:             dataDanInformasi.Keterangan,
 			Tahun:                  dataDanInformasi.Tahun,
 			CreatedAt:              dataDanInformasi.CreatedAt.Format("2006-01-02 15:04:05"),
 			UpdatedAt:              dataDanInformasi.UpdatedAt.Format("2006-01-02 15:04:05"),
@@ -245,6 +246,7 @@ func (service *DataDanInformasiServiceImpl) FindById(ctx context.Context, dataId
 		InformasiTerkaitInput:  dataDanInformasi.InformasiTerkaitInput,
 		InformasiTerkaitOutput: dataDanInformasi.InformasiTerkaitOutput,
 		Interoprabilitas:       dataDanInformasi.Interoprabilitas,
+		Keterangan:             dataDanInformasi.Keterangan,
 		Tahun:                  dataDanInformasi.Tahun,
 		CreatedAt:              dataDanInformasi.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt:              dataDanInformasi.UpdatedAt.Format("2006-01-02 15:04:05"),
@@ -282,6 +284,7 @@ func (service *DataDanInformasiServiceImpl) Insert(ctx context.Context, request 
 		InformasiTerkaitInput:  request.InformasiTerkaitInput,
 		InformasiTerkaitOutput: request.InformasiTerkaitOutput,
 		Interoprabilitas:       request.Interoprabilitas,
+		Keterangan:             request.Keterangan,
 		Tahun:                  request.Tahun,
 		CreatedAt:              currentTime,
 		RadLevel1id: sql.NullInt32{
@@ -389,6 +392,7 @@ func (service *DataDanInformasiServiceImpl) Update(ctx context.Context, request 
 	dataInformasi.InformasiTerkaitInput = request.InformasiTerkaitInput
 	dataInformasi.InformasiTerkaitOutput = request.InformasiTerkaitOutput
 	dataInformasi.Interoprabilitas = request.Interoprabilitas
+	dataInformasi.Keterangan = request.Keterangan
 	dataInformasi.Tahun = request.Tahun
 	dataInformasi.RadLevel1id = sql.NullInt32{Int32: int32(request.RadLevel1id), Valid: request.RadLevel1id != 0}
 	dataInformasi.RadLevel2id = sql.NullInt32{Int32: int32(request.RadLevel2id), Valid: request.RadLevel2id != 0}

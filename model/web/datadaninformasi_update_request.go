@@ -13,6 +13,7 @@ type DataDanInformasiUpdateRequest struct {
 	InformasiTerkaitInput  string `json:"informasi_terkait_input"`
 	InformasiTerkaitOutput string `json:"informasi_terkait_output"`
 	Interoprabilitas       string `json:"interoprabilitas"`
+	Keterangan             string `json:"keterangan"`
 	Tahun                  int    `json:"tahun"`
 	RadLevel1id            int    `json:"rad_level_1_id"`
 	RadLevel2id            int    `json:"rad_level_2_id"`
