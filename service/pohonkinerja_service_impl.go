@@ -15,7 +15,7 @@ type PohonKinerjaServiceImpl struct {
 	DB                     *sql.DB
 }
 
-func NewPohonKinerjaService(pohonkinerjaRepository repository.PohonKinerjaRepository, DB *sql.DB) PohonKinerjaService {
+func NewPohonKinerjaServiceImpl(pohonkinerjaRepository repository.PohonKinerjaRepository, DB *sql.DB) *PohonKinerjaServiceImpl {
 	return &PohonKinerjaServiceImpl{
 		PohonKinerjaRepository: pohonkinerjaRepository,
 		DB:                     DB,

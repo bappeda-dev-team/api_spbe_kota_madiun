@@ -14,7 +14,7 @@ type ReferensiArsitekturControllerImpl struct {
 	ReferensiArsitekturService service.ReferensiArsitekturService
 }
 
-func NewReferensiarstitekturController(referenceService service.ReferensiArsitekturService) ReferensiArsitekturController {
+func NewReferensiArsitekturControllerImpl(referenceService service.ReferensiArsitekturService) *ReferensiArsitekturControllerImpl {
 	return &ReferensiArsitekturControllerImpl{
 		ReferensiArsitekturService: referenceService,
 	}

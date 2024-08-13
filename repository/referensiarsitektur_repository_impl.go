@@ -14,7 +14,7 @@ import (
 type ReferensiArsitekturRepositoryImpl struct {
 }
 
-func NewReferensiArsitekturRepository() ReferensiArsitekturRepository {
+func NewReferensiArsitekturRepositoryImpl() *ReferensiArsitekturRepositoryImpl {
 	return &ReferensiArsitekturRepositoryImpl{}
 }
 

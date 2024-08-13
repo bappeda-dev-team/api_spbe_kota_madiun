@@ -7,6 +7,7 @@ import (
 	"api_spbe_kota_madiun/repository"
 	"context"
 	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -20,7 +21,7 @@ type DataDanInformasiServiceImpl struct {
 	Validate                      *validator.Validate
 }
 
-func NewDataDanInformasiService(datadaninformasiRepository repository.DataDanInformasiRepository, pohonkinerjaRepository repository.PohonKinerjaRepository, referensiarsitekturRepository repository.ReferensiArsitekturRepository, DB *sql.DB, validate *validator.Validate) DataDanInformasiService {
+func NewDataDanInformasiServiceImpl(datadaninformasiRepository repository.DataDanInformasiRepository, pohonkinerjaRepository repository.PohonKinerjaRepository, referensiarsitekturRepository repository.ReferensiArsitekturRepository, DB *sql.DB, validate *validator.Validate) *DataDanInformasiServiceImpl {
 	return &DataDanInformasiServiceImpl{
 		DataDanInformasiRepository:    datadaninformasiRepository,
 		PohonkinerjaRepository:        pohonkinerjaRepository,
@@ -32,9 +33,7 @@ func NewDataDanInformasiService(datadaninformasiRepository repository.DataDanInf
 
 func (service *DataDanInformasiServiceImpl) FindByKodeOpd(ctx context.Context, kodeOPD string, tahun int) ([]web.DataDanInformasiRespons, error) {
 	tx, err := service.DB.Begin()
-	if err != nil {
-		return nil, err
-	}
+	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
 	dataDanInformasiList, err := service.DataDanInformasiRepository.FindByKodeOpd(ctx, tx, kodeOPD, tahun)
@@ -129,7 +128,6 @@ func (service *DataDanInformasiServiceImpl) FindByKodeOpd(ctx context.Context, k
 			InformasiTerkaitInput:  dataDanInformasi.InformasiTerkaitInput,
 			InformasiTerkaitOutput: dataDanInformasi.InformasiTerkaitOutput,
 			Interoprabilitas:       dataDanInformasi.Interoprabilitas,
-			Keterangan:             dataDanInformasi.Keterangan,
 			Tahun:                  dataDanInformasi.Tahun,
 			CreatedAt:              dataDanInformasi.CreatedAt.Format("2006-01-02 15:04:05"),
 			UpdatedAt:              dataDanInformasi.UpdatedAt.Format("2006-01-02 15:04:05"),
@@ -147,7 +145,7 @@ func (service *DataDanInformasiServiceImpl) FindByKodeOpd(ctx context.Context, k
 	return responses, nil
 }
 
-func (service *DataDanInformasiServiceImpl) FindById(ctx context.Context, dataId int) (web.DataDanInformasiRespons, error) {
+func (service *DataDanInformasiServiceImpl) FindById(ctx context.Context, dataId int, kodeOPD string) (web.DataDanInformasiRespons, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		return web.DataDanInformasiRespons{}, err
@@ -157,6 +155,10 @@ func (service *DataDanInformasiServiceImpl) FindById(ctx context.Context, dataId
 	dataDanInformasi, err := service.DataDanInformasiRepository.FindById(ctx, tx, dataId)
 	if err != nil {
 		return web.DataDanInformasiRespons{}, err
+	}
+
+	if kodeOPD != "" && dataDanInformasi.KodeOPD != kodeOPD {
+		return web.DataDanInformasiRespons{}, errors.New("data dan informasi tidak ditemukan untuk OPD ini")
 	}
 
 	var strategicid, tacticalid, operational *web.DataDanInformasiPohonResponns
@@ -246,7 +248,6 @@ func (service *DataDanInformasiServiceImpl) FindById(ctx context.Context, dataId
 		InformasiTerkaitInput:  dataDanInformasi.InformasiTerkaitInput,
 		InformasiTerkaitOutput: dataDanInformasi.InformasiTerkaitOutput,
 		Interoprabilitas:       dataDanInformasi.Interoprabilitas,
-		Keterangan:             dataDanInformasi.Keterangan,
 		Tahun:                  dataDanInformasi.Tahun,
 		CreatedAt:              dataDanInformasi.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt:              dataDanInformasi.UpdatedAt.Format("2006-01-02 15:04:05"),
@@ -284,7 +285,6 @@ func (service *DataDanInformasiServiceImpl) Insert(ctx context.Context, request 
 		InformasiTerkaitInput:  request.InformasiTerkaitInput,
 		InformasiTerkaitOutput: request.InformasiTerkaitOutput,
 		Interoprabilitas:       request.Interoprabilitas,
-		Keterangan:             request.Keterangan,
 		Tahun:                  request.Tahun,
 		CreatedAt:              currentTime,
 		RadLevel1id: sql.NullInt32{
@@ -392,7 +392,6 @@ func (service *DataDanInformasiServiceImpl) Update(ctx context.Context, request 
 	dataInformasi.InformasiTerkaitInput = request.InformasiTerkaitInput
 	dataInformasi.InformasiTerkaitOutput = request.InformasiTerkaitOutput
 	dataInformasi.Interoprabilitas = request.Interoprabilitas
-	dataInformasi.Keterangan = request.Keterangan
 	dataInformasi.Tahun = request.Tahun
 	dataInformasi.RadLevel1id = sql.NullInt32{Int32: int32(request.RadLevel1id), Valid: request.RadLevel1id != 0}
 	dataInformasi.RadLevel2id = sql.NullInt32{Int32: int32(request.RadLevel2id), Valid: request.RadLevel2id != 0}
@@ -408,7 +407,7 @@ func (service *DataDanInformasiServiceImpl) Update(ctx context.Context, request 
 
 }
 
-func (service *DataDanInformasiServiceImpl) Delete(ctx context.Context, dataId int) {
+func (service *DataDanInformasiServiceImpl) Delete(ctx context.Context, dataId int, kodeOPD string) error {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
@@ -416,5 +415,10 @@ func (service *DataDanInformasiServiceImpl) Delete(ctx context.Context, dataId i
 	dataInformasi, err := service.DataDanInformasiRepository.FindById(ctx, tx, dataId)
 	helper.PanicIfError(err)
 
+	if dataInformasi.KodeOPD != kodeOPD {
+		panic(errors.New("data informasi tidak ditemukan untuk OPD ini"))
+	}
+
 	service.DataDanInformasiRepository.Delete(ctx, tx, dataInformasi)
+	return nil
 }

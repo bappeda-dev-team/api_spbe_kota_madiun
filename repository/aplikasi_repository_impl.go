@@ -12,7 +12,7 @@ import (
 type AplikasiRepositoryImpl struct {
 }
 
-func NewAplikasiRepository() AplikasiRepository {
+func NewAplikasiRepositoryImpl() *AplikasiRepositoryImpl {
 	return &AplikasiRepositoryImpl{}
 }
 

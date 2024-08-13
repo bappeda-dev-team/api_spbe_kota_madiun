@@ -15,7 +15,7 @@ type KebutuhanSPBEServiceImpl struct {
 	DB                      *sql.DB
 }
 
-func NewKebutuhanSPBEService(kebutuhanSPBERepository repository.KebutuhanSPBERepository, prosesBisnisRepository repository.ProsesBisnisRepository, DB *sql.DB) KebutuhanSPBEService {
+func NewKebutuhanSPBEServiceImpl(kebutuhanSPBERepository repository.KebutuhanSPBERepository, prosesBisnisRepository repository.ProsesBisnisRepository, DB *sql.DB) *KebutuhanSPBEServiceImpl {
 	return &KebutuhanSPBEServiceImpl{
 		KebutuhanSPBERepository: kebutuhanSPBERepository,
 		ProsesBisnisRepository:  prosesBisnisRepository,

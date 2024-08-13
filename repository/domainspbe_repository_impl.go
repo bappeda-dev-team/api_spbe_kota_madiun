@@ -10,7 +10,7 @@ import (
 type DomainSPBERepositoryImpl struct {
 }
 
-func NewDomainSPBERepository() DomainSPBERepository {
+func NewDomainSPBERepositoryImpl() *DomainSPBERepositoryImpl {
 	return &DomainSPBERepositoryImpl{}
 }
 

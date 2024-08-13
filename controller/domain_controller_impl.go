@@ -14,7 +14,7 @@ type DomainSPBEControllerImpl struct {
 	DomainSPBEService service.DomainSPBEService
 }
 
-func NewDomainSPBEController(domainSPBEService service.DomainSPBEService) DomainSPBEController {
+func NewDomainSPBEControllerImpl(domainSPBEService service.DomainSPBEService) *DomainSPBEControllerImpl {
 	return &DomainSPBEControllerImpl{
 		DomainSPBEService: domainSPBEService,
 	}

@@ -7,6 +7,7 @@ import (
 	"api_spbe_kota_madiun/repository"
 	"context"
 	"database/sql"
+	"errors"
 	"log"
 	"time"
 
@@ -23,7 +24,7 @@ type ProsesBisnisServiceImpl struct {
 	Validate                      *validator.Validate
 }
 
-func NewProsesBisnisService(referensiarsitekturRepository repository.ReferensiArsitekturRepository, sasarankotaRepository repository.SasaranKotaRepository, bidangUrusanRepository repository.BidangUrusanRepository, prosesbisnisRepository repository.ProsesBisnisRepository, pohonkinerjaRepository repository.PohonKinerjaRepository, DB *sql.DB, validate *validator.Validate) ProsesBisnisService {
+func NewProsesBisnisServiceImpl(referensiarsitekturRepository repository.ReferensiArsitekturRepository, sasarankotaRepository repository.SasaranKotaRepository, bidangUrusanRepository repository.BidangUrusanRepository, prosesbisnisRepository repository.ProsesBisnisRepository, pohonkinerjaRepository repository.PohonKinerjaRepository, DB *sql.DB, validate *validator.Validate) *ProsesBisnisServiceImpl {
 	return &ProsesBisnisServiceImpl{
 		ProsesBisnisRepository:        prosesbisnisRepository,
 		SasaranKotaRepository:         sasarankotaRepository,
@@ -37,9 +38,7 @@ func NewProsesBisnisService(referensiarsitekturRepository repository.ReferensiAr
 
 func (service *ProsesBisnisServiceImpl) GetProsesBisnis(ctx context.Context, kodeOPD string, tahun int) ([]web.ProsesBisnisRespons, error) {
 	tx, err := service.DB.Begin()
-	if err != nil {
-		return nil, err
-	}
+	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
 	prosesBisnisList, err := service.ProsesBisnisRepository.FindByKodeOpd(ctx, tx, kodeOPD, tahun)
@@ -159,7 +158,7 @@ func (service *ProsesBisnisServiceImpl) GetProsesBisnis(ctx context.Context, kod
 	return responses, nil
 }
 
-func (service *ProsesBisnisServiceImpl) FindById(ctx context.Context, prosesbisnisId int) (web.ProsesBisnisRespons, error) {
+func (service *ProsesBisnisServiceImpl) FindById(ctx context.Context, prosesbisnisId int, kodeOPD string) (web.ProsesBisnisRespons, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		return web.ProsesBisnisRespons{}, err
@@ -169,6 +168,10 @@ func (service *ProsesBisnisServiceImpl) FindById(ctx context.Context, prosesbisn
 	prosesBisnis, err := service.ProsesBisnisRepository.FindById(ctx, tx, prosesbisnisId)
 	if err != nil {
 		return web.ProsesBisnisRespons{}, err
+	}
+
+	if kodeOPD != "" && prosesBisnis.KodeOPD != kodeOPD {
+		return web.ProsesBisnisRespons{}, errors.New("proses bisnis tidak ditemukan untuk OPD ini")
 	}
 
 	var sasaranKota *web.ProsbisSasaranKotaRespons
@@ -456,7 +459,7 @@ func (service *ProsesBisnisServiceImpl) Update(ctx context.Context, request web.
 	return helper.ToProsesBisnisResponse(prosesBisnis)
 }
 
-func (service *ProsesBisnisServiceImpl) Delete(ctx context.Context, prosesbisnisId int) {
+func (service *ProsesBisnisServiceImpl) Delete(ctx context.Context, prosesbisnisId int, kodeOPD string) error {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
@@ -464,7 +467,13 @@ func (service *ProsesBisnisServiceImpl) Delete(ctx context.Context, prosesbisnis
 	prosesBisnis, err := service.ProsesBisnisRepository.FindById(ctx, tx, prosesbisnisId)
 	helper.PanicIfError(err)
 
+	if prosesBisnis.KodeOPD != kodeOPD {
+		panic(errors.New("proses bisnis tidak ditemukan untuk OPD ini"))
+	}
+
 	service.ProsesBisnisRepository.Delete(ctx, tx, prosesBisnis)
+
+	return nil
 }
 
 func (service *ProsesBisnisServiceImpl) GetProsesBisnisGrouped(ctx context.Context, kodeOpd string, tahun int) ([]web.GapProsesBisnis, error) {

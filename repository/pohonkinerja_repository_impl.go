@@ -18,7 +18,7 @@ import (
 type PohonKinerjaRepositoryImpl struct {
 }
 
-func NewPohonKinerjaRepository() PohonKinerjaRepository {
+func NewPohonKinerjaRepositoryImpl() *PohonKinerjaRepositoryImpl {
 	return &PohonKinerjaRepositoryImpl{}
 }
 

@@ -15,10 +15,9 @@ import (
 type OpdRepositoryImpl struct {
 }
 
-func NewOpdRepository() OpdRepository {
+func NewOpdRepositoryImpl() *OpdRepositoryImpl {
 	return &OpdRepositoryImpl{}
 }
-
 func (rrepository *OpdRepositoryImpl) FetchKodeOpd(ctx context.Context, tx *sql.Tx) (web.Opd, error) {
 	log.Println("Starting FetchKodeOpd")
 	apiURL := "https://kak.madiunkota.go.id/api/opd/urusan_opd"

@@ -13,7 +13,6 @@ type DataDanInformasiRespons struct {
 	InformasiTerkaitInput  string
 	InformasiTerkaitOutput string
 	Interoprabilitas       string
-	Keterangan             string
 	Tahun                  int
 	CreatedAt              string
 	UpdatedAt              string

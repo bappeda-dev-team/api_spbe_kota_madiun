@@ -13,12 +13,11 @@ type UrusanControllerImpl struct {
 	UrusanService service.UrusanService
 }
 
-func NewUrusanController(urusanService service.UrusanService) UrusanController {
+func NewUrusanControllerImpl(urusanService service.UrusanService) *UrusanControllerImpl {
 	return &UrusanControllerImpl{
 		UrusanService: urusanService,
 	}
 }
-
 func (controller *UrusanControllerImpl) FetchApiUrusan(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	urusanApiResponse, err := controller.UrusanService.FetchUrusan(request.Context())
 	if err != nil {

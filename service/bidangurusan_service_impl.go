@@ -14,7 +14,7 @@ type BidangUrusanServiceImpl struct {
 	DB                     *sql.DB
 }
 
-func NewBidangUrusanService(bidangurusanRepository repository.BidangUrusanRepository, DB *sql.DB) BidangUrusanService {
+func NewBidangUrusanServiceImpl(bidangurusanRepository repository.BidangUrusanRepository, DB *sql.DB) *BidangUrusanServiceImpl {
 	return &BidangUrusanServiceImpl{
 		BidangUrusanRepository: bidangurusanRepository,
 		DB:                     DB,

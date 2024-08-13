@@ -15,7 +15,7 @@ type SasaranKotaServiceImpl struct {
 	DB                    *sql.DB
 }
 
-func NewSasaranKotaService(sasarankotaRepository repository.SasaranKotaRepository, DB *sql.DB) SasaranKotaService {
+func NewSasaranKotaServiceImpl(sasarankotaRepository repository.SasaranKotaRepository, DB *sql.DB) *SasaranKotaServiceImpl {
 	return &SasaranKotaServiceImpl{
 		SasaranKotaRepository: sasarankotaRepository,
 		DB:                    DB,

@@ -1,6 +1,6 @@
 package web
 
-type AplikasiUpdateRespons struct {
+type AplikasiUpdateRequest struct {
 	Id                     int
 	NamaAplikasi           string `json:"nama_aplikasi"`
 	FungsiAplikasi         string `json:"fungsi_aplikasi"`

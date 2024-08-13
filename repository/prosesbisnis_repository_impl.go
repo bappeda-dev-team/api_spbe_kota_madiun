@@ -12,7 +12,7 @@ import (
 type ProsesBisnisRepositoryImpl struct {
 }
 
-func NewProsesBisnisRepository() ProsesBisnisRepository {
+func NewProsesBisnisRepositoryImpl() *ProsesBisnisRepositoryImpl {
 	return &ProsesBisnisRepositoryImpl{}
 }
 

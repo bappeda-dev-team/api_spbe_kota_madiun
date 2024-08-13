@@ -7,6 +7,7 @@ import (
 	"api_spbe_kota_madiun/repository"
 	"context"
 	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -20,7 +21,7 @@ type LayananSpbeServiceImpl struct {
 	Validate                      *validator.Validate
 }
 
-func NewLayananSpbeService(layananspbeRepository repository.LayananSPBERepository, pohonkinerjaRepository repository.PohonKinerjaRepository, referensiarsitekturRepository repository.ReferensiArsitekturRepository, DB *sql.DB, validate *validator.Validate) LayananSpbeService {
+func NewLayananSpbeServiceImpl(layananspbeRepository repository.LayananSPBERepository, pohonkinerjaRepository repository.PohonKinerjaRepository, referensiarsitekturRepository repository.ReferensiArsitekturRepository, DB *sql.DB, validate *validator.Validate) *LayananSpbeServiceImpl {
 	return &LayananSpbeServiceImpl{
 		LayananspbeRepository:         layananspbeRepository,
 		PohonkinerjaRepository:        pohonkinerjaRepository,
@@ -152,7 +153,7 @@ func (service *LayananSpbeServiceImpl) FindByKodeOpd(ctx context.Context, kodeOP
 	return responses, nil
 }
 
-func (service *LayananSpbeServiceImpl) FindById(ctx context.Context, layananspbeId int) (web.LayananSpbeRespons, error) {
+func (service *LayananSpbeServiceImpl) FindById(ctx context.Context, layananspbeId int, kodeOPD string) (web.LayananSpbeRespons, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		return web.LayananSpbeRespons{}, err
@@ -162,6 +163,10 @@ func (service *LayananSpbeServiceImpl) FindById(ctx context.Context, layananspbe
 	layananspbe, err := service.LayananspbeRepository.FindById(ctx, tx, layananspbeId)
 	if err != nil {
 		return web.LayananSpbeRespons{}, err
+	}
+
+	if kodeOPD != "" && layananspbe.KodeOPD != kodeOPD {
+		return web.LayananSpbeRespons{}, errors.New("layanan spbe tidak ditemukan untuk OPD ini")
 	}
 
 	var tujuanlayanan, strategicid, tacticalid, operational *web.LayananspbePohonRespons
@@ -271,6 +276,7 @@ func (service *LayananSpbeServiceImpl) FindById(ctx context.Context, layananspbe
 
 	return response, nil
 }
+
 func (service *LayananSpbeServiceImpl) Insert(ctx context.Context, request web.LayananSpbeCreateRequest) web.LayananSpbeRespons {
 	err := service.Validate.Struct(request)
 	helper.PanicIfError(err)
@@ -383,6 +389,7 @@ func (service *LayananSpbeServiceImpl) Insert(ctx context.Context, request web.L
 	return helper.ToLayananSpbeRespons(layananSpbe)
 
 }
+
 func (service *LayananSpbeServiceImpl) Update(ctx context.Context, request web.LayananSpbeUpdateRequest) web.LayananSpbeRespons {
 	err := service.Validate.Struct(request)
 	helper.PanicIfError(err)
@@ -416,7 +423,7 @@ func (service *LayananSpbeServiceImpl) Update(ctx context.Context, request web.L
 	return helper.ToLayananSpbeRespons(layananSpbe)
 }
 
-func (service *LayananSpbeServiceImpl) Delete(ctx context.Context, layananspbeId int) {
+func (service *LayananSpbeServiceImpl) Delete(ctx context.Context, layananspbeId int, kodeOPD string) error {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
@@ -424,5 +431,11 @@ func (service *LayananSpbeServiceImpl) Delete(ctx context.Context, layananspbeId
 	layananSpbe, err := service.LayananspbeRepository.FindById(ctx, tx, layananspbeId)
 	helper.PanicIfError(err)
 
+	if layananSpbe.KodeOPD != kodeOPD {
+		panic(errors.New("layanan spbe tidak ditemukan untuk OPD ini"))
+	}
+
 	service.LayananspbeRepository.Delete(ctx, tx, layananSpbe)
+
+	return nil
 }

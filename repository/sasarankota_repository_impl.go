@@ -18,7 +18,7 @@ import (
 type SasaranKotaRepositoryImpl struct {
 }
 
-func NewSasaranKotaRepository() SasaranKotaRepository {
+func NewSasaranKotaRepositoryImpl() *SasaranKotaRepositoryImpl {
 	return &SasaranKotaRepositoryImpl{}
 }
 

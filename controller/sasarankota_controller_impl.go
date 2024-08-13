@@ -14,7 +14,7 @@ type SasaranKotaControllerImpl struct {
 	SasaranKotaService service.SasaranKotaService
 }
 
-func NewSasaranKotaController(sasaranService service.SasaranKotaService) SasaranKotaController {
+func NewSasaranKotaControllerImpl(sasaranService service.SasaranKotaService) *SasaranKotaControllerImpl {
 	return &SasaranKotaControllerImpl{
 		SasaranKotaService: sasaranService,
 	}

@@ -153,7 +153,6 @@ func ToDataDanInformasiRespons(data domain.DataDanInformasi) web.DataDanInformas
 		InformasiTerkaitInput:  data.InformasiTerkaitInput,
 		InformasiTerkaitOutput: data.InformasiTerkaitOutput,
 		Interoprabilitas:       data.Interoprabilitas,
-		Keterangan:             data.Keterangan,
 		Tahun:                  data.Tahun,
 		CreatedAt:              data.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt:              data.UpdatedAt.Format("2006-01-02 15:04:05"),

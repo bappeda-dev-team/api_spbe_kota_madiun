@@ -13,7 +13,7 @@ type OpdServiceImpl struct {
 	DB            *sql.DB
 }
 
-func NewOpdService(opdRepository repository.OpdRepository, DB *sql.DB) OpdService {
+func NewOpdServiceImpl(opdRepository repository.OpdRepository, DB *sql.DB) *OpdServiceImpl {
 	return &OpdServiceImpl{
 		OpdRepository: opdRepository,
 		DB:            DB,

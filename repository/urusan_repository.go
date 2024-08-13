@@ -6,6 +6,6 @@ import (
 	"database/sql"
 )
 
-type UrusanReposiotry interface {
+type UrusanRepository interface {
 	FetchUrusan(ctx context.Context, tx *sql.Tx) (web.UrusanOPD, error)
 }

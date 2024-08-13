@@ -13,7 +13,7 @@ type OpdControllerImpl struct {
 	OpdService service.OpdService
 }
 
-func NewOpdController(opdService service.OpdService) OpdController {
+func NewOpdControllerImpl(opdService service.OpdService) *OpdControllerImpl {
 	return &OpdControllerImpl{
 		OpdService: opdService,
 	}

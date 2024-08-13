@@ -18,7 +18,7 @@ type DomainSPBEServiceImpl struct {
 	Validate             *validator.Validate
 }
 
-func NewDomainSPBEService(domainspbeRepository repository.DomainSPBERepository, DB *sql.DB, validate *validator.Validate) DomainSPBEService {
+func NewDomainSPBEServiceImpl(domainspbeRepository repository.DomainSPBERepository, DB *sql.DB, validate *validator.Validate) *DomainSPBEServiceImpl {
 	return &DomainSPBEServiceImpl{
 		DomainSPBERepository: domainspbeRepository,
 		DB:                   DB,

@@ -9,11 +9,11 @@ import (
 )
 
 type UrusanServiceImpl struct {
-	UrusanRepository repository.UrusanReposiotry
+	UrusanRepository repository.UrusanRepository
 	DB               *sql.DB
 }
 
-func NewUrusanService(urusanRepository repository.UrusanReposiotry, DB *sql.DB) UrusanService {
+func NewUrusanServiceImpl(urusanRepository repository.UrusanRepository, DB *sql.DB) *UrusanServiceImpl {
 	return &UrusanServiceImpl{
 		UrusanRepository: urusanRepository,
 		DB:               DB,

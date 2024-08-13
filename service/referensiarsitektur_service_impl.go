@@ -21,7 +21,7 @@ type ReferensiArsitekturServiceImpl struct {
 	Validate                      *validator.Validate
 }
 
-func NewReferensiArsitekturService(referensiarsitekturRepository repository.ReferensiArsitekturRepository, DB *sql.DB, validate *validator.Validate) ReferensiArsitekturService {
+func NewReferensiArsitekturServiceImpl(referensiarsitekturRepository repository.ReferensiArsitekturRepository, DB *sql.DB, validate *validator.Validate) *ReferensiArsitekturServiceImpl {
 	return &ReferensiArsitekturServiceImpl{
 		ReferensiArsitekturRepository: referensiarsitekturRepository,
 		DB:                            DB,

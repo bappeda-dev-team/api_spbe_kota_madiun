@@ -18,7 +18,6 @@ type DataDanInformasi struct {
 	InformasiTerkaitInput  string
 	InformasiTerkaitOutput string
 	Interoprabilitas       string
-	Keterangan             string
 	Tahun                  int
 	CreatedAt              time.Time
 	UpdatedAt              time.Time

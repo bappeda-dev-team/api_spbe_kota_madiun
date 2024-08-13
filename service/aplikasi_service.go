@@ -7,8 +7,8 @@ import (
 
 type AplikasiService interface {
 	FindByKodeOpd(ctx context.Context, kodeOPD string, tahun int) ([]web.AplikasiRespons, error)
-	FindById(ctx context.Context, aplikasiId int) (web.AplikasiRespons, error)
+	FindById(ctx context.Context, aplikasiId int, kodeOPD string) (web.AplikasiRespons, error)
 	Insert(ctx context.Context, request web.AplikasiCreateRequest) web.AplikasiRespons
-	Update(ctx context.Context, request web.AplikasiUpdateRespons) web.AplikasiRespons
-	Delete(ctx context.Context, aplikasiId int)
+	Update(ctx context.Context, request web.AplikasiUpdateRequest) web.AplikasiRespons
+	Delete(ctx context.Context, aplikasiId int, kodeOPD string) error
 }

@@ -10,7 +10,7 @@ import (
 type KebutuhanSPBERepositoryImpl struct {
 }
 
-func NewKebutuhanSPBERepository() KebutuhanSPBERepository {
+func NewKebutuhanSPBERepositoryImpl() *KebutuhanSPBERepositoryImpl {
 	return &KebutuhanSPBERepositoryImpl{}
 }
 

@@ -14,7 +14,7 @@ type KebutuhanSPBEControllerImpl struct {
 	KebutuhanSPBEService service.KebutuhanSPBEService
 }
 
-func NewKebutuhanSPBEController(kebutuhanSPBEService service.KebutuhanSPBEService) KebutuhanSPBEController {
+func NewKebutuhanSPBEControllerImpl(kebutuhanSPBEService service.KebutuhanSPBEService) *KebutuhanSPBEControllerImpl {
 	return &KebutuhanSPBEControllerImpl{
 		KebutuhanSPBEService: kebutuhanSPBEService,
 	}

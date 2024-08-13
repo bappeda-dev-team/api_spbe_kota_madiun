@@ -14,7 +14,7 @@ type PohonKinerjaControllerImpl struct {
 	PohonKinerjaService service.PohonKinerjaService
 }
 
-func NewPohonKinerjaController(pohonService service.PohonKinerjaService) PohonKinerjaController {
+func NewPohonKinerjaControllerImpl(pohonService service.PohonKinerjaService) *PohonKinerjaControllerImpl {
 	return &PohonKinerjaControllerImpl{
 		PohonKinerjaService: pohonService,
 	}

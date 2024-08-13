@@ -12,7 +12,6 @@ type DataDanInformasiCreateRequest struct {
 	InformasiTerkaitInput  string `json:"informasi_terkait_input" validate:"required"`
 	InformasiTerkaitOutput string `json:"informasi_terkait_output" validate:"required"`
 	Interoprabilitas       string `json:"interoprabilitas" validate:"required"`
-	Keterangan             string `json:"keterangan"`
 	Tahun                  int    `json:"tahun" validate:"required"`
 	RadLevel1id            *int   `json:"rad_level_1_id"`
 	RadLevel2id            *int   `json:"rad_level_2_id"`
