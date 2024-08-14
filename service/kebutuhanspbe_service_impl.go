@@ -7,6 +7,7 @@ import (
 	"api_spbe_kota_madiun/repository"
 	"context"
 	"database/sql"
+	"errors"
 )
 
 type KebutuhanSPBEServiceImpl struct {
@@ -80,6 +81,7 @@ func (service *KebutuhanSPBEServiceImpl) Update(ctx context.Context, request web
 	for _, jk := range request.JenisKebutuhan {
 		jenisKebutuhan := domain.JenisKebutuhan{
 			Id:          jk.ID,
+			KebutuhanId: jk.JenisKebutuhanId,
 			Kebutuhan:   jk.Kebutuhan,
 			KondisiAwal: []domain.KondisiAwal{},
 		}
@@ -103,12 +105,21 @@ func (service *KebutuhanSPBEServiceImpl) Update(ctx context.Context, request web
 	return helper.ToKebutuhanSPBEResponse(kebutuhanSPBE), nil
 }
 
-func (service *KebutuhanSPBEServiceImpl) Delete(ctx context.Context, kebutuhanSPBEId int) error {
+func (service *KebutuhanSPBEServiceImpl) Delete(ctx context.Context, kebutuhanSPBEId int, kodeOPD string) error {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		return err
 	}
 	defer helper.CommitOrRollback(tx)
+
+	kebutuhanspbe, err := service.KebutuhanSPBERepository.FindById(ctx, tx, kebutuhanSPBEId)
+	if err != nil {
+		return err
+	}
+
+	if kebutuhanspbe.KodeOpd != kodeOPD {
+		return errors.New("kebutuhan spbe tidak ditemukan untuk OPD ini")
+	}
 
 	err = service.KebutuhanSPBERepository.Delete(ctx, tx, kebutuhanSPBEId)
 	if err != nil {
@@ -119,7 +130,7 @@ func (service *KebutuhanSPBEServiceImpl) Delete(ctx context.Context, kebutuhanSP
 }
 
 // fix by id
-func (service *KebutuhanSPBEServiceImpl) FindById(ctx context.Context, kebutuhanSPBEId int) (web.KebutuhanSPBEResponse, error) {
+func (service *KebutuhanSPBEServiceImpl) FindById(ctx context.Context, kebutuhanSPBEId int, kodeOpd string) (web.KebutuhanSPBEResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		return web.KebutuhanSPBEResponse{}, err
@@ -129,6 +140,10 @@ func (service *KebutuhanSPBEServiceImpl) FindById(ctx context.Context, kebutuhan
 	kebutuhanSPBE, err := service.KebutuhanSPBERepository.FindById(ctx, tx, kebutuhanSPBEId)
 	if err != nil {
 		return web.KebutuhanSPBEResponse{}, err
+	}
+
+	if kodeOpd != "" && kebutuhanSPBE.KodeOpd != kodeOpd {
+		return web.KebutuhanSPBEResponse{}, errors.New("kebutuhan spbe tidak ditemukan untuk OPD ini")
 	}
 
 	jenisKebutuhan, err := service.KebutuhanSPBERepository.FindJenisKebutuhanByKebutuhanId(ctx, tx, kebutuhanSPBE.ID)

@@ -201,15 +201,14 @@ func (controller *ProsesBisnisControllerImpl) Delete(writer http.ResponseWriter,
 }
 
 func (controller *ProsesBisnisControllerImpl) GetProsesBisnisGrouped(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	kodeOPD := params.ByName("kodeOPD")
 	tahunStr := params.ByName("tahun")
+	tahun, _ := strconv.Atoi(tahunStr)
 
-	var tahun int
-	var err error
+	role := request.Context().Value("roles").(string)
+	kodeOPD := ""
 
-	if tahunStr != "" {
-		tahun, err = strconv.Atoi(tahunStr)
-		helper.PanicIfError(err)
+	if role != "admin_kota" {
+		kodeOPD = request.Context().Value("kode_opd").(string)
 	}
 
 	prosesBisnisResponse, err := controller.ProsesBisnisService.GetProsesBisnisGrouped(request.Context(), kodeOPD, tahun)
@@ -234,15 +233,14 @@ func (controller *ProsesBisnisControllerImpl) GetProsesBisnisGrouped(writer http
 }
 
 func (controller *ProsesBisnisControllerImpl) GetProsesBisnisNoGap(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	kodeOPD := params.ByName("kodeOPD")
 	tahunStr := params.ByName("tahun")
+	tahun, _ := strconv.Atoi(tahunStr)
 
-	var tahun int
-	var err error
+	role := request.Context().Value("roles").(string)
+	kodeOPD := ""
 
-	if tahunStr != "" {
-		tahun, err = strconv.Atoi(tahunStr)
-		helper.PanicIfError(err)
+	if role != "admin_kota" {
+		kodeOPD = request.Context().Value("kode_opd").(string)
 	}
 
 	prosesBisnisResponse, err := controller.ProsesBisnisService.GetProsesBisnisNoGap(request.Context(), kodeOPD, tahun)
