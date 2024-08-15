@@ -10,5 +10,5 @@ import (
 type SasaranKotaRepository interface {
 	InsertApi(ctx context.Context, tx *sql.Tx) (web.SasaranKotaApi, error)
 	FindById(ctx context.Context, tx *sql.Tx, sasarankotaId int) (domain.SasaranKota, error)
-	FindAll(ctx context.Context, tx *sql.Tx) []domain.SasaranKota
+	FindAll(ctx context.Context, tx *sql.Tx, tahun int) []domain.SasaranKota
 }

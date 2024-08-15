@@ -23,13 +23,27 @@ func NewProsesBisnisControllerImpl(prosbisService service.ProsesBisnisService) *
 }
 
 func (controller *ProsesBisnisControllerImpl) FindByKodeOPD(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	tahunStr := params.ByName("tahun")
-	tahun, _ := strconv.Atoi(tahunStr)
+	tahunStr := request.URL.Query().Get("tahun")
+	tahun := 0
+	var err error
+	if tahunStr != "" {
+		tahun, err = strconv.Atoi(tahunStr)
+		if err != nil {
+			helper.WriteToResponseBody(writer, web.WebResponse{
+				Code:   http.StatusBadRequest,
+				Status: "Format tahun tidak valid",
+				Data:   nil,
+			})
+			return
+		}
+	}
 
 	role := request.Context().Value("roles").(string)
 	kodeOPD := ""
 
-	if role != "admin_kota" {
+	if role == "admin_kota" {
+		kodeOPD = request.URL.Query().Get("kode_opd")
+	} else {
 		kodeOPD = request.Context().Value("kode_opd").(string)
 	}
 
@@ -201,22 +215,36 @@ func (controller *ProsesBisnisControllerImpl) Delete(writer http.ResponseWriter,
 }
 
 func (controller *ProsesBisnisControllerImpl) GetProsesBisnisGrouped(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	tahunStr := params.ByName("tahun")
-	tahun, _ := strconv.Atoi(tahunStr)
+	tahunStr := request.URL.Query().Get("tahun")
+	tahun := 0
+	var err error
+	if tahunStr != "" {
+		tahun, err = strconv.Atoi(tahunStr)
+		if err != nil {
+			helper.WriteToResponseBody(writer, web.WebResponse{
+				Code:   http.StatusBadRequest,
+				Status: "Format tahun tidak valid",
+				Data:   nil,
+			})
+			return
+		}
+	}
 
 	role := request.Context().Value("roles").(string)
 	kodeOPD := ""
 
-	if role != "admin_kota" {
+	if role == "admin_kota" {
+		kodeOPD = request.URL.Query().Get("kode_opd")
+	} else {
 		kodeOPD = request.Context().Value("kode_opd").(string)
 	}
 
 	prosesBisnisResponse, err := controller.ProsesBisnisService.GetProsesBisnisGrouped(request.Context(), kodeOPD, tahun)
 	if err != nil {
-		log.Printf("Error getting Gap ESPBE: %v", err)
+		log.Printf("Error mendapatkan Gap ESPBE: %v", err)
 		webResponse := web.WebResponse{
 			Code:   500,
-			Status: "Internal Server Error",
+			Status: "Kesalahan Internal Server",
 			Data:   nil,
 		}
 		helper.WriteToResponseBody(writer, webResponse)
@@ -225,7 +253,7 @@ func (controller *ProsesBisnisControllerImpl) GetProsesBisnisGrouped(writer http
 
 	webResponse := web.WebResponse{
 		Code:   200,
-		Status: "Success get GAP ESPBE",
+		Status: "Berhasil mendapatkan GAP ESPBE",
 		Data:   prosesBisnisResponse,
 	}
 
@@ -233,13 +261,27 @@ func (controller *ProsesBisnisControllerImpl) GetProsesBisnisGrouped(writer http
 }
 
 func (controller *ProsesBisnisControllerImpl) GetProsesBisnisNoGap(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	tahunStr := params.ByName("tahun")
-	tahun, _ := strconv.Atoi(tahunStr)
+	tahunStr := request.URL.Query().Get("tahun")
+	tahun := 0
+	var err error
+	if tahunStr != "" {
+		tahun, err = strconv.Atoi(tahunStr)
+		if err != nil {
+			helper.WriteToResponseBody(writer, web.WebResponse{
+				Code:   http.StatusBadRequest,
+				Status: "Format tahun tidak valid",
+				Data:   nil,
+			})
+			return
+		}
+	}
 
 	role := request.Context().Value("roles").(string)
 	kodeOPD := ""
 
-	if role != "admin_kota" {
+	if role == "admin_kota" {
+		kodeOPD = request.URL.Query().Get("kode_opd")
+	} else {
 		kodeOPD = request.Context().Value("kode_opd").(string)
 	}
 

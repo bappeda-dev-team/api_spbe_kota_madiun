@@ -7,4 +7,5 @@ import (
 
 type UserService interface {
 	Login(ctx context.Context, req web.LoginRequest) (web.LoginResponse, error)
+	InsertApi(ctx context.Context, kodeOPD string, tahun string) (web.UserApiData, error)
 }

@@ -99,6 +99,7 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.GET("/opdafetch", opdController.FetchApiOpd)
 	router.GET("/urusanfetch", urusanController.FetchApiUrusan)
 	router.GET("/bidangurusanfetch", bidangurusan.FetchBidangUrusan)
+	router.GET("/userapifetch", userController.InsertApi)
 
 	//GAP SPBE
 	router.GET("/v1/GapSPBE", prosesbisnisController.GetProsesBisnisGrouped)

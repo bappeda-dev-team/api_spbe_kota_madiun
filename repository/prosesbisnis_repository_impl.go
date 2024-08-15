@@ -108,7 +108,7 @@ func (repository *ProsesBisnisRepositoryImpl) Delete(ctx context.Context, tx *sq
 
 func (repository *ProsesBisnisRepositoryImpl) GapProsesBisnis(ctx context.Context, tx *sql.Tx, kodeOpd string, tahun int) ([]domain.GapProsesBisnis, error) {
 	query := `
-	   SELECT
+    SELECT
         pb.id,
         pb.kode_opd,
         pb.tahun,
@@ -120,18 +120,19 @@ func (repository *ProsesBisnisRepositoryImpl) GapProsesBisnis(ctx context.Contex
     FROM
         proses_bisnis pb
     LEFT JOIN
-        layanan_spbe l ON (l.strategic_id = pb.strategic_id AND l.tactical_id = pb.tactical_id AND l.operational_id = pb.operational_id  AND l.kode_opd = pb.kode_opd)
-        OR (l.strategic_id = pb.strategic_id AND l.tactical_id = pb.tactical_id  AND l.kode_opd = pb.kode_opd)
-        OR (l.strategic_id = pb.strategic_id  AND l.kode_opd = pb.kode_opd)
+        layanan_spbe l ON (l.strategic_id = pb.strategic_id AND l.tactical_id = pb.tactical_id AND l.operational_id = pb.operational_id AND l.kode_opd = pb.kode_opd)
+        OR (l.strategic_id = pb.strategic_id AND l.tactical_id = pb.tactical_id AND l.kode_opd = pb.kode_opd)
+        OR (l.strategic_id = pb.strategic_id AND l.kode_opd = pb.kode_opd)
     LEFT JOIN
-        data_dan_informasi d ON (d.strategic_id = pb.strategic_id AND d.tactical_id = pb.tactical_id AND d.operational_id = pb.operational_id  AND l.kode_opd = pb.kode_opd)
-        OR (d.strategic_id = pb.strategic_id AND d.tactical_id = pb.tactical_id  AND l.kode_opd = pb.kode_opd)
-        OR (d.strategic_id = pb.strategic_id  AND d.kode_opd = pb.kode_opd)
+        data_dan_informasi d ON (d.strategic_id = pb.strategic_id AND d.tactical_id = pb.tactical_id AND d.operational_id = pb.operational_id AND d.kode_opd = pb.kode_opd)
+        OR (d.strategic_id = pb.strategic_id AND d.tactical_id = pb.tactical_id AND d.kode_opd = pb.kode_opd)
+        OR (d.strategic_id = pb.strategic_id AND d.kode_opd = pb.kode_opd)
     LEFT JOIN
-        aplikasi a ON (a.strategic_id = pb.strategic_id AND a.tactical_id = pb.tactical_id AND a.operational_id = pb.operational_id  AND l.kode_opd = pb.kode_opd)
-        OR (a.strategic_id = pb.strategic_id AND a.tactical_id = pb.tactical_id  AND l.kode_opd = pb.kode_opd)
-        OR (a.strategic_id = pb.strategic_id  AND a.kode_opd = pb.kode_opd)
+        aplikasi a ON (a.strategic_id = pb.strategic_id AND a.tactical_id = pb.tactical_id AND a.operational_id = pb.operational_id AND a.kode_opd = pb.kode_opd)
+        OR (a.strategic_id = pb.strategic_id AND a.tactical_id = pb.tactical_id AND a.kode_opd = pb.kode_opd)
+        OR (a.strategic_id = pb.strategic_id AND a.kode_opd = pb.kode_opd)
     WHERE 1=1
+    AND (l.nama_layanan IS NULL OR d.nama_data IS NULL OR a.nama_aplikasi IS NULL)
 	`
 
 	var args []interface{}

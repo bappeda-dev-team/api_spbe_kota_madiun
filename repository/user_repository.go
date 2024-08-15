@@ -2,6 +2,7 @@ package repository
 
 import (
 	"api_spbe_kota_madiun/model/domain"
+	"api_spbe_kota_madiun/model/web"
 	"context"
 	"database/sql"
 )
@@ -9,4 +10,5 @@ import (
 type UserRepository interface {
 	FindByNIP(ctx context.Context, tx *sql.Tx, nip string) (domain.User, error)
 	GetUserRoles(ctx context.Context, tx *sql.Tx, userID int) ([]domain.Role, error)
+	InsertApi(ctx context.Context, tx *sql.Tx, kodeOPD string, tahun string) (web.UserApiData, error)
 }

@@ -13,6 +13,7 @@ func ToReferensiArsitekturResponse(referensiarsitektur domain.ReferensiArsitektu
 		Nama_referensi:  referensiarsitektur.Nama_referensi,
 		Level_referensi: referensiarsitektur.Level_referensi,
 		Jenis_referensi: referensiarsitektur.Jenis_referensi,
+		Tahun:           referensiarsitektur.Tahun,
 		Created_at:      referensiarsitektur.Created_at,
 		Updated_at:      referensiarsitektur.Updated_at,
 	}

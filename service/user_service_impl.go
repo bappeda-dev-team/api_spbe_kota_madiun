@@ -83,3 +83,23 @@ func (service *UserServiceImpl) Login(ctx context.Context, req web.LoginRequest)
 		},
 	}, nil
 }
+
+func (service *UserServiceImpl) InsertApi(ctx context.Context, kodeOPD string, tahun string) (web.UserApiData, error) {
+	tx, err := service.DB.Begin()
+	if err != nil {
+		return web.UserApiData{}, err
+	}
+	defer tx.Rollback()
+
+	result, err := service.UserRepository.InsertApi(ctx, tx, kodeOPD, tahun)
+	if err != nil {
+		return web.UserApiData{}, err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return web.UserApiData{}, err
+	}
+
+	return result, nil
+}

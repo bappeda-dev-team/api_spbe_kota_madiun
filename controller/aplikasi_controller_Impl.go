@@ -21,16 +21,29 @@ func NewAplikasiControllerImpl(aplikasiService service.AplikasiService) *Aplikas
 }
 
 func (controller *AplikasiControllerImpl) FindByKodeOPD(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	tahunStr := params.ByName("tahun")
-	tahun, _ := strconv.Atoi(tahunStr)
+	tahunStr := request.URL.Query().Get("tahun")
+	tahun := 0
+	var err error
+	if tahunStr != "" {
+		tahun, err = strconv.Atoi(tahunStr)
+		if err != nil {
+			helper.WriteToResponseBody(writer, web.WebResponse{
+				Code:   http.StatusBadRequest,
+				Status: "Format tahun tidak valid",
+				Data:   nil,
+			})
+			return
+		}
+	}
 
 	role := request.Context().Value("roles").(string)
 	kodeOPD := ""
 
-	if role != "admin_kota" {
+	if role == "admin_kota" {
+		kodeOPD = request.URL.Query().Get("kode_opd")
+	} else {
 		kodeOPD = request.Context().Value("kode_opd").(string)
 	}
-
 	aplikasiResponse, err := controller.aplikasiService.FindByKodeOpd(request.Context(), kodeOPD, tahun)
 	if err != nil {
 		webResponse := web.WebResponse{

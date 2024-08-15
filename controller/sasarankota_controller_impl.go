@@ -37,11 +37,23 @@ func (controller *SasaranKotaControllerImpl) FindById(writer http.ResponseWriter
 }
 
 func (controller *SasaranKotaControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	sasarankotaResponse := controller.SasaranKotaService.FindAll(request.Context())
+	tahunParam := request.URL.Query().Get("tahun")
+	tahun := 0
+
+	if tahunParam != "" {
+		var err error
+		tahun, err = strconv.Atoi(tahunParam)
+		if err != nil {
+			http.Error(writer, "Parameter tahun tidak valid", http.StatusBadRequest)
+			return
+		}
+	}
+
+	sasarankotaResponse := controller.SasaranKotaService.FindAll(request.Context(), tahun)
 
 	webResponse := web.WebResponse{
 		Code:   200,
-		Status: "Success get all sasaran kota",
+		Status: "Berhasil mendapatkan semua sasaran kota",
 		Data:   sasarankotaResponse,
 	}
 

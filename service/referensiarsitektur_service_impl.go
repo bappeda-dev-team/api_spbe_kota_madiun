@@ -86,12 +86,12 @@ func (service *ReferensiArsitekturServiceImpl) Delete(ctx context.Context, refer
 
 }
 
-func (service *ReferensiArsitekturServiceImpl) FindAll(ctx context.Context) []web.ReferensiArsitekturResponse {
+func (service *ReferensiArsitekturServiceImpl) FindAll(ctx context.Context, tahun int) []web.ReferensiArsitekturResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	reference := service.ReferensiArsitekturRepository.FindAll(ctx, tx)
+	reference := service.ReferensiArsitekturRepository.FindAll(ctx, tx, tahun)
 	return helper.ToReferenceResponses(reference)
 }
 
