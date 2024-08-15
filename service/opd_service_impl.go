@@ -1,6 +1,7 @@
 package service
 
 import (
+	"api_spbe_kota_madiun/helper"
 	"api_spbe_kota_madiun/model/web"
 	"api_spbe_kota_madiun/repository"
 	"context"
@@ -43,4 +44,13 @@ func (service *OpdServiceImpl) FetchKodeOpd(ctx context.Context) (web.Opd, error
 	}
 
 	return result, nil
+}
+
+func (service *OpdServiceImpl) FindAll(ctx context.Context, kodeOPD string) []web.Opd {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	opd := service.OpdRepository.FindAll(ctx, tx, kodeOPD)
+	return helper.ToOpdResponses(opd)
 }

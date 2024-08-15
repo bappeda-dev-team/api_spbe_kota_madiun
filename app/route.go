@@ -105,6 +105,9 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.GET("/v1/GapSPBE", prosesbisnisController.GetProsesBisnisGrouped)
 	router.GET("/v1/gapSPBE/:kodeOPD", prosesbisnisController.GetProsesBisnisGrouped)
 
+	//OPD
+	router.GET("/v1/opd", opdController.FindAll)
+
 	//user
 	router.POST("/v1/login", userController.Login)
 

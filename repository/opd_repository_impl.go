@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"api_spbe_kota_madiun/helper"
+	"api_spbe_kota_madiun/model/domain"
 	"api_spbe_kota_madiun/model/web"
 	"context"
 	"database/sql"
@@ -80,4 +82,27 @@ func (rrepository *OpdRepositoryImpl) FetchKodeOpd(ctx context.Context, tx *sql.
 
 	log.Println("Data successfully fetched and saved.")
 	return web.Opd{}, nil
+}
+
+func (repository *OpdRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, kodeOPD string) []domain.Opd {
+	script := "select id, kode_opd, nama_opd from opd where 1=1"
+	args := []interface{}{}
+
+	if kodeOPD != "" {
+		script += " AND kode_opd = ?"
+		args = append(args, kodeOPD)
+	}
+
+	rows, err := tx.QueryContext(ctx, script, args...)
+	helper.PanicIfError(err)
+	defer rows.Close()
+
+	var opd []domain.Opd
+	for rows.Next() {
+		getOpd := domain.Opd{}
+		err := rows.Scan(&getOpd.Id, &getOpd.KodeOpd, &getOpd.NamaOpd)
+		helper.PanicIfError(err)
+		opd = append(opd, getOpd)
+	}
+	return opd
 }

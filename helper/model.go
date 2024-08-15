@@ -217,6 +217,13 @@ func ToAplikasiRespons(aplikasi domain.Aplikasi) web.AplikasiRespons {
 	}
 }
 
+func ToOpdRespons(getOpd domain.Opd) web.Opd {
+	return web.Opd{
+		KodeOpd: getOpd.KodeOpd,
+		NamaOpd: getOpd.NamaOpd,
+	}
+}
+
 // get all
 func ToSasaranResponses(sasaran []domain.SasaranKota) []web.SasaranKotaRespons {
 	var sasaranKotaResponses []web.SasaranKotaRespons
@@ -248,6 +255,14 @@ func ToDomainSPBEResponses(domains []domain.DomainSPBE) []web.DomainSPBEResponse
 		domainSPBEResponses = append(domainSPBEResponses, ToDomainSPBEResponse(domain))
 	}
 	return domainSPBEResponses
+}
+
+func ToOpdResponses(getOpd []domain.Opd) []web.Opd {
+	var opdResponses []web.Opd
+	for _, opd := range getOpd {
+		opdResponses = append(opdResponses, ToOpdRespons(opd))
+	}
+	return opdResponses
 }
 
 // func ToKebutuhanSPBERespons(kebutuhanSPBE domain.KebutuhanSPBE) web.KebutuhanSPBEResponse {
