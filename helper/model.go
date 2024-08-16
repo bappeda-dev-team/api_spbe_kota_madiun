@@ -141,7 +141,7 @@ func ToLayananSpbeRespons(layananSpbe domain.LayananSPBE) web.LayananSpbeRespons
 }
 
 func ToDataDanInformasiRespons(data domain.DataDanInformasi) web.DataDanInformasiRespons {
-	return web.DataDanInformasiRespons{
+	response := web.DataDanInformasiRespons{
 		Id:                     data.Id,
 		NamaData:               data.NamaData,
 		SifatData:              data.SifatData,
@@ -179,10 +179,16 @@ func ToDataDanInformasiRespons(data domain.DataDanInformasi) web.DataDanInformas
 			ID: nullInt32ToInt(data.OperationalId),
 		},
 	}
+
+	if data.Keterangan.Valid {
+		response.Keterangan = &data.Keterangan.String
+	}
+
+	return response
 }
 
 func ToAplikasiRespons(aplikasi domain.Aplikasi) web.AplikasiRespons {
-	return web.AplikasiRespons{
+	response := web.AplikasiRespons{
 		Id:                     aplikasi.Id,
 		NamaAplikasi:           aplikasi.NamaAplikasi,
 		FungsiAplikasi:         aplikasi.FungsiAplikasi,
@@ -215,6 +221,12 @@ func ToAplikasiRespons(aplikasi domain.Aplikasi) web.AplikasiRespons {
 			ID: nullInt32ToInt(aplikasi.OperationalId),
 		},
 	}
+
+	if aplikasi.Keterangan.Valid {
+		response.Keterangan = &aplikasi.Keterangan.String
+	}
+
+	return response
 }
 
 func ToOpdRespons(getOpd domain.Opd) web.Opd {

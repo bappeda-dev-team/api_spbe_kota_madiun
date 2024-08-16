@@ -116,6 +116,7 @@ func (service *AplikasiServiceImpl) FindByKodeOpd(ctx context.Context, kodeOPD s
 			InformasiTerkaitInput:  aplikasi.InformasiTerkaitInput,
 			InformasiTerkaitOutput: aplikasi.InformasiTerkaitOutput,
 			Interoprabilitas:       aplikasi.Interoprabilitas,
+			Keterangan:             nil,
 			Tahun:                  aplikasi.Tahun,
 			CreatedAt:              aplikasi.CreatedAt.Format("2006-01-02 15:04:05"),
 			UpdatedAt:              aplikasi.UpdatedAt.Format("2006-01-02 15:04:05"),
@@ -126,6 +127,10 @@ func (service *AplikasiServiceImpl) FindByKodeOpd(ctx context.Context, kodeOPD s
 			TacticalId:             tacticalid,
 			OperationalId:          operational,
 		}
+		if aplikasi.Keterangan.Valid && aplikasi.Keterangan.String != "" {
+			response.Keterangan = &aplikasi.Keterangan.String
+		}
+
 		responses = append(responses, response)
 	}
 
@@ -223,6 +228,7 @@ func (service *AplikasiServiceImpl) FindById(ctx context.Context, aplikasiId int
 		InformasiTerkaitInput:  aplikasi.InformasiTerkaitInput,
 		InformasiTerkaitOutput: aplikasi.InformasiTerkaitOutput,
 		Interoprabilitas:       aplikasi.Interoprabilitas,
+		Keterangan:             nil,
 		Tahun:                  aplikasi.Tahun,
 		CreatedAt:              aplikasi.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt:              aplikasi.UpdatedAt.Format("2006-01-02 15:04:05"),
@@ -232,6 +238,9 @@ func (service *AplikasiServiceImpl) FindById(ctx context.Context, aplikasiId int
 		StrategicId:            strategicid,
 		TacticalId:             tacticalid,
 		OperationalId:          operational,
+	}
+	if aplikasi.Keterangan.Valid && aplikasi.Keterangan.String != "" {
+		response.Keterangan = &aplikasi.Keterangan.String
 	}
 
 	return response, nil
@@ -257,8 +266,12 @@ func (service *AplikasiServiceImpl) Insert(ctx context.Context, request web.Apli
 		InformasiTerkaitInput:  request.InformasiTerkaitInput,
 		InformasiTerkaitOutput: request.InformasiTerkaitOutput,
 		Interoprabilitas:       request.Interoprabilitas,
-		Tahun:                  request.Tahun,
-		CreatedAt:              currentTime,
+		Keterangan: sql.NullString{
+			String: "",
+			Valid:  false,
+		},
+		Tahun:     request.Tahun,
+		CreatedAt: currentTime,
 		RaaLevel1id: sql.NullInt32{
 			Int32: int32(0),
 			Valid: false,
@@ -283,6 +296,13 @@ func (service *AplikasiServiceImpl) Insert(ctx context.Context, request web.Apli
 			Int32: int32(0),
 			Valid: false,
 		},
+	}
+
+	if request.Keterangan != nil {
+		aplikasi.Keterangan = sql.NullString{
+			String: *request.Keterangan,
+			Valid:  *request.Keterangan != "",
+		}
 	}
 
 	if request.RaaLevel1id != nil {
@@ -359,6 +379,7 @@ func (service *AplikasiServiceImpl) Update(ctx context.Context, request web.Apli
 	aplikasi.InformasiTerkaitOutput = request.InformasiTerkaitOutput
 	aplikasi.Interoprabilitas = request.Interoprabilitas
 	aplikasi.Tahun = request.Tahun
+	aplikasi.Keterangan = sql.NullString{String: string(request.Keterangan), Valid: request.Keterangan != ""}
 	aplikasi.RaaLevel1id = sql.NullInt32{Int32: int32(request.RaaLevel1id), Valid: request.RaaLevel1id != 0}
 	aplikasi.RaaLevel2id = sql.NullInt32{Int32: int32(request.RaaLevel2id), Valid: request.RaaLevel2id != 0}
 	aplikasi.RaaLevel3id = sql.NullInt32{Int32: int32(request.RaaLevel3id), Valid: request.RaaLevel3id != 0}

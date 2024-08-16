@@ -11,6 +11,7 @@ type AplikasiUpdateRequest struct {
 	InformasiTerkaitInput  string `json:"informasi_terkait_input"`
 	InformasiTerkaitOutput string `json:"informasi_terkait_output"`
 	Interoprabilitas       string `json:"interoprabilitas"`
+	Keterangan             string `json:"keterangan"`
 	Tahun                  int    `json:"tahun"`
 	RaaLevel1id            int    `json:"raa_level_1_id"`
 	RaaLevel2id            int    `json:"raa_level_2_id"`
