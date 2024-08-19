@@ -6,15 +6,54 @@ import (
 	"time"
 )
 
-func GenerateRandomKode() string {
+func GenerateRandomKodeProsesBisnis() string {
 	rand.NewSource(time.Now().UnixNano())
 
-	min := 1000
-	max := 9999
+	min := 1
+	max := 99999999999
 
 	randomInt := rand.Intn(max-min) + min
 
-	randomKodeProsesBisnis := strconv.Itoa(randomInt)
+	randomKodeProsesBisnis := "pb-" + strconv.Itoa(randomInt)
+
+	return randomKodeProsesBisnis
+}
+
+func GenerateRandomKodeLayananSPBE() string {
+	rand.NewSource(time.Now().UnixNano())
+
+	min := 1
+	max := 99999999999
+
+	randomInt := rand.Intn(max-min) + min
+
+	randomKodeProsesBisnis := "l-" + strconv.Itoa(randomInt)
+
+	return randomKodeProsesBisnis
+}
+
+func GenerateRandomKodeDatanInformasi() string {
+	rand.NewSource(time.Now().UnixNano())
+
+	min := 1
+	max := 99999999999
+
+	randomInt := rand.Intn(max-min) + min
+
+	randomKodeProsesBisnis := "di-" + strconv.Itoa(randomInt)
+
+	return randomKodeProsesBisnis
+}
+
+func GenerateRandomKodeAplikasi() string {
+	rand.NewSource(time.Now().UnixNano())
+
+	min := 1
+	max := 99999999999
+
+	randomInt := rand.Intn(max-min) + min
+
+	randomKodeProsesBisnis := "a-" + strconv.Itoa(randomInt)
 
 	return randomKodeProsesBisnis
 }
@@ -22,8 +61,8 @@ func GenerateRandomKode() string {
 func GenerateRandomKodeDomain() string {
 	rand.NewSource(time.Now().UnixNano())
 
-	min := 10000
-	max := 99999
+	min := 1
+	max := 99999999999
 
 	randomInt := rand.Intn(max-min) + min
 

@@ -286,7 +286,7 @@ func (service *LayananSpbeServiceImpl) Insert(ctx context.Context, request web.L
 	defer helper.CommitOrRollback(tx)
 
 	currentTime := time.Now()
-	kodeLayanan := helper.GenerateRandomKode()
+	kodeLayanan := helper.GenerateRandomKodeLayananSPBE()
 
 	layananspbe := domain.LayananSPBE{
 		NamaLayanan: request.NamaLayanan,
@@ -403,7 +403,7 @@ func (service *LayananSpbeServiceImpl) Update(ctx context.Context, request web.L
 
 	layananSpbe.NamaLayanan = request.NamaLayanan
 	if layananSpbe.KodeLayanan == "" {
-		layananSpbe.KodeLayanan = helper.GenerateRandomKode()
+		layananSpbe.KodeLayanan = helper.GenerateRandomKodeLayananSPBE()
 	}
 	layananSpbe.TujuanLayananId = sql.NullInt32{Int32: int32(request.TujuanLayananId), Valid: request.TujuanLayananId != 0}
 	layananSpbe.FungsiLayanan = request.FungsiLayanan

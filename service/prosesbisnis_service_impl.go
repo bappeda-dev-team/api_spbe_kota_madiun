@@ -292,7 +292,7 @@ func (service *ProsesBisnisServiceImpl) Insert(ctx context.Context, request web.
 	defer helper.CommitOrRollback(tx)
 
 	currentTime := time.Now()
-	kodeprosbis := helper.GenerateRandomKode()
+	kodeprosbis := helper.GenerateRandomKodeProsesBisnis()
 
 	var namaProsesBisnis string
 	if request.RabLevel6ID != nil {
@@ -442,7 +442,7 @@ func (service *ProsesBisnisServiceImpl) Update(ctx context.Context, request web.
 
 	prosesBisnis.SasaranKotaId = sql.NullInt32{Int32: int32(request.SasaranKotaId), Valid: request.SasaranKotaId != 0}
 	if prosesBisnis.KodeProsesBisnis == "" {
-		prosesBisnis.KodeProsesBisnis = helper.GenerateRandomKode()
+		prosesBisnis.KodeProsesBisnis = helper.GenerateRandomKodeProsesBisnis()
 	}
 	prosesBisnis.KodeOPD = request.KodeOPD
 	prosesBisnis.BidangUrusanId = sql.NullInt32{Int32: int32(request.BidangUrusanId), Valid: request.BidangUrusanId != 0}

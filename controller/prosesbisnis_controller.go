@@ -14,4 +14,5 @@ type ProsesBisnisController interface {
 	Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	GetProsesBisnisGrouped(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	GetProsesBisnisNoGap(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
+	ExportExcel(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 }

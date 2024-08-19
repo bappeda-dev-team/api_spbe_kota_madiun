@@ -111,6 +111,12 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	//user
 	router.POST("/v1/login", userController.Login)
 
+	//export excel
+	router.GET("/exportexcelprosesbisnis", prosesbisnisController.ExportExcel)
+	router.GET("/exportexcelLayananspbe", layananspbeController.ExportExcel)
+	router.GET("/exportexcelDataInformasi", datainformasiController.ExportExcel)
+	router.GET("/exportexcelaplikasi", aplikasiController.ExportExcel)
+
 	router.PanicHandler = exception.ErrorHandler
 
 	return router
