@@ -1,0 +1,1 @@
+ALTER TABLE aplikasi DROP COLUMN keterangan;

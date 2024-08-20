@@ -16,6 +16,7 @@ type Aplikasi struct {
 	InformasiTerkaitInput  string
 	InformasiTerkaitOutput string
 	Interoprabilitas       string
+	Keterangan             sql.NullString
 	Tahun                  int
 	CreatedAt              time.Time
 	UpdatedAt              time.Time

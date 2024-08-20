@@ -18,7 +18,7 @@ import (
 type SasaranKotaRepositoryImpl struct {
 }
 
-func NewSasaranKotaRepository() SasaranKotaRepository {
+func NewSasaranKotaRepositoryImpl() *SasaranKotaRepositoryImpl {
 	return &SasaranKotaRepositoryImpl{}
 }
 
@@ -110,10 +110,16 @@ func (repository *SasaranKotaRepositoryImpl) FindById(ctx context.Context, tx *s
 	}
 }
 
-func (repository *SasaranKotaRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.SasaranKota {
-	script := "select id, sasaran, strategi_kota, tujuan_kota, tahun, created_at, updated_at from sasaran_kota"
+func (repository *SasaranKotaRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, tahun int) []domain.SasaranKota {
+	script := "SELECT id, sasaran, strategi_kota, tujuan_kota, tahun, created_at, updated_at FROM sasaran_kota"
+	args := []interface{}{}
 
-	rows, err := tx.QueryContext(ctx, script)
+	if tahun != 0 {
+		script += " WHERE tahun = ?"
+		args = append(args, tahun)
+	}
+
+	rows, err := tx.QueryContext(ctx, script, args...)
 	helper.PanicIfError(err)
 	defer rows.Close()
 

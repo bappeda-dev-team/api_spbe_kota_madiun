@@ -18,7 +18,7 @@ import (
 type BidangUrusanRepositoryImpl struct {
 }
 
-func NewBidangUrusanRepository() BidangUrusanRepository {
+func NewBidangUrusanRepositoryImpl() *BidangUrusanRepositoryImpl {
 	return &BidangUrusanRepositoryImpl{}
 }
 

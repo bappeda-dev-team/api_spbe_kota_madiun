@@ -13,7 +13,7 @@ type BidangUrusanControllerImpl struct {
 	BidangUrusanService service.BidangUrusanService
 }
 
-func NewBidangUrusanController(bidangService service.BidangUrusanService) BidangUrusanController {
+func NewBidangUrusanControllerImpl(bidangService service.BidangUrusanService) *BidangUrusanControllerImpl {
 	return &BidangUrusanControllerImpl{
 		BidangUrusanService: bidangService,
 	}

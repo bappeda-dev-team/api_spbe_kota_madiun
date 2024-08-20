@@ -15,7 +15,7 @@ import (
 type UrusanRepositoryImpl struct {
 }
 
-func NewUrusanRepository() UrusanReposiotry {
+func NewUrusanRepositoryImpl() *UrusanRepositoryImpl {
 	return &UrusanRepositoryImpl{}
 }
 

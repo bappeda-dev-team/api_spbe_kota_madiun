@@ -14,7 +14,7 @@ type ReferensiArsitekturControllerImpl struct {
 	ReferensiArsitekturService service.ReferensiArsitekturService
 }
 
-func NewReferensiarstitekturController(referenceService service.ReferensiArsitekturService) ReferensiArsitekturController {
+func NewReferensiArsitekturControllerImpl(referenceService service.ReferensiArsitekturService) *ReferensiArsitekturControllerImpl {
 	return &ReferensiArsitekturControllerImpl{
 		ReferensiArsitekturService: referenceService,
 	}
@@ -72,11 +72,31 @@ func (controller *ReferensiArsitekturControllerImpl) Delete(writer http.Response
 }
 
 func (controller *ReferensiArsitekturControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	referensiarsitekturResponse := controller.ReferensiArsitekturService.FindAll(request.Context())
+	// Ambil parameter tahun dari query string
+	tahun := request.URL.Query().Get("tahun")
+
+	var tahunInt int
+	var err error
+
+	// Jika tahun tidak kosong, konversi ke integer
+	if tahun != "" {
+		tahunInt, err = strconv.Atoi(tahun)
+		if err != nil {
+			webResponse := web.WebResponse{
+				Code:   400,
+				Status: "Bad Request",
+				Data:   "Tahun harus berupa angka",
+			}
+			helper.WriteToResponseBody(writer, webResponse)
+			return
+		}
+	}
+
+	referensiarsitekturResponse := controller.ReferensiArsitekturService.FindAll(request.Context(), tahunInt)
 
 	webResponse := web.WebResponse{
 		Code:   200,
-		Status: "Success get all referensi arsitektur",
+		Status: "Berhasil mendapatkan semua referensi arsitektur",
 		Data:   referensiarsitekturResponse,
 	}
 

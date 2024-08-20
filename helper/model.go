@@ -13,6 +13,7 @@ func ToReferensiArsitekturResponse(referensiarsitektur domain.ReferensiArsitektu
 		Nama_referensi:  referensiarsitektur.Nama_referensi,
 		Level_referensi: referensiarsitektur.Level_referensi,
 		Jenis_referensi: referensiarsitektur.Jenis_referensi,
+		Tahun:           referensiarsitektur.Tahun,
 		Created_at:      referensiarsitektur.Created_at,
 		Updated_at:      referensiarsitektur.Updated_at,
 	}
@@ -140,7 +141,7 @@ func ToLayananSpbeRespons(layananSpbe domain.LayananSPBE) web.LayananSpbeRespons
 }
 
 func ToDataDanInformasiRespons(data domain.DataDanInformasi) web.DataDanInformasiRespons {
-	return web.DataDanInformasiRespons{
+	response := web.DataDanInformasiRespons{
 		Id:                     data.Id,
 		NamaData:               data.NamaData,
 		SifatData:              data.SifatData,
@@ -178,10 +179,16 @@ func ToDataDanInformasiRespons(data domain.DataDanInformasi) web.DataDanInformas
 			ID: nullInt32ToInt(data.OperationalId),
 		},
 	}
+
+	if data.Keterangan.Valid {
+		response.Keterangan = &data.Keterangan.String
+	}
+
+	return response
 }
 
 func ToAplikasiRespons(aplikasi domain.Aplikasi) web.AplikasiRespons {
-	return web.AplikasiRespons{
+	response := web.AplikasiRespons{
 		Id:                     aplikasi.Id,
 		NamaAplikasi:           aplikasi.NamaAplikasi,
 		FungsiAplikasi:         aplikasi.FungsiAplikasi,
@@ -213,6 +220,19 @@ func ToAplikasiRespons(aplikasi domain.Aplikasi) web.AplikasiRespons {
 		OperationalId: &web.AplikasiPohonRespons{
 			ID: nullInt32ToInt(aplikasi.OperationalId),
 		},
+	}
+
+	if aplikasi.Keterangan.Valid {
+		response.Keterangan = &aplikasi.Keterangan.String
+	}
+
+	return response
+}
+
+func ToOpdRespons(getOpd domain.Opd) web.Opd {
+	return web.Opd{
+		KodeOpd: getOpd.KodeOpd,
+		NamaOpd: getOpd.NamaOpd,
 	}
 }
 
@@ -247,6 +267,14 @@ func ToDomainSPBEResponses(domains []domain.DomainSPBE) []web.DomainSPBEResponse
 		domainSPBEResponses = append(domainSPBEResponses, ToDomainSPBEResponse(domain))
 	}
 	return domainSPBEResponses
+}
+
+func ToOpdResponses(getOpd []domain.Opd) []web.Opd {
+	var opdResponses []web.Opd
+	for _, opd := range getOpd {
+		opdResponses = append(opdResponses, ToOpdRespons(opd))
+	}
+	return opdResponses
 }
 
 // func ToKebutuhanSPBERespons(kebutuhanSPBE domain.KebutuhanSPBE) web.KebutuhanSPBEResponse {

@@ -15,7 +15,7 @@ type SasaranKotaServiceImpl struct {
 	DB                    *sql.DB
 }
 
-func NewSasaranKotaService(sasarankotaRepository repository.SasaranKotaRepository, DB *sql.DB) SasaranKotaService {
+func NewSasaranKotaServiceImpl(sasarankotaRepository repository.SasaranKotaRepository, DB *sql.DB) *SasaranKotaServiceImpl {
 	return &SasaranKotaServiceImpl{
 		SasaranKotaRepository: sasarankotaRepository,
 		DB:                    DB,
@@ -35,12 +35,12 @@ func (service *SasaranKotaServiceImpl) FindById(ctx context.Context, sasarankota
 	return helper.ToSasaranKotaResponse(sasaran)
 }
 
-func (service *SasaranKotaServiceImpl) FindAll(ctx context.Context) []web.SasaranKotaRespons {
+func (service *SasaranKotaServiceImpl) FindAll(ctx context.Context, tahun int) []web.SasaranKotaRespons {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	sasaran := service.SasaranKotaRepository.FindAll(ctx, tx)
+	sasaran := service.SasaranKotaRepository.FindAll(ctx, tx, tahun)
 	return helper.ToSasaranResponses(sasaran)
 }
 

@@ -18,7 +18,7 @@ import (
 type PohonKinerjaRepositoryImpl struct {
 }
 
-func NewPohonKinerjaRepository() PohonKinerjaRepository {
+func NewPohonKinerjaRepositoryImpl() *PohonKinerjaRepositoryImpl {
 	return &PohonKinerjaRepositoryImpl{}
 }
 
@@ -45,10 +45,21 @@ func (repository *PohonKinerjaRepositoryImpl) FindById(ctx context.Context, tx *
 	}
 }
 
-func (repository *PohonKinerjaRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.PohonKinerja {
-	script := "select id, nama_pohon, jenis_pohon, level_pohon, created_at, updated_at, tahun, kode_opd from pohon_kinerja"
+func (repository *PohonKinerjaRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, kodeOpd string, tahun int) []domain.PohonKinerja {
+	script := "SELECT id, nama_pohon, jenis_pohon, level_pohon, created_at, updated_at, tahun, kode_opd FROM pohon_kinerja WHERE 1=1"
+	args := []interface{}{}
 
-	rows, err := tx.QueryContext(ctx, script)
+	if tahun > 0 {
+		script += " AND tahun = ?"
+		args = append(args, tahun)
+	}
+
+	if kodeOpd != "" {
+		script += " AND kode_opd = ?"
+		args = append(args, kodeOpd)
+	}
+
+	rows, err := tx.QueryContext(ctx, script, args...)
 	helper.PanicIfError(err)
 	defer rows.Close()
 

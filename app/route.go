@@ -11,7 +11,7 @@ type RouteController struct {
 }
 
 func NewRouter(referensiarsitekturController controller.ReferensiArsitekturController,
-	prosesbisnisController controller.ProsesBisnisController, sasarankotaController controller.SasaranKotaController, pohonkinerja controller.PohonKinerjaController, bidangurusan controller.BidangUrusanController, opdController controller.OpdController, urusanController controller.UrusanController, layananspbeController controller.LayananSpbeController, datainformasiController controller.DataDanInformasiController, aplikasiController controller.AplikasiController, domainspbeController controller.DomainSPBEController, kebutuhanSPBEController controller.KebutuhanSPBEController) *httprouter.Router {
+	prosesbisnisController controller.ProsesBisnisController, sasarankotaController controller.SasaranKotaController, pohonkinerja controller.PohonKinerjaController, bidangurusan controller.BidangUrusanController, opdController controller.OpdController, urusanController controller.UrusanController, layananspbeController controller.LayananSpbeController, datainformasiController controller.DataDanInformasiController, aplikasiController controller.AplikasiController, domainspbeController controller.DomainSPBEController, kebutuhanSPBEController controller.KebutuhanSPBEController, userController controller.UserController) *httprouter.Router {
 	router := httprouter.New()
 
 	//referensi arsitektur router
@@ -99,10 +99,23 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.GET("/opdafetch", opdController.FetchApiOpd)
 	router.GET("/urusanfetch", urusanController.FetchApiUrusan)
 	router.GET("/bidangurusanfetch", bidangurusan.FetchBidangUrusan)
+	router.GET("/userapifetch", userController.InsertApi)
 
 	//GAP SPBE
 	router.GET("/v1/GapSPBE", prosesbisnisController.GetProsesBisnisGrouped)
 	router.GET("/v1/gapSPBE/:kodeOPD", prosesbisnisController.GetProsesBisnisGrouped)
+
+	//OPD
+	router.GET("/v1/opd", opdController.FindAll)
+
+	//user
+	router.POST("/v1/login", userController.Login)
+
+	//export excel
+	router.GET("/exportexcelprosesbisnis", prosesbisnisController.ExportExcel)
+	router.GET("/exportexcelLayananspbe", layananspbeController.ExportExcel)
+	router.GET("/exportexcelDataInformasi", datainformasiController.ExportExcel)
+	router.GET("/exportexcelaplikasi", aplikasiController.ExportExcel)
 
 	router.PanicHandler = exception.ErrorHandler
 

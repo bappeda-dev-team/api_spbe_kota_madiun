@@ -10,9 +10,10 @@ type KebutuhanSPBEUpdateRequest struct {
 }
 
 type JenisKebutuhanUpdate struct {
-	ID          int                 `json:"id,omitempty"`
-	Kebutuhan   string              `validate:"required" json:"kebutuhan"`
-	KondisiAwal []KondisiAwalUpdate `json:"kondisi_awal"`
+	ID               int                 `json:"id,omitempty"`
+	JenisKebutuhanId int                 `json:"kebutuhan_id"`
+	Kebutuhan        string              `validate:"required" json:"kebutuhan"`
+	KondisiAwal      []KondisiAwalUpdate `json:"kondisi_awal"`
 }
 
 type KondisiAwalUpdate struct {

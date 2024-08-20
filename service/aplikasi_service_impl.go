@@ -7,6 +7,7 @@ import (
 	"api_spbe_kota_madiun/repository"
 	"context"
 	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -20,7 +21,7 @@ type AplikasiServiceImpl struct {
 	Validate                      *validator.Validate
 }
 
-func NewAplikasiService(aplikasiRepository repository.AplikasiRepository, pohonkinerjaRepository repository.PohonKinerjaRepository, referensiarsitektuRepository repository.ReferensiArsitekturRepository, DB *sql.DB, validate *validator.Validate) AplikasiService {
+func NewAplikasiServiceImpl(aplikasiRepository repository.AplikasiRepository, pohonkinerjaRepository repository.PohonKinerjaRepository, referensiarsitektuRepository repository.ReferensiArsitekturRepository, DB *sql.DB, validate *validator.Validate) *AplikasiServiceImpl {
 	return &AplikasiServiceImpl{
 		AplikasiRepository:            aplikasiRepository,
 		PohonkinerjaRepository:        pohonkinerjaRepository,
@@ -115,6 +116,7 @@ func (service *AplikasiServiceImpl) FindByKodeOpd(ctx context.Context, kodeOPD s
 			InformasiTerkaitInput:  aplikasi.InformasiTerkaitInput,
 			InformasiTerkaitOutput: aplikasi.InformasiTerkaitOutput,
 			Interoprabilitas:       aplikasi.Interoprabilitas,
+			Keterangan:             nil,
 			Tahun:                  aplikasi.Tahun,
 			CreatedAt:              aplikasi.CreatedAt.Format("2006-01-02 15:04:05"),
 			UpdatedAt:              aplikasi.UpdatedAt.Format("2006-01-02 15:04:05"),
@@ -125,13 +127,17 @@ func (service *AplikasiServiceImpl) FindByKodeOpd(ctx context.Context, kodeOPD s
 			TacticalId:             tacticalid,
 			OperationalId:          operational,
 		}
+		if aplikasi.Keterangan.Valid && aplikasi.Keterangan.String != "" {
+			response.Keterangan = &aplikasi.Keterangan.String
+		}
+
 		responses = append(responses, response)
 	}
 
 	return responses, nil
 
 }
-func (service *AplikasiServiceImpl) FindById(ctx context.Context, aplikasiId int) (web.AplikasiRespons, error) {
+func (service *AplikasiServiceImpl) FindById(ctx context.Context, aplikasiId int, kodeOPD string) (web.AplikasiRespons, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		return web.AplikasiRespons{}, err
@@ -141,6 +147,10 @@ func (service *AplikasiServiceImpl) FindById(ctx context.Context, aplikasiId int
 	aplikasi, err := service.AplikasiRepository.FindById(ctx, tx, aplikasiId)
 	if err != nil {
 		return web.AplikasiRespons{}, err
+	}
+
+	if kodeOPD != "" && aplikasi.KodeOPD != kodeOPD {
+		return web.AplikasiRespons{}, errors.New("aplikasi tidak ditemukan untuk OPD ini")
 	}
 
 	var strategicid, tacticalid, operational *web.AplikasiPohonRespons
@@ -218,6 +228,7 @@ func (service *AplikasiServiceImpl) FindById(ctx context.Context, aplikasiId int
 		InformasiTerkaitInput:  aplikasi.InformasiTerkaitInput,
 		InformasiTerkaitOutput: aplikasi.InformasiTerkaitOutput,
 		Interoprabilitas:       aplikasi.Interoprabilitas,
+		Keterangan:             nil,
 		Tahun:                  aplikasi.Tahun,
 		CreatedAt:              aplikasi.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt:              aplikasi.UpdatedAt.Format("2006-01-02 15:04:05"),
@@ -227,6 +238,9 @@ func (service *AplikasiServiceImpl) FindById(ctx context.Context, aplikasiId int
 		StrategicId:            strategicid,
 		TacticalId:             tacticalid,
 		OperationalId:          operational,
+	}
+	if aplikasi.Keterangan.Valid && aplikasi.Keterangan.String != "" {
+		response.Keterangan = &aplikasi.Keterangan.String
 	}
 
 	return response, nil
@@ -252,8 +266,12 @@ func (service *AplikasiServiceImpl) Insert(ctx context.Context, request web.Apli
 		InformasiTerkaitInput:  request.InformasiTerkaitInput,
 		InformasiTerkaitOutput: request.InformasiTerkaitOutput,
 		Interoprabilitas:       request.Interoprabilitas,
-		Tahun:                  request.Tahun,
-		CreatedAt:              currentTime,
+		Keterangan: sql.NullString{
+			String: "",
+			Valid:  false,
+		},
+		Tahun:     request.Tahun,
+		CreatedAt: currentTime,
 		RaaLevel1id: sql.NullInt32{
 			Int32: int32(0),
 			Valid: false,
@@ -278,6 +296,13 @@ func (service *AplikasiServiceImpl) Insert(ctx context.Context, request web.Apli
 			Int32: int32(0),
 			Valid: false,
 		},
+	}
+
+	if request.Keterangan != nil {
+		aplikasi.Keterangan = sql.NullString{
+			String: *request.Keterangan,
+			Valid:  *request.Keterangan != "",
+		}
 	}
 
 	if request.RaaLevel1id != nil {
@@ -333,7 +358,7 @@ func (service *AplikasiServiceImpl) Insert(ctx context.Context, request web.Apli
 	return helper.ToAplikasiRespons(aplikasData)
 }
 
-func (service *AplikasiServiceImpl) Update(ctx context.Context, request web.AplikasiUpdateRespons) web.AplikasiRespons {
+func (service *AplikasiServiceImpl) Update(ctx context.Context, request web.AplikasiUpdateRequest) web.AplikasiRespons {
 	err := service.Validate.Struct(request)
 	helper.PanicIfError(err)
 
@@ -354,6 +379,7 @@ func (service *AplikasiServiceImpl) Update(ctx context.Context, request web.Apli
 	aplikasi.InformasiTerkaitOutput = request.InformasiTerkaitOutput
 	aplikasi.Interoprabilitas = request.Interoprabilitas
 	aplikasi.Tahun = request.Tahun
+	aplikasi.Keterangan = sql.NullString{String: string(request.Keterangan), Valid: request.Keterangan != ""}
 	aplikasi.RaaLevel1id = sql.NullInt32{Int32: int32(request.RaaLevel1id), Valid: request.RaaLevel1id != 0}
 	aplikasi.RaaLevel2id = sql.NullInt32{Int32: int32(request.RaaLevel2id), Valid: request.RaaLevel2id != 0}
 	aplikasi.RaaLevel3id = sql.NullInt32{Int32: int32(request.RaaLevel3id), Valid: request.RaaLevel3id != 0}
@@ -371,13 +397,18 @@ func (service *AplikasiServiceImpl) Update(ctx context.Context, request web.Apli
 	return helper.ToAplikasiRespons(aplikasi)
 }
 
-func (service *AplikasiServiceImpl) Delete(ctx context.Context, aplikasiId int) {
+func (service *AplikasiServiceImpl) Delete(ctx context.Context, aplikasiId int, kodeOPD string) error {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	layananSpbe, err := service.AplikasiRepository.FindById(ctx, tx, aplikasiId)
+	aplikasi, err := service.AplikasiRepository.FindById(ctx, tx, aplikasiId)
 	helper.PanicIfError(err)
 
-	service.AplikasiRepository.Delete(ctx, tx, layananSpbe)
+	if aplikasi.KodeOPD != kodeOPD {
+		panic(errors.New("aplikasi tidak ditemukan untuk OPD ini"))
+	}
+
+	service.AplikasiRepository.Delete(ctx, tx, aplikasi)
+	return nil
 }

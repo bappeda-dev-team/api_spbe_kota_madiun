@@ -12,7 +12,7 @@ import (
 type LayananSPBERepositoryImpl struct {
 }
 
-func NewLayananSPBERepository() LayananSPBERepository {
+func NewLayananSPBERepositoryImpl() *LayananSPBERepositoryImpl {
 	return &LayananSPBERepositoryImpl{}
 }
 

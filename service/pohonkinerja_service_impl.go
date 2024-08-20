@@ -15,7 +15,7 @@ type PohonKinerjaServiceImpl struct {
 	DB                     *sql.DB
 }
 
-func NewPohonKinerjaService(pohonkinerjaRepository repository.PohonKinerjaRepository, DB *sql.DB) PohonKinerjaService {
+func NewPohonKinerjaServiceImpl(pohonkinerjaRepository repository.PohonKinerjaRepository, DB *sql.DB) *PohonKinerjaServiceImpl {
 	return &PohonKinerjaServiceImpl{
 		PohonKinerjaRepository: pohonkinerjaRepository,
 		DB:                     DB,
@@ -35,12 +35,12 @@ func (service *PohonKinerjaServiceImpl) FindById(ctx context.Context, pohonId in
 	return helper.ToPohonKinerjaResponse(pohon)
 }
 
-func (service *PohonKinerjaServiceImpl) FindAll(ctx context.Context) []web.PohonKinerjaRespons {
+func (service *PohonKinerjaServiceImpl) FindAll(ctx context.Context, kodeOpd string, tahun int) []web.PohonKinerjaRespons {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	pohon := service.PohonKinerjaRepository.FindAll(ctx, tx)
+	pohon := service.PohonKinerjaRepository.FindAll(ctx, tx, kodeOpd, tahun)
 	return helper.ToPohonResponses(pohon)
 }
 

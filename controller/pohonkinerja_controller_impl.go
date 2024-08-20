@@ -14,7 +14,7 @@ type PohonKinerjaControllerImpl struct {
 	PohonKinerjaService service.PohonKinerjaService
 }
 
-func NewPohonKinerjaController(pohonService service.PohonKinerjaService) PohonKinerjaController {
+func NewPohonKinerjaControllerImpl(pohonService service.PohonKinerjaService) *PohonKinerjaControllerImpl {
 	return &PohonKinerjaControllerImpl{
 		PohonKinerjaService: pohonService,
 	}
@@ -37,11 +37,32 @@ func (controller *PohonKinerjaControllerImpl) FindById(writer http.ResponseWrite
 }
 
 func (controller *PohonKinerjaControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	pohonResponse := controller.PohonKinerjaService.FindAll(request.Context())
+	tahunParam := request.URL.Query().Get("tahun")
+	var tahun int
+	var err error
+	if tahunParam != "" {
+		tahun, err = strconv.Atoi(tahunParam)
+		if err != nil {
+			http.Error(writer, "Parameter tahun harus berupa angka", http.StatusBadRequest)
+			return
+		}
+	}
+
+	role := request.Context().Value("roles").(string)
+	kodeOPD := request.Context().Value("kode_opd").(string)
+
+	// Hanya admin_kota yang dapat menggunakan parameter kode_opd
+	if role == "admin_kota" {
+		if paramKodeOPD := request.URL.Query().Get("kode_opd"); paramKodeOPD != "" {
+			kodeOPD = paramKodeOPD
+		}
+	}
+
+	pohonResponse := controller.PohonKinerjaService.FindAll(request.Context(), kodeOPD, tahun)
 
 	webResponse := web.WebResponse{
 		Code:   200,
-		Status: "Success get all pohon kinerja",
+		Status: "Berhasil mendapatkan semua pohon kinerja",
 		Data:   pohonResponse,
 	}
 

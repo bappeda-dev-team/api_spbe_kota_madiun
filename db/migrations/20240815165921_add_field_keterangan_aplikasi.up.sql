@@ -1,0 +1,1 @@
+ALTER TABLE aplikasi ADD column keterangan TEXT;
