@@ -128,16 +128,6 @@ func (controller *AplikasiControllerImpl) Update(writer http.ResponseWriter, req
 	role := request.Context().Value("roles").(string)
 	kodeOPD := request.Context().Value("kode_opd").(string)
 
-	if role != "asn" {
-		webResponse := web.WebResponse{
-			Code:   http.StatusForbidden,
-			Status: "FORBIDDEN",
-			Data:   "Hanya pengguna ASN yang dapat memperbarui data dan informasi",
-		}
-		helper.WriteToResponseBody(writer, webResponse)
-		return
-	}
-
 	AplikasiUpdateRequest := web.AplikasiUpdateRequest{}
 	helper.ReadFromRequestBody(request, &AplikasiUpdateRequest)
 
