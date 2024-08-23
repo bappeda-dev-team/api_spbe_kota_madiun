@@ -105,24 +105,16 @@ func (controller *ProsesBisnisControllerImpl) Insert(writer http.ResponseWriter,
 	prosesbisnisInsertRequest := web.ProsesBisnisCreateRequest{}
 	helper.ReadFromRequestBody(request, &prosesbisnisInsertRequest)
 
-	// Ambil kode OPD dari context yang telah ditambahkan oleh middleware
-	kodeOPD, ok := request.Context().Value("kode_opd").(string)
-	if !ok {
-		webResponse := web.WebResponse{
-			Code:   http.StatusInternalServerError,
-			Status: "INTERNAL SERVER ERROR",
-			Data:   "Kode OPD tidak ditemukan",
-		}
-		helper.WriteToResponseBody(writer, webResponse)
-		return
+	role := request.Context().Value("roles").(string)
+	if role == "admin_opd" || role == "asn" {
+		kodeOPD := request.Context().Value("kode_opd").(string)
+		prosesbisnisInsertRequest.KodeOPD = kodeOPD
 	}
 
-	// Tambahkan kode OPD ke request
-	prosesbisnisInsertRequest.KodeOPD = kodeOPD
-
 	prosesbisnisResponse := controller.ProsesBisnisService.Insert(request.Context(), prosesbisnisInsertRequest)
+
 	webResponse := web.WebResponse{
-		Code:   200,
+		Code:   http.StatusOK,
 		Status: "Berhasil membuat proses bisnis",
 		Data:   prosesbisnisResponse,
 	}
@@ -131,18 +123,8 @@ func (controller *ProsesBisnisControllerImpl) Insert(writer http.ResponseWriter,
 }
 
 func (controller *ProsesBisnisControllerImpl) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-
-	role := request.Context().Value("roles").(string)
 	kodeOPD := request.Context().Value("kode_opd").(string)
-
-	if role != "asn" {
-		helper.WriteToResponseBody(writer, web.WebResponse{
-			Code:   http.StatusForbidden,
-			Status: "FORBIDDEN",
-			Data:   "Hanya pengguna ASN yang dapat memperbarui proses bisnis",
-		})
-		return
-	}
+	role := request.Context().Value("roles").(string)
 
 	//read request body
 	prosesbisnisUpdateRequest := web.ProsesBisnisUpdateRequest{}
@@ -150,18 +132,28 @@ func (controller *ProsesBisnisControllerImpl) Update(writer http.ResponseWriter,
 	prosesbisnisId, _ := strconv.Atoi(params.ByName("prosesbisnisId"))
 	prosesbisnisUpdateRequest.Id = prosesbisnisId
 
-	// cek == kode opd
-	existingProsesBisnis, err := controller.ProsesBisnisService.FindById(request.Context(), prosesbisnisId, kodeOPD)
-	if err != nil || existingProsesBisnis.KodeOPD != kodeOPD {
+	// cek == kode opd untuk roles asn dan admin_opd
+	if role == "asn" || role == "admin_opd" {
+		existingProsesBisnis, err := controller.ProsesBisnisService.FindById(request.Context(), prosesbisnisId, kodeOPD)
+		if err != nil || existingProsesBisnis.KodeOPD != kodeOPD {
+			helper.WriteToResponseBody(writer, web.WebResponse{
+				Code:   http.StatusForbidden,
+				Status: "FORBIDDEN",
+				Data:   "Anda tidak memiliki akses untuk memperbarui proses bisnis ini",
+			})
+			return
+		}
+		prosesbisnisUpdateRequest.KodeOPD = kodeOPD
+	} else if role == "admin_kota" {
+		// untuk admin_kota, tidak ada cek kode OPD
+	} else {
 		helper.WriteToResponseBody(writer, web.WebResponse{
-			Code:   http.StatusForbidden,
-			Status: "FORBIDDEN",
-			Data:   "Anda tidak memiliki akses untuk memperbarui proses bisnis ini",
+			Code:   http.StatusUnauthorized,
+			Status: "UNAUTHORIZED",
+			Data:   "Role tidak diizinkan untuk memperbarui proses bisnis",
 		})
 		return
 	}
-
-	prosesbisnisUpdateRequest.KodeOPD = kodeOPD
 
 	prosesbisnisResponse := controller.ProsesBisnisService.Update(request.Context(), prosesbisnisUpdateRequest)
 
@@ -185,19 +177,11 @@ func (controller *ProsesBisnisControllerImpl) Delete(writer http.ResponseWriter,
 		return
 	}
 
-	// Ambil kode OPD dari context
-	kodeOPD, ok := request.Context().Value("kode_opd").(string)
-	if !ok {
-		webResponse := web.WebResponse{
-			Code:   http.StatusInternalServerError,
-			Status: "INTERNAL SERVER ERROR",
-			Data:   "Kode OPD tidak ditemukan",
-		}
-		helper.WriteToResponseBody(writer, webResponse)
-		return
-	}
+	// Ambil kode OPD dan role dari context
+	kodeOPD, _ := request.Context().Value("kode_opd").(string)
+	role, _ := request.Context().Value("roles").(string)
 
-	err = controller.ProsesBisnisService.Delete(request.Context(), id, kodeOPD)
+	err = controller.ProsesBisnisService.Delete(request.Context(), id, kodeOPD, role)
 	if err != nil {
 		webResponse := web.WebResponse{
 			Code:   http.StatusInternalServerError,

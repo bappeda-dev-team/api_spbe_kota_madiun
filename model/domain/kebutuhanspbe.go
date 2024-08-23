@@ -2,6 +2,7 @@ package domain
 
 type KebutuhanSPBE struct {
 	ID             int              `json:"id"`
+	Keterangan     string           `json:"keterangan"`
 	KodeOpd        string           `json:"kode_opd"`
 	Tahun          int              `json:"tahun"`
 	NamaDomain     string           `json:"nama_domain"`

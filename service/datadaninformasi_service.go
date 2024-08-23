@@ -10,5 +10,5 @@ type DataDanInformasiService interface {
 	FindById(ctx context.Context, dataId int, kodeOPD string) (web.DataDanInformasiRespons, error)
 	Insert(ctx context.Context, request web.DataDanInformasiCreateRequest) web.DataDanInformasiRespons
 	Update(ctx context.Context, request web.DataDanInformasiUpdateRequest) web.DataDanInformasiRespons
-	Delete(ctx context.Context, dataId int, kodeOPD string) error
+	Delete(ctx context.Context, dataId int, kodeOPD string, role string) error
 }

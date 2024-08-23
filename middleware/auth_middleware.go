@@ -96,8 +96,8 @@ func (middleware *AuthMiddleware) ServeHTTP(writer http.ResponseWriter, request 
 		}
 	}
 
-	// Jika metode adalah POST atau PUT, tambahkan kode OPD ke body request
-	if request.Method == "POST" || request.Method == "PUT" {
+	// Jika metode adalah POST atau PUT, tambahkan kode OPD ke body request untuk admin_opd dan asn
+	if (role == "admin_opd" || role == "asn") && (request.Method == "POST" || request.Method == "PUT") {
 		err := request.ParseForm()
 		if err != nil {
 			middleware.sendUnauthorizedResponse(writer, "Gagal memproses form data")
@@ -111,18 +111,18 @@ func (middleware *AuthMiddleware) ServeHTTP(writer http.ResponseWriter, request 
 	// Mengatur akses berdasarkan role
 	switch role {
 	case "admin_kota":
-		// Admin kota hanya dapat melihat data
-		if request.Method == "GET" {
+		// Admin kota melakukan crud semua data
+		if request.Method == "GET" || request.Method == "POST" || request.Method == "PUT" || request.Method == "DELETE" {
 			middleware.Handler.ServeHTTP(writer, request)
 		} else {
 			middleware.sendUnauthorizedResponse(writer, "Admin kota tidak ada akses")
 		}
 	case "admin_opd":
-		// Admin OPD hanya dapat melihat data berdasarkan kode OPD
-		if request.Method == "GET" {
+		// Admin OPD dapat melakukan crud data berdasarkan kode OPD
+		if request.Method == "GET" || request.Method == "POST" || request.Method == "PUT" || request.Method == "DELETE" {
 			middleware.Handler.ServeHTTP(writer, request)
 		} else {
-			middleware.sendUnauthorizedResponse(writer, "Admin OPD tidak ada akses")
+			middleware.sendUnauthorizedResponse(writer, "Metode tidak diizinkan untuk admin kota")
 		}
 	case "asn":
 		// ASN dapat melakukan CRUD pada data OPD mereka sendiri

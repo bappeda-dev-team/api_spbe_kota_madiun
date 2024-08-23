@@ -32,6 +32,7 @@ func (service *KebutuhanSPBEServiceImpl) Create(ctx context.Context, request web
 	defer helper.CommitOrRollback(tx)
 
 	kebutuhanSPBE := domain.KebutuhanSPBE{
+		Keterangan:     request.KeteranganGap,
 		KodeOpd:        request.KodeOpd,
 		Tahun:          request.Tahun,
 		NamaDomain:     request.NamaDomain,
@@ -73,6 +74,7 @@ func (service *KebutuhanSPBEServiceImpl) Update(ctx context.Context, request web
 		return web.KebutuhanSPBEResponse{}, err
 	}
 
+	kebutuhanSPBE.Keterangan = request.KeteranganGap
 	kebutuhanSPBE.KodeOpd = request.KodeOpd
 	kebutuhanSPBE.Tahun = request.Tahun
 	kebutuhanSPBE.NamaDomain = request.NamaDomain
@@ -180,10 +182,11 @@ func (service *KebutuhanSPBEServiceImpl) FindById(ctx context.Context, kebutuhan
 	helper.PanicIfError(err)
 
 	response := web.KebutuhanSPBEResponse{
-		ID:         kebutuhanSPBE.ID,
-		KodeOpd:    kebutuhanSPBE.KodeOpd,
-		Tahun:      kebutuhanSPBE.Tahun,
-		NamaDomain: kebutuhanSPBE.NamaDomain,
+		ID:            kebutuhanSPBE.ID,
+		KeteranganGap: kebutuhanSPBE.Keterangan,
+		KodeOpd:       kebutuhanSPBE.KodeOpd,
+		Tahun:         kebutuhanSPBE.Tahun,
+		NamaDomain:    kebutuhanSPBE.NamaDomain,
 		ProsesBisnis: web.ProsesBisnisResponse{
 			ID:               prosesBisnis.ID,
 			NamaProsesBisnis: prosesBisnis.NamaProsesBisnis,
@@ -194,14 +197,14 @@ func (service *KebutuhanSPBEServiceImpl) FindById(ctx context.Context, kebutuhan
 	return response, nil
 }
 
-func (service *KebutuhanSPBEServiceImpl) FindByKodeOpdAndTahun(ctx context.Context, kodeOpd string, tahun int) ([]web.KebutuhanSPBEResponse, error) {
+func (service *KebutuhanSPBEServiceImpl) FindByKodeOpdAndTahun(ctx context.Context, kodeOpd string, tahun int, prosesbisnis int) ([]web.KebutuhanSPBEResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		return nil, err
 	}
 	defer helper.CommitOrRollback(tx)
 
-	kebutuhanSPBEs, err := service.KebutuhanSPBERepository.FindByKodeOpdAndTahun(ctx, tx, kodeOpd, tahun)
+	kebutuhanSPBEs, err := service.KebutuhanSPBERepository.FindByKodeOpdAndTahun(ctx, tx, kodeOpd, tahun, prosesbisnis)
 	if err != nil {
 		return nil, err
 	}
@@ -242,10 +245,11 @@ func (service *KebutuhanSPBEServiceImpl) FindByKodeOpdAndTahun(ctx context.Conte
 		helper.PanicIfError(err)
 
 		responses = append(responses, web.KebutuhanSPBEResponse{
-			ID:         kebutuhanSPBE.ID,
-			KodeOpd:    kebutuhanSPBE.KodeOpd,
-			Tahun:      kebutuhanSPBE.Tahun,
-			NamaDomain: kebutuhanSPBE.NamaDomain,
+			ID:            kebutuhanSPBE.ID,
+			KeteranganGap: kebutuhanSPBE.Keterangan,
+			KodeOpd:       kebutuhanSPBE.KodeOpd,
+			Tahun:         kebutuhanSPBE.Tahun,
+			NamaDomain:    kebutuhanSPBE.NamaDomain,
 			ProsesBisnis: web.ProsesBisnisResponse{
 				ID:               prosesBisnis.ID,
 				NamaProsesBisnis: prosesBisnis.NamaProsesBisnis,

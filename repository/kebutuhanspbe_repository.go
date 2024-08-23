@@ -8,7 +8,7 @@ import (
 
 type KebutuhanSPBERepository interface {
 	Insert(ctx context.Context, tx *sql.Tx, kebutuhanSPBE domain.KebutuhanSPBE) (domain.KebutuhanSPBE, error)
-	FindByKodeOpdAndTahun(ctx context.Context, tx *sql.Tx, kodeOpd string, tahun int) ([]domain.KebutuhanSPBE, error)
+	FindByKodeOpdAndTahun(ctx context.Context, tx *sql.Tx, kodeOpd string, tahun int, prosesbisnis int) ([]domain.KebutuhanSPBE, error)
 	Update(ctx context.Context, tx *sql.Tx, kebutuhanSPBE domain.KebutuhanSPBE) (domain.KebutuhanSPBE, error)
 	Delete(ctx context.Context, tx *sql.Tx, kebutuhanSPBEId int) error
 	FindById(ctx context.Context, tx *sql.Tx, kebutuhanSPBEId int) (domain.KebutuhanSPBE, error)

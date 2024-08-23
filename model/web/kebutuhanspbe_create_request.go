@@ -1,11 +1,12 @@
 package web
 
 type KebutuhanSPBECreateRequest struct {
-	KodeOpd        string                 `validate:"required" json:"kode_opd"`
-	Tahun          int                    `validate:"required" json:"tahun"`
-	NamaDomain     string                 `validate:"required" json:"nama_domain"`
-	IdProsesbisnis int                    `validate:"required" json:"id_prosesbisnis"`
-	JenisKebutuhan []JenisKebutuhanCreate `validate:"required" json:"jenis_kebutuhan"`
+	KeteranganGap  string                 `json:"keterangan_gap"`
+	KodeOpd        string                 `json:"kode_opd"`
+	Tahun          int                    `json:"tahun"`
+	NamaDomain     string                 `json:"nama_domain"`
+	IdProsesbisnis int                    `json:"id_prosesbisnis"`
+	JenisKebutuhan []JenisKebutuhanCreate `json:"jenis_kebutuhan"`
 }
 
 type JenisKebutuhanCreate struct {

@@ -188,6 +188,20 @@ func (controller *KebutuhanSPBEControllerImpl) FindByKodeOpdAndTahun(writer http
 			return
 		}
 	}
+	prosesbisnisStr := request.URL.Query().Get("prosesbisnis")
+	prosesbisnis := 0
+	var err2 error
+	if prosesbisnisStr != "" {
+		prosesbisnis, err2 = strconv.Atoi(prosesbisnisStr)
+		if err2 != nil {
+			helper.WriteToResponseBody(writer, web.WebResponse{
+				Code:   http.StatusBadRequest,
+				Status: "Id prosesbisnis tidak valid",
+				Data:   nil,
+			})
+			return
+		}
+	}
 
 	role := request.Context().Value("roles").(string)
 	kodeOpd := ""
@@ -198,7 +212,7 @@ func (controller *KebutuhanSPBEControllerImpl) FindByKodeOpdAndTahun(writer http
 		kodeOpd = request.Context().Value("kode_opd").(string)
 	}
 
-	kebutuhanSPBEResponses, err := controller.KebutuhanSPBEService.FindByKodeOpdAndTahun(request.Context(), kodeOpd, tahun)
+	kebutuhanSPBEResponses, err := controller.KebutuhanSPBEService.FindByKodeOpdAndTahun(request.Context(), kodeOpd, tahun, prosesbisnis)
 	if err != nil {
 		webResponse := web.WebResponse{
 			Code:   500,

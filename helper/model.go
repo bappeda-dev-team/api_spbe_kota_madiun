@@ -308,10 +308,11 @@ func ToOpdResponses(getOpd []domain.Opd) []web.Opd {
 
 func ToKebutuhanSPBEResponse(kebutuhanSPBE domain.KebutuhanSPBE) web.KebutuhanSPBEResponse {
 	return web.KebutuhanSPBEResponse{
-		ID:         kebutuhanSPBE.ID,
-		KodeOpd:    kebutuhanSPBE.KodeOpd,
-		Tahun:      kebutuhanSPBE.Tahun,
-		NamaDomain: kebutuhanSPBE.NamaDomain,
+		ID:            kebutuhanSPBE.ID,
+		KeteranganGap: kebutuhanSPBE.Keterangan,
+		KodeOpd:       kebutuhanSPBE.KodeOpd,
+		Tahun:         kebutuhanSPBE.Tahun,
+		NamaDomain:    kebutuhanSPBE.NamaDomain,
 		ProsesBisnis: web.ProsesBisnisResponse{
 			ID: kebutuhanSPBE.IdProsesbisnis,
 		},

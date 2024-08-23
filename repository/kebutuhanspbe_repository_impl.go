@@ -15,8 +15,8 @@ func NewKebutuhanSPBERepositoryImpl() *KebutuhanSPBERepositoryImpl {
 }
 
 func (repository *KebutuhanSPBERepositoryImpl) Insert(ctx context.Context, tx *sql.Tx, kebutuhanSPBE domain.KebutuhanSPBE) (domain.KebutuhanSPBE, error) {
-	script := "INSERT INTO kebutuhan_spbe(kode_opd, tahun, nama_domain, id_prosesbisnis) VALUES (?, ?, ?, ?)"
-	result, err := tx.ExecContext(ctx, script, kebutuhanSPBE.KodeOpd, kebutuhanSPBE.Tahun, kebutuhanSPBE.NamaDomain, kebutuhanSPBE.IdProsesbisnis)
+	script := "INSERT INTO kebutuhan_spbe(keterangan , kode_opd, tahun, nama_domain, id_prosesbisnis) VALUES (?, ?, ?, ?, ?)"
+	result, err := tx.ExecContext(ctx, script, kebutuhanSPBE.Keterangan, kebutuhanSPBE.KodeOpd, kebutuhanSPBE.Tahun, kebutuhanSPBE.NamaDomain, kebutuhanSPBE.IdProsesbisnis)
 	if err != nil {
 		return kebutuhanSPBE, err
 	}
@@ -60,10 +60,10 @@ func (repository *KebutuhanSPBERepositoryImpl) Insert(ctx context.Context, tx *s
 	return kebutuhanSPBE, nil
 }
 
-func (repository *KebutuhanSPBERepositoryImpl) FindByKodeOpdAndTahun(ctx context.Context, tx *sql.Tx, kodeOpd string, tahun int) ([]domain.KebutuhanSPBE, error) {
-	log.Println("Menjalankan FindByKodeOpdAndTahun dengan kodeOpd:", kodeOpd, "dan tahun:", tahun)
+func (repository *KebutuhanSPBERepositoryImpl) FindByKodeOpdAndTahun(ctx context.Context, tx *sql.Tx, kodeOpd string, tahun int, prosesbisnis int) ([]domain.KebutuhanSPBE, error) {
+	log.Println("Menjalankan FindByKodeOpdAndTahun dengan kodeOpd:", kodeOpd, "dan tahun:", tahun, "dan prosesbisnisId:", prosesbisnis)
 
-	script := "SELECT id, kode_opd, tahun, nama_domain, id_prosesbisnis FROM kebutuhan_spbe WHERE 1=1"
+	script := "SELECT id, keterangan, kode_opd, tahun, nama_domain, id_prosesbisnis FROM kebutuhan_spbe WHERE 1=1"
 	var args []interface{}
 
 	if kodeOpd != "" {
@@ -73,6 +73,10 @@ func (repository *KebutuhanSPBERepositoryImpl) FindByKodeOpdAndTahun(ctx context
 	if tahun != 0 {
 		script += " AND tahun = ?"
 		args = append(args, tahun)
+	}
+	if prosesbisnis != 0 {
+		script += " AND id_prosesbisnis =?"
+		args = append(args, prosesbisnis)
 	}
 
 	log.Println("Menjalankan query:", script, "dengan args:", args)
@@ -87,7 +91,7 @@ func (repository *KebutuhanSPBERepositoryImpl) FindByKodeOpdAndTahun(ctx context
 	var kebutuhanSPBEs []domain.KebutuhanSPBE
 	for rows.Next() {
 		kebutuhanSPBE := domain.KebutuhanSPBE{}
-		err := rows.Scan(&kebutuhanSPBE.ID, &kebutuhanSPBE.KodeOpd, &kebutuhanSPBE.Tahun, &kebutuhanSPBE.NamaDomain, &kebutuhanSPBE.IdProsesbisnis)
+		err := rows.Scan(&kebutuhanSPBE.ID, &kebutuhanSPBE.Keterangan, &kebutuhanSPBE.KodeOpd, &kebutuhanSPBE.Tahun, &kebutuhanSPBE.NamaDomain, &kebutuhanSPBE.IdProsesbisnis)
 		if err != nil {
 			log.Println("Error saat memindai baris:", err)
 			return nil, err
@@ -144,14 +148,14 @@ func (repository *KebutuhanSPBERepositoryImpl) FindKondisiAwalByJenisKebutuhanId
 func (repository *KebutuhanSPBERepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, kebutuhanSPBEId int) (domain.KebutuhanSPBE, error) {
 	log.Println("Menjalankan FindById dengan kebutuhanSPBEId:", kebutuhanSPBEId)
 
-	script := "SELECT id, kode_opd, tahun, nama_domain, id_prosesbisnis FROM kebutuhan_spbe WHERE id = ?"
+	script := "SELECT id, keterangan, kode_opd, tahun, nama_domain, id_prosesbisnis FROM kebutuhan_spbe WHERE id = ?"
 	args := []interface{}{kebutuhanSPBEId}
 
 	log.Println("Menjalankan query:", script, "dengan args:", args)
 
 	row := tx.QueryRowContext(ctx, script, args...)
 	kebutuhanSPBE := domain.KebutuhanSPBE{}
-	err := row.Scan(&kebutuhanSPBE.ID, &kebutuhanSPBE.KodeOpd, &kebutuhanSPBE.Tahun, &kebutuhanSPBE.NamaDomain, &kebutuhanSPBE.IdProsesbisnis)
+	err := row.Scan(&kebutuhanSPBE.ID, &kebutuhanSPBE.Keterangan, &kebutuhanSPBE.KodeOpd, &kebutuhanSPBE.Tahun, &kebutuhanSPBE.NamaDomain, &kebutuhanSPBE.IdProsesbisnis)
 	if err != nil {
 		log.Println("Error saat memindai baris:", err)
 		return kebutuhanSPBE, err
@@ -161,8 +165,8 @@ func (repository *KebutuhanSPBERepositoryImpl) FindById(ctx context.Context, tx 
 }
 
 func (repository *KebutuhanSPBERepositoryImpl) Update(ctx context.Context, tx *sql.Tx, kebutuhanSPBE domain.KebutuhanSPBE) (domain.KebutuhanSPBE, error) {
-	script := "UPDATE kebutuhan_spbe SET kode_opd = ?, tahun = ?, nama_domain = ?, id_prosesbisnis = ? WHERE id = ?"
-	_, err := tx.ExecContext(ctx, script, kebutuhanSPBE.KodeOpd, kebutuhanSPBE.Tahun, kebutuhanSPBE.NamaDomain, kebutuhanSPBE.IdProsesbisnis, kebutuhanSPBE.ID)
+	script := "UPDATE kebutuhan_spbe SET keterangan = ?, kode_opd = ?, tahun = ?, nama_domain = ?, id_prosesbisnis = ? WHERE id = ?"
+	_, err := tx.ExecContext(ctx, script, kebutuhanSPBE.Keterangan, kebutuhanSPBE.KodeOpd, kebutuhanSPBE.Tahun, kebutuhanSPBE.NamaDomain, kebutuhanSPBE.IdProsesbisnis, kebutuhanSPBE.ID)
 	if err != nil {
 		log.Println("Error saat mengupdate kebutuhan_spbe:", err)
 		return kebutuhanSPBE, err

@@ -10,5 +10,5 @@ type AplikasiService interface {
 	FindById(ctx context.Context, aplikasiId int, kodeOPD string) (web.AplikasiRespons, error)
 	Insert(ctx context.Context, request web.AplikasiCreateRequest) web.AplikasiRespons
 	Update(ctx context.Context, request web.AplikasiUpdateRequest) web.AplikasiRespons
-	Delete(ctx context.Context, aplikasiId int, kodeOPD string) error
+	Delete(ctx context.Context, aplikasiId int, kodeOPD string, role string) error
 }

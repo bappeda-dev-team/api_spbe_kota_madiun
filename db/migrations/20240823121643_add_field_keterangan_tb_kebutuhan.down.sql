@@ -1,0 +1,1 @@
+ALTER TABLE kebutuhan_spbe DROP COLUMN keterangan;

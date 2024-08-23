@@ -10,5 +10,5 @@ type LayananSpbeService interface {
 	FindById(ctx context.Context, layananspbeId int, kodeOPD string) (web.LayananSpbeRespons, error)
 	Insert(ctx context.Context, request web.LayananSpbeCreateRequest) web.LayananSpbeRespons
 	Update(ctx context.Context, request web.LayananSpbeUpdateRequest) web.LayananSpbeRespons
-	Delete(ctx context.Context, layananspbeId int, kodeOPD string) error
+	Delete(ctx context.Context, layananspbeId int, kodeOPD string, role string) error
 }
