@@ -26,7 +26,7 @@ type KondisiAwalUpdate struct {
 
 type KebutuhanSPBEKeteranganUpdateRequest struct {
 	ID         int    `json:"id"`
-	Keterangan string `json:"keterangan"`
+	Keterangan string `json:"keterangan_gap"`
 }
 
 type KebutuhanSPBEPjUpdateRequest struct {
