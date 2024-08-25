@@ -23,3 +23,14 @@ type KondisiAwalUpdate struct {
 	Keterangan       string `json:"keterangan"`
 	Tahun            int    `json:"tahun"`
 }
+
+type KebutuhanSPBEKeteranganUpdateRequest struct {
+	ID         int    `json:"id"`
+	Keterangan string `json:"keterangan"`
+}
+
+type KebutuhanSPBEPjUpdateRequest struct {
+	ID              int    `json:"id"`
+	IndikatorPj     string `json:"indikator_pj"`
+	PenanggungJawab string `json:"penanggung_jawab"`
+}

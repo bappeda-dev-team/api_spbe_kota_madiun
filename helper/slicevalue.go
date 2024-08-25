@@ -31,3 +31,13 @@ func ContainAplikasi(aplikasi []web.GapAplikasi, app web.GapAplikasi) bool {
 	}
 	return false
 }
+
+func ContainKeterangan(keterangan []web.GapKeterangan, ket web.GapKeterangan) bool {
+	for _, k := range keterangan {
+		if k.Keterangan.Valid == ket.Keterangan.Valid &&
+			(k.Keterangan.Valid && k.Keterangan.String == ket.Keterangan.String || !k.Keterangan.Valid) {
+			return true
+		}
+	}
+	return false
+}

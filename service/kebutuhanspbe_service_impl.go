@@ -8,6 +8,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"time"
 )
 
 type KebutuhanSPBEServiceImpl struct {
@@ -31,11 +32,23 @@ func (service *KebutuhanSPBEServiceImpl) Create(ctx context.Context, request web
 	}
 	defer helper.CommitOrRollback(tx)
 
+	// Menggunakan tahun sekarang jika tidak ada input
+	tahun := time.Now().Year()
+	if request.Tahun != 0 {
+		tahun = request.Tahun
+	}
+
+	// Konversi NamaDomain ke pointer, null jika kosong
+	namaDomain := sql.NullString{
+		String: request.NamaDomain,
+		Valid:  request.NamaDomain != "",
+	}
+
 	kebutuhanSPBE := domain.KebutuhanSPBE{
 		Keterangan:     request.KeteranganGap,
 		KodeOpd:        request.KodeOpd,
-		Tahun:          request.Tahun,
-		NamaDomain:     request.NamaDomain,
+		Tahun:          tahun,
+		NamaDomain:     namaDomain,
 		IdProsesbisnis: request.IdProsesbisnis,
 		JenisKebutuhan: []domain.JenisKebutuhan{},
 	}
@@ -74,10 +87,12 @@ func (service *KebutuhanSPBEServiceImpl) Update(ctx context.Context, request web
 		return web.KebutuhanSPBEResponse{}, err
 	}
 
-	kebutuhanSPBE.Keterangan = request.KeteranganGap
 	kebutuhanSPBE.KodeOpd = request.KodeOpd
 	kebutuhanSPBE.Tahun = request.Tahun
-	kebutuhanSPBE.NamaDomain = request.NamaDomain
+	kebutuhanSPBE.NamaDomain = sql.NullString{
+		String: request.NamaDomain,
+		Valid:  request.NamaDomain != "",
+	}
 	kebutuhanSPBE.IdProsesbisnis = request.IdProsesbisnis
 
 	for _, jk := range request.JenisKebutuhan {
@@ -107,25 +122,87 @@ func (service *KebutuhanSPBEServiceImpl) Update(ctx context.Context, request web
 	return helper.ToKebutuhanSPBEResponse(kebutuhanSPBE), nil
 }
 
-func (service *KebutuhanSPBEServiceImpl) Delete(ctx context.Context, kebutuhanSPBEId int, kodeOPD string) error {
+func (service *KebutuhanSPBEServiceImpl) UpdateKeterangan(ctx context.Context, request web.KebutuhanSPBEKeteranganUpdateRequest) (web.KebutuhanSPBEKeteranganResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
-		return err
+		return web.KebutuhanSPBEKeteranganResponse{}, err
 	}
 	defer helper.CommitOrRollback(tx)
 
+	kebutuhanSPBE, err := service.KebutuhanSPBERepository.FindById(ctx, tx, request.ID)
+	if err != nil {
+		return web.KebutuhanSPBEKeteranganResponse{}, err
+	}
+
+	kebutuhanSPBE.Keterangan = request.Keterangan
+	kebutuhanSPBE, err = service.KebutuhanSPBERepository.UpdateKeterangan(ctx, tx, kebutuhanSPBE)
+	helper.PanicIfError(err)
+
+	return helper.ToKebutuhanSPBEKeteranganResponse(kebutuhanSPBE), nil
+}
+
+func (service *KebutuhanSPBEServiceImpl) UpdatePenanggungJawab(ctx context.Context, request web.KebutuhanSPBEPjUpdateRequest) (web.KebutuhanSPBEPjResponse, error) {
+	tx, err := service.DB.Begin()
+	if err != nil {
+		return web.KebutuhanSPBEPjResponse{}, err
+	}
+	defer helper.CommitOrRollback(tx)
+
+	kebutuhanSPBE, err := service.KebutuhanSPBERepository.FindById(ctx, tx, request.ID)
+	if err != nil {
+		return web.KebutuhanSPBEPjResponse{}, err
+	}
+
+	kebutuhanSPBE.IndikatorPj = sql.NullString{
+		String: request.IndikatorPj,
+		Valid:  request.IndikatorPj != "",
+	}
+
+	// Jika indikator internal, gunakan kode_opd dari context
+	if request.IndikatorPj == "internal" {
+		kodeOPD, ok := ctx.Value("kode_opd").(string)
+		if !ok {
+			return web.KebutuhanSPBEPjResponse{}, errors.New("kode OPD tidak ditemukan dalam context")
+		}
+		kebutuhanSPBE.PenanggungJawab = sql.NullString{
+			String: kodeOPD,
+			Valid:  true,
+		}
+	} else {
+		// Jika bukan internal, gunakan penanggung jawab dari request
+		kebutuhanSPBE.PenanggungJawab = sql.NullString{
+			String: request.PenanggungJawab,
+			Valid:  request.PenanggungJawab != "",
+		}
+	}
+
+	kebutuhanSPBE, err = service.KebutuhanSPBERepository.UpdatePenanggungJawab(ctx, tx, kebutuhanSPBE)
+	if err != nil {
+		return web.KebutuhanSPBEPjResponse{}, err
+	}
+
+	return helper.ToKebutuhanSPBEPjResponse(kebutuhanSPBE), nil
+}
+
+func (service *KebutuhanSPBEServiceImpl) Delete(ctx context.Context, kebutuhanSPBEId int, kodeOPD string, role string) error {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
 	kebutuhanspbe, err := service.KebutuhanSPBERepository.FindById(ctx, tx, kebutuhanSPBEId)
-	if err != nil {
-		return err
-	}
+	helper.PanicIfError(err)
 
-	if kebutuhanspbe.KodeOpd != kodeOPD {
-		return errors.New("kebutuhan spbe tidak ditemukan untuk OPD ini")
-	}
-
-	err = service.KebutuhanSPBERepository.Delete(ctx, tx, kebutuhanSPBEId)
-	if err != nil {
-		return err
+	if role == "admin_kota" {
+		// Admin kota dapat menghapus semua data tanpa memeriksa kode OPD
+		service.KebutuhanSPBERepository.Delete(ctx, tx, kebutuhanSPBEId)
+	} else if role == "admin_opd" || role == "asn" {
+		// Admin OPD dan ASN hanya dapat menghapus data berdasarkan kode OPD mereka
+		if kebutuhanspbe.KodeOpd != kodeOPD {
+			return errors.New("kebutuhan spbe tidak ditemukan untuk OPD ini")
+		}
+		service.KebutuhanSPBERepository.Delete(ctx, tx, kebutuhanSPBEId)
+	} else {
+		return errors.New("role tidak memiliki izin untuk menghapus kebutuhan spbe")
 	}
 
 	return nil
@@ -186,12 +263,14 @@ func (service *KebutuhanSPBEServiceImpl) FindById(ctx context.Context, kebutuhan
 		KeteranganGap: kebutuhanSPBE.Keterangan,
 		KodeOpd:       kebutuhanSPBE.KodeOpd,
 		Tahun:         kebutuhanSPBE.Tahun,
-		NamaDomain:    kebutuhanSPBE.NamaDomain,
+		NamaDomain:    kebutuhanSPBE.NamaDomain.String,
 		ProsesBisnis: web.ProsesBisnisResponse{
 			ID:               prosesBisnis.ID,
 			NamaProsesBisnis: prosesBisnis.NamaProsesBisnis,
 		},
-		JenisKebutuhan: jenisKebutuhanResponses,
+		JenisKebutuhan:  jenisKebutuhanResponses,
+		IndikatorPj:     kebutuhanSPBE.IndikatorPj.String,
+		PenanggungJawab: kebutuhanSPBE.PenanggungJawab.String,
 	}
 
 	return response, nil
@@ -249,12 +328,14 @@ func (service *KebutuhanSPBEServiceImpl) FindByKodeOpdAndTahun(ctx context.Conte
 			KeteranganGap: kebutuhanSPBE.Keterangan,
 			KodeOpd:       kebutuhanSPBE.KodeOpd,
 			Tahun:         kebutuhanSPBE.Tahun,
-			NamaDomain:    kebutuhanSPBE.NamaDomain,
+			NamaDomain:    kebutuhanSPBE.NamaDomain.String,
 			ProsesBisnis: web.ProsesBisnisResponse{
 				ID:               prosesBisnis.ID,
 				NamaProsesBisnis: prosesBisnis.NamaProsesBisnis,
 			},
-			JenisKebutuhan: jenisKebutuhanResponses,
+			JenisKebutuhan:  jenisKebutuhanResponses,
+			IndikatorPj:     kebutuhanSPBE.IndikatorPj.String,
+			PenanggungJawab: kebutuhanSPBE.PenanggungJawab.String,
 		})
 	}
 

@@ -312,11 +312,25 @@ func ToKebutuhanSPBEResponse(kebutuhanSPBE domain.KebutuhanSPBE) web.KebutuhanSP
 		KeteranganGap: kebutuhanSPBE.Keterangan,
 		KodeOpd:       kebutuhanSPBE.KodeOpd,
 		Tahun:         kebutuhanSPBE.Tahun,
-		NamaDomain:    kebutuhanSPBE.NamaDomain,
+		NamaDomain:    kebutuhanSPBE.NamaDomain.String,
 		ProsesBisnis: web.ProsesBisnisResponse{
 			ID: kebutuhanSPBE.IdProsesbisnis,
 		},
 		JenisKebutuhan: ToJenisKebutuhanResponses(kebutuhanSPBE.JenisKebutuhan),
+	}
+}
+func ToKebutuhanSPBEKeteranganResponse(kebutuhanSPBE domain.KebutuhanSPBE) web.KebutuhanSPBEKeteranganResponse {
+	return web.KebutuhanSPBEKeteranganResponse{
+		ID:            kebutuhanSPBE.ID,
+		KeteranganGap: kebutuhanSPBE.Keterangan,
+	}
+}
+
+func ToKebutuhanSPBEPjResponse(kebutuhanSPBE domain.KebutuhanSPBE) web.KebutuhanSPBEPjResponse {
+	return web.KebutuhanSPBEPjResponse{
+		ID:              kebutuhanSPBE.ID,
+		IndikatorPj:     kebutuhanSPBE.IndikatorPj.String,
+		PenanggungJawab: kebutuhanSPBE.PenanggungJawab.String,
 	}
 }
 

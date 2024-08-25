@@ -131,8 +131,8 @@ func (controller *AplikasiControllerImpl) Update(writer http.ResponseWriter, req
 	AplikasiUpdateRequest := web.AplikasiUpdateRequest{}
 	helper.ReadFromRequestBody(request, &AplikasiUpdateRequest)
 
-	layananspbeId := params.ByName("aplikasiId")
-	id, err := strconv.Atoi(layananspbeId)
+	aplikasiId := params.ByName("aplikasiId")
+	id, err := strconv.Atoi(aplikasiId)
 	helper.PanicIfError(err)
 
 	AplikasiUpdateRequest.Id = id

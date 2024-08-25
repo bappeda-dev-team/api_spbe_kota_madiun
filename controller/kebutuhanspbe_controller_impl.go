@@ -21,24 +21,56 @@ func NewKebutuhanSPBEControllerImpl(kebutuhanSPBEService service.KebutuhanSPBESe
 }
 
 func (controller *KebutuhanSPBEControllerImpl) Create(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	kebutuhanSPBECreateRequest := web.KebutuhanSPBECreateRequest{}
-	helper.ReadFromRequestBody(request, &kebutuhanSPBECreateRequest)
+	role := request.Context().Value("roles").(string)
 
-	kodeOPD, ok := request.Context().Value("kode_opd").(string)
-	if !ok {
+	if role != "admin_opd" && role != "admin_kota" {
 		webResponse := web.WebResponse{
-			Code:   http.StatusInternalServerError,
-			Status: "INTERNAL SERVER ERROR",
-			Data:   "Kode OPD tidak ditemukan",
+			Code:   http.StatusForbidden,
+			Status: "FORBIDDEN",
+			Data:   "Hanya admin_opd dan admin_kota yang diizinkan untuk membuat kebutuhan SPBE",
 		}
 		helper.WriteToResponseBody(writer, webResponse)
 		return
 	}
 
-	kebutuhanSPBECreateRequest.KodeOpd = kodeOPD
+	// Ambil id_prosesbisnis dari URL query parameters
+	idProsesBisnisStr := request.URL.Query().Get("id_prosesbisnis")
+	idProsesBisnis, err := strconv.Atoi(idProsesBisnisStr)
+	if err != nil {
+		webResponse := web.WebResponse{
+			Code:   http.StatusBadRequest,
+			Status: "BAD REQUEST",
+			Data:   "ID proses bisnis tidak valid atau tidak ditemukan",
+		}
+		helper.WriteToResponseBody(writer, webResponse)
+		return
+	}
+
+	kebutuhanSPBECreateRequest := web.KebutuhanSPBECreateRequest{}
+	helper.ReadFromRequestBody(request, &kebutuhanSPBECreateRequest)
+
+	// Set id_prosesbisnis dari query parameter
+	kebutuhanSPBECreateRequest.IdProsesbisnis = idProsesBisnis
+
+	if role == "admin_kota" {
+		kebutuhanSPBECreateRequest.KodeOpd = request.URL.Query().Get("kode_opd")
+	}
+
+	if role == "admin_opd" {
+		kodeOPD := request.Context().Value("kode_opd").(string)
+		kebutuhanSPBECreateRequest.KodeOpd = kodeOPD
+	}
 
 	kebutuhanSPBEResponse, err := controller.KebutuhanSPBEService.Create(request.Context(), kebutuhanSPBECreateRequest)
-	helper.PanicIfError(err)
+	if err != nil {
+		webResponse := web.WebResponse{
+			Code:   http.StatusInternalServerError,
+			Status: "INTERNAL SERVER ERROR",
+			Data:   err.Error(),
+		}
+		helper.WriteToResponseBody(writer, webResponse)
+		return
+	}
 
 	webResponse := web.WebResponse{
 		Code:   200,
@@ -53,15 +85,6 @@ func (controller *KebutuhanSPBEControllerImpl) Update(writer http.ResponseWriter
 	role := request.Context().Value("roles").(string)
 	kodeOPD := request.Context().Value("kode_opd").(string)
 
-	if role != "asn" {
-		helper.WriteToResponseBody(writer, web.WebResponse{
-			Code:   http.StatusForbidden,
-			Status: "FORBIDDEN",
-			Data:   "Hanya pengguna ASN yang dapat memperbarui proses bisnis",
-		})
-		return
-	}
-
 	kebutuhanSPBEUpdateRequest := web.KebutuhanSPBEUpdateRequest{}
 	helper.ReadFromRequestBody(request, &kebutuhanSPBEUpdateRequest)
 
@@ -71,12 +94,25 @@ func (controller *KebutuhanSPBEControllerImpl) Update(writer http.ResponseWriter
 
 	kebutuhanSPBEUpdateRequest.ID = id
 
-	existingKebutuhanSPBE, err := controller.KebutuhanSPBEService.FindById(request.Context(), id, kodeOPD)
-	if err != nil || existingKebutuhanSPBE.KodeOpd != kodeOPD {
+	// cek == kode opd untuk roles asn dan admin_opd
+	if role == "admin_opd" || role == "asn" {
+		existingKebutuhanSPBE, err := controller.KebutuhanSPBEService.FindById(request.Context(), id, kodeOPD)
+		if err != nil || existingKebutuhanSPBE.KodeOpd != kodeOPD {
+			helper.WriteToResponseBody(writer, web.WebResponse{
+				Code:   http.StatusForbidden,
+				Status: "FORBIDDEN",
+				Data:   "Anda tidak memiliki akses untuk memperbarui Kebutuhan SPBE ini",
+			})
+			return
+		}
+		kebutuhanSPBEUpdateRequest.KodeOpd = kodeOPD
+	} else if role == "admin_kota" {
+		kebutuhanSPBEUpdateRequest.KodeOpd = request.URL.Query().Get("kode_opd")
+	} else {
 		helper.WriteToResponseBody(writer, web.WebResponse{
-			Code:   http.StatusForbidden,
-			Status: "FORBIDDEN",
-			Data:   "Anda tidak memiliki akses untuk memperbarui kebutuhan SPBE ini",
+			Code:   http.StatusUnauthorized,
+			Status: "UNAUTHORIZED",
+			Data:   "Role tidak diizinkan untuk memperbarui proses bisnis",
 		})
 		return
 	}
@@ -103,23 +139,84 @@ func (controller *KebutuhanSPBEControllerImpl) Update(writer http.ResponseWriter
 	helper.WriteToResponseBody(writer, webResponse)
 }
 
-func (controller *KebutuhanSPBEControllerImpl) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	kebutuhanSPBEId := params.ByName("kebutuhanSPBEId")
-	id, err := strconv.Atoi(kebutuhanSPBEId)
-	helper.PanicIfError(err)
+func (controller *KebutuhanSPBEControllerImpl) UpdateKeterangan(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	role := request.Context().Value("roles").(string)
 
-	kodeOPD, ok := request.Context().Value("kode_opd").(string)
-	if !ok {
+	if role != "admin_opd" && role != "admin_kota" {
 		webResponse := web.WebResponse{
-			Code:   http.StatusInternalServerError,
-			Status: "INTERNAL SERVER ERROR",
-			Data:   "Kode OPD tidak ditemukan",
+			Code:   http.StatusForbidden,
+			Status: "FORBIDDEN",
+			Data:   "Hanya admin_opd dan admin_kota yang diizinkan untuk membuat kebutuhan SPBE",
 		}
 		helper.WriteToResponseBody(writer, webResponse)
 		return
 	}
 
-	err = controller.KebutuhanSPBEService.Delete(request.Context(), id, kodeOPD)
+	kebutuhanSPBEKeteranganUpdateRequest := web.KebutuhanSPBEKeteranganUpdateRequest{}
+	helper.ReadFromRequestBody(request, &kebutuhanSPBEKeteranganUpdateRequest)
+
+	kebutuhanSPBEId := params.ByName("kebutuhanSPBEId")
+	id, err := strconv.Atoi(kebutuhanSPBEId)
+	helper.PanicIfError(err)
+
+	kebutuhanSPBEKeteranganUpdateRequest.ID = id
+
+	kebutuhanSPBEKeteranganResponse, err := controller.KebutuhanSPBEService.UpdateKeterangan(request.Context(), kebutuhanSPBEKeteranganUpdateRequest)
+	helper.PanicIfError(err)
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   kebutuhanSPBEKeteranganResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+
+}
+
+func (controller *KebutuhanSPBEControllerImpl) UpdatePenanggungJawab(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	role := request.Context().Value("roles").(string)
+
+	if role != "admin_opd" && role != "admin_kota" {
+		webResponse := web.WebResponse{
+			Code:   http.StatusForbidden,
+			Status: "FORBIDDEN",
+			Data:   "Hanya admin_opd dan admin_kota yang diizinkan untuk membuat kebutuhan SPBE",
+		}
+		helper.WriteToResponseBody(writer, webResponse)
+		return
+	}
+
+	KebutuhanSPBEPjUpdateRequest := web.KebutuhanSPBEPjUpdateRequest{}
+	helper.ReadFromRequestBody(request, &KebutuhanSPBEPjUpdateRequest)
+
+	kebutuhanSPBEId := params.ByName("kebutuhanSPBEId")
+	id, err := strconv.Atoi(kebutuhanSPBEId)
+	helper.PanicIfError(err)
+
+	KebutuhanSPBEPjUpdateRequest.ID = id
+
+	kebutuhanSPBEPjResponse, err := controller.KebutuhanSPBEService.UpdatePenanggungJawab(request.Context(), KebutuhanSPBEPjUpdateRequest)
+	helper.PanicIfError(err)
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   kebutuhanSPBEPjResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+
+func (controller *KebutuhanSPBEControllerImpl) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	kebutuhanSPBEId := params.ByName("kebutuhanSPBEId")
+	id, err := strconv.Atoi(kebutuhanSPBEId)
+	helper.PanicIfError(err)
+
+	kodeOPD, _ := request.Context().Value("kode_opd").(string)
+	role, _ := request.Context().Value("roles").(string)
+
+	err = controller.KebutuhanSPBEService.Delete(request.Context(), id, kodeOPD, role)
 	if err != nil {
 		if err.Error() == "kebutuhan spbe tidak ditemukan untuk OPD ini" {
 			webResponse := web.WebResponse{

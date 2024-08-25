@@ -14,6 +14,7 @@ type GapProsesBisnis struct {
 	Layanans         []GapLayanan          `json:"layanans"`
 	DataDanInformasi []GapDataDanInformasi `json:"data_dan_informasi"`
 	Aplikasi         []GapAplikasi         `json:"aplikasi"`
+	Keterangan       []GapKeterangan       `json:"keterangan"`
 }
 
 type GapLayanan struct {
@@ -26,6 +27,10 @@ type GapDataDanInformasi struct {
 
 type GapAplikasi struct {
 	NamaAplikasi NullString `json:"nama_aplikasi"`
+}
+
+type GapKeterangan struct {
+	Keterangan NullString `json:"keterangan"`
 }
 
 type NullString struct {
