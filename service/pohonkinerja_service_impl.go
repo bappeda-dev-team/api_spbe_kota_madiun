@@ -8,6 +8,7 @@ import (
 	"context"
 	"database/sql"
 	"log"
+	"strconv"
 )
 
 type PohonKinerjaServiceImpl struct {
@@ -67,4 +68,51 @@ func (service *PohonKinerjaServiceImpl) InsertApi(ctx context.Context) (web.Poho
 	}
 
 	return result, nil
+}
+
+func (service *PohonKinerjaServiceImpl) FindByOperational(ctx context.Context, pohonId int) web.PohonKinerjaHierarchyResponse {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	strategic, tactical, operational, err := service.PohonKinerjaRepository.FindByOperational(ctx, tx, pohonId)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
+
+	response := web.PohonKinerjaHierarchyResponse{
+		Strategic:   []web.StrategicResponse{},
+		Tactical:    []web.TacticalResponse{},
+		Operational: []web.OperationalResponse{},
+	}
+
+	if strategic.ID != 0 {
+		response.Strategic = append(response.Strategic, web.StrategicResponse{
+			IDStrategic: strategic.ID,
+			Level:       strategic.LevelPohon,
+			NamaPohon:   strategic.NamaPohon,
+		})
+	}
+
+	if len(tactical) > 0 {
+		parentID, _ := strconv.Atoi(tactical[0].Parent)
+		response.Tactical = append(response.Tactical, web.TacticalResponse{
+			IDTactical: tactical[0].ID,
+			Parent:     parentID,
+			Level:      tactical[0].LevelPohon,
+			NamaPohon:  tactical[0].NamaPohon,
+		})
+	}
+
+	if len(operational) > 0 {
+		parentID, _ := strconv.Atoi(operational[0].Parent)
+		response.Operational = append(response.Operational, web.OperationalResponse{
+			IDOperational: operational[0].ID,
+			Parent:        parentID,
+			Level:         operational[0].LevelPohon,
+			NamaPohon:     operational[0].NamaPohon,
+		})
+	}
+
+	return response
 }

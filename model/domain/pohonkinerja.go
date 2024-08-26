@@ -4,6 +4,7 @@ import "time"
 
 type PohonKinerja struct {
 	ID         int
+	Parent     string
 	JenisPohon string
 	LevelPohon int
 	NamaPohon  string

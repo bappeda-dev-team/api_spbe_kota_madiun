@@ -42,6 +42,8 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	//pohon kinerja
 	router.GET("/v1/pohonkinerja/:pohonId", pohonkinerja.FindById)
 	router.GET("/v1/pohonkinerja", pohonkinerja.FindAll)
+	router.GET("/v1/pohonkinerjahirarki/:pohonId", pohonkinerja.FindByOperational)
+	router.GET("/v1/pohonkinerjahirarki", pohonkinerja.FindByOperational)
 
 	//bidangurusan
 	router.GET("/v1/bidangurusan", bidangurusan.FindAll)

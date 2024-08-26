@@ -83,3 +83,21 @@ func (controller *PohonKinerjaControllerImpl) FetchApiPohon(writer http.Response
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
+
+func (controller *PohonKinerjaControllerImpl) FindByOperational(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	pohonId := request.URL.Query().Get("pohonId")
+	if pohonId == "" {
+		pohonId = params.ByName("pohonId")
+	}
+	id, err := strconv.Atoi(pohonId)
+	helper.PanicIfError(err)
+
+	pohonKinerjaResponse := controller.PohonKinerjaService.FindByOperational(request.Context(), id)
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "Berhasil",
+		Data:   pohonKinerjaResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
