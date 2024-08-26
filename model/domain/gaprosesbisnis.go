@@ -27,5 +27,6 @@ type GapAplikasi struct {
 }
 
 type GapKeterangan struct {
-	Keterangan sql.NullString `json:"keterangan"`
+	IdKeterangan sql.NullInt32  `json:"id_keterangan"`
+	Keterangan   sql.NullString `json:"keterangan"`
 }

@@ -561,13 +561,22 @@ func (service *ProsesBisnisServiceImpl) GetProsesBisnisGrouped(ctx context.Conte
 
 		if pb.Keterangan != nil {
 			for _, k := range pb.Keterangan {
+				var webNullInt32 web.NullInt32
 				var webNullString web.NullString
+
+				if k.IdKeterangan.Valid {
+					webNullInt32.Int32 = k.IdKeterangan.Int32
+					webNullInt32.Valid = true
+				}
 				if k.Keterangan.Valid {
 					webNullString.String = k.Keterangan.String
 					webNullString.Valid = true
 				}
 
-				tempKeterangan := web.GapKeterangan{Keterangan: webNullString}
+				tempKeterangan := web.GapKeterangan{
+					IdKeterangan: webNullInt32,
+					Keterangan:   webNullString,
+				}
 				if !helper.ContainKeterangan(webPb.Keterangan, tempKeterangan) {
 					webPb.Keterangan = append(webPb.Keterangan, tempKeterangan)
 				}

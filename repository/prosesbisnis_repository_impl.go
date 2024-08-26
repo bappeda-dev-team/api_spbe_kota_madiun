@@ -109,31 +109,32 @@ func (repository *ProsesBisnisRepositoryImpl) Delete(ctx context.Context, tx *sq
 func (repository *ProsesBisnisRepositoryImpl) GapProsesBisnis(ctx context.Context, tx *sql.Tx, kodeOpd string, tahun int) ([]domain.GapProsesBisnis, error) {
 	query := `
 		SELECT
-			pb.id,
-			pb.kode_opd,
-			pb.tahun,
-			pb.nama_proses_bisnis,
-			pb.kode_proses_bisnis,
-			l.nama_layanan,
-			d.nama_data,
-			a.nama_aplikasi,
-			ks.keterangan as keterangan
+		pb.id,
+		pb.kode_opd,
+		pb.tahun,
+		pb.nama_proses_bisnis,
+		pb.kode_proses_bisnis,
+		l.nama_layanan,
+		d.nama_data,
+		a.nama_aplikasi,
+		ks.keterangan AS keterangan,
+		ks.id AS id_keterangan
 		FROM
-			proses_bisnis pb
+		proses_bisnis pb
 		LEFT JOIN
-			layanan_spbe l ON (l.strategic_id = pb.strategic_id AND l.tactical_id = pb.tactical_id AND l.operational_id = pb.operational_id AND l.kode_opd = pb.kode_opd)
-			OR (l.strategic_id = pb.strategic_id AND l.tactical_id = pb.tactical_id AND l.kode_opd = pb.kode_opd)
-			OR (l.strategic_id = pb.strategic_id AND l.kode_opd = pb.kode_opd)
+		layanan_spbe l ON (l.strategic_id = pb.strategic_id AND l.tactical_id = pb.tactical_id AND l.operational_id = pb.operational_id AND l.kode_opd = pb.kode_opd)
+		OR (l.strategic_id = pb.strategic_id AND l.tactical_id = pb.tactical_id AND l.kode_opd = pb.kode_opd)
+		OR (l.strategic_id = pb.strategic_id AND l.kode_opd = pb.kode_opd)
 		LEFT JOIN
-			data_dan_informasi d ON (d.strategic_id = pb.strategic_id AND d.tactical_id = pb.tactical_id AND d.operational_id = pb.operational_id AND d.kode_opd = pb.kode_opd)
-			OR (d.strategic_id = pb.strategic_id AND d.tactical_id = pb.tactical_id AND d.kode_opd = pb.kode_opd)
-			OR (d.strategic_id = pb.strategic_id AND d.kode_opd = pb.kode_opd)
+		data_dan_informasi d ON (d.strategic_id = pb.strategic_id AND d.tactical_id = pb.tactical_id AND d.operational_id = pb.operational_id AND d.kode_opd = pb.kode_opd)
+		OR (d.strategic_id = pb.strategic_id AND d.tactical_id = pb.tactical_id AND d.kode_opd = pb.kode_opd)
+		OR (d.strategic_id = pb.strategic_id AND d.kode_opd = pb.kode_opd)
 		LEFT JOIN
-			aplikasi a ON (a.strategic_id = pb.strategic_id AND a.tactical_id = pb.tactical_id AND a.operational_id = pb.operational_id AND a.kode_opd = pb.kode_opd)
-			OR (a.strategic_id = pb.strategic_id AND a.tactical_id = pb.tactical_id AND a.kode_opd = pb.kode_opd)
-			OR (a.strategic_id = pb.strategic_id AND a.kode_opd = pb.kode_opd)
+		aplikasi a ON (a.strategic_id = pb.strategic_id AND a.tactical_id = pb.tactical_id AND a.operational_id = pb.operational_id AND a.kode_opd = pb.kode_opd)
+		OR (a.strategic_id = pb.strategic_id AND a.tactical_id = pb.tactical_id AND a.kode_opd = pb.kode_opd)
+		OR (a.strategic_id = pb.strategic_id AND a.kode_opd = pb.kode_opd)
 		LEFT JOIN
-			kebutuhan_spbe ks ON ks.id_prosesbisnis = pb.id
+		kebutuhan_spbe ks ON ks.id_prosesbisnis = pb.id
 		WHERE 1=1
 	`
 
@@ -162,6 +163,7 @@ func (repository *ProsesBisnisRepositoryImpl) GapProsesBisnis(ctx context.Contex
 		var kodeOpd string
 		var tahun int
 		var namaProsesBisnis, kodeProsesBisnis string
+		var idKeterangan sql.NullInt32
 		var namaLayanan, namaData, namaAplikasi, keterangan sql.NullString
 
 		if err := rows.Scan(
@@ -174,6 +176,7 @@ func (repository *ProsesBisnisRepositoryImpl) GapProsesBisnis(ctx context.Contex
 			&namaData,
 			&namaAplikasi,
 			&keterangan,
+			&idKeterangan,
 		); err != nil {
 			return nil, err
 		}
@@ -228,9 +231,17 @@ func (repository *ProsesBisnisRepositoryImpl) GapProsesBisnis(ctx context.Contex
 				NamaAplikasi: sql.NullString{},
 			})
 		}
-		if keterangan.Valid {
+
+		if idKeterangan.Valid {
 			pb.Keterangan = append(
 				pb.Keterangan, domain.GapKeterangan{
+					IdKeterangan: idKeterangan,
+					Keterangan:   keterangan,
+				})
+		} else if keterangan.Valid {
+			pb.Keterangan = append(
+				pb.Keterangan, domain.GapKeterangan{
+					IdKeterangan: sql.NullInt32{},
 					Keterangan: sql.NullString{
 						String: keterangan.String,
 						Valid:  true,
