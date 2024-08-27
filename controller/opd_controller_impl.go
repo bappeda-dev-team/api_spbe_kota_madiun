@@ -54,3 +54,18 @@ func (controller *OpdControllerImpl) FindAll(writer http.ResponseWriter, request
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
+
+func (controller *OpdControllerImpl) FindAllOPD(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+
+	kodeOPD := ""
+
+	opdResponses := controller.OpdService.FindAll(request.Context(), kodeOPD)
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "Berhasil mendapatkan kode opd",
+		Data:   opdResponses,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}

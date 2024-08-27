@@ -111,6 +111,7 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 
 	//OPD
 	router.GET("/v1/opd", opdController.FindAll)
+	router.GET("/v1/opdall", opdController.FindAllOPD)
 
 	//user
 	router.POST("/v1/login", userController.Login)
