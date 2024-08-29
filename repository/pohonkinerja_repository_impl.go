@@ -115,10 +115,10 @@ func (repository *PohonKinerjaRepositoryImpl) InsertApi(ctx context.Context, tx 
 	log.Printf("Parsed Data: %+v\n", result.Results.Data)
 
 	stmt, err := tx.PrepareContext(ctx, `
-		INSERT INTO pohon_kinerja (jenis_pohon, parent ,level_pohon, kode_opd, nama_pohon, tahun)
-		VALUES (?, ?, ?, ?, ?, 2024)
+		INSERT INTO pohon_kinerja (id, jenis_pohon, parent ,level_pohon, kode_opd, nama_pohon, tahun)
+		VALUES (?,?, ?, ?, ?, ?, 2024)
 		ON DUPLICATE KEY UPDATE
-		jenis_pohon=VALUES(jenis_pohon), parent=VALUES(parent), level_pohon=VALUES(level_pohon),kode_opd=VALUES(kode_opd), nama_pohon=VALUES(nama_pohon)`)
+		id=(VALUES(id)),jenis_pohon=VALUES(jenis_pohon), parent=VALUES(parent), level_pohon=VALUES(level_pohon),kode_opd=VALUES(kode_opd), nama_pohon=VALUES(nama_pohon)`)
 	if err != nil {
 		log.Println("Error preparing statement:", err)
 		return web.PohonKinerjaApi{}, err
@@ -126,8 +126,8 @@ func (repository *PohonKinerjaRepositoryImpl) InsertApi(ctx context.Context, tx 
 	defer stmt.Close()
 
 	for _, item := range result.Results.Data.PohonKinerjas {
-		log.Printf("Insert Pohon Kinerja: Jenis Pohon=%v, Parent=%v, Level Pohon=%v, Kode OPD=%v, Nama Pohon=%v \n", item.JenisPohon, item.Parent, item.LevelPohon, result.Results.Data.KodeOpd, item.Strategi)
-		_, err := stmt.ExecContext(ctx, item.JenisPohon, item.Parent, item.LevelPohon, result.Results.Data.KodeOpd, item.Strategi)
+		log.Printf("Insert Pohon Kinerja:Id-%v, Jenis Pohon=%v, Parent=%v, Level Pohon=%v, Kode OPD=%v, Nama Pohon=%v \n", item.ID, item.JenisPohon, item.Parent, item.LevelPohon, result.Results.Data.KodeOpd, item.Strategi)
+		_, err := stmt.ExecContext(ctx, item.ID, item.JenisPohon, item.Parent, item.LevelPohon, result.Results.Data.KodeOpd, item.Strategi)
 		if err != nil {
 			log.Println("Error executing statement:", err)
 			return web.PohonKinerjaApi{}, err
@@ -136,4 +136,57 @@ func (repository *PohonKinerjaRepositoryImpl) InsertApi(ctx context.Context, tx 
 
 	log.Println("Data successfully fetched and saved.")
 	return web.PohonKinerjaApi{}, nil
+}
+
+func (repository *PohonKinerjaRepositoryImpl) FindByOperational(ctx context.Context, tx *sql.Tx, pohonkinerjaId int) (domain.PohonKinerja, []domain.PohonKinerja, []domain.PohonKinerja, error) {
+	// Ambil data operational
+	operationalScript := "SELECT id, nama_pohon, jenis_pohon, level_pohon, parent, created_at, updated_at, tahun, kode_opd FROM pohon_kinerja WHERE id = ?"
+	operationalRow := tx.QueryRowContext(ctx, operationalScript, pohonkinerjaId)
+
+	var operational domain.PohonKinerja
+	err := operationalRow.Scan(&operational.ID, &operational.NamaPohon, &operational.JenisPohon, &operational.LevelPohon, &operational.Parent, &operational.CreatedAt, &operational.UpdatedAt, &operational.Tahun, &operational.KodeOpd)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return domain.PohonKinerja{}, nil, nil, errors.New("pohon kinerja not found")
+		}
+		return domain.PohonKinerja{}, nil, nil, err
+	}
+
+	// Jika tidak ada parent, kembalikan hanya data operational
+	if operational.Parent == "" {
+		return domain.PohonKinerja{}, nil, []domain.PohonKinerja{operational}, nil
+	}
+
+	// Ambil data tactical
+	tacticalScript := "SELECT id, nama_pohon, jenis_pohon, level_pohon, parent, created_at, updated_at, tahun, kode_opd FROM pohon_kinerja WHERE id = ?"
+	tacticalRow := tx.QueryRowContext(ctx, tacticalScript, operational.Parent)
+
+	var tactical domain.PohonKinerja
+	err = tacticalRow.Scan(&tactical.ID, &tactical.NamaPohon, &tactical.JenisPohon, &tactical.LevelPohon, &tactical.Parent, &tactical.CreatedAt, &tactical.UpdatedAt, &tactical.Tahun, &tactical.KodeOpd)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return domain.PohonKinerja{}, nil, []domain.PohonKinerja{operational}, nil
+		}
+		return domain.PohonKinerja{}, nil, nil, err
+	}
+
+	// Jika tidak ada parent untuk tactical, kembalikan data tactical dan operational
+	if tactical.Parent == "" {
+		return domain.PohonKinerja{}, []domain.PohonKinerja{tactical}, []domain.PohonKinerja{operational}, nil
+	}
+
+	// Ambil data strategic
+	strategicScript := "SELECT id, nama_pohon, jenis_pohon, level_pohon, parent, created_at, updated_at, tahun, kode_opd FROM pohon_kinerja WHERE id = ?"
+	strategicRow := tx.QueryRowContext(ctx, strategicScript, tactical.Parent)
+
+	var strategic domain.PohonKinerja
+	err = strategicRow.Scan(&strategic.ID, &strategic.NamaPohon, &strategic.JenisPohon, &strategic.LevelPohon, &strategic.Parent, &strategic.CreatedAt, &strategic.UpdatedAt, &strategic.Tahun, &strategic.KodeOpd)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return domain.PohonKinerja{}, []domain.PohonKinerja{tactical}, []domain.PohonKinerja{operational}, nil
+		}
+		return domain.PohonKinerja{}, nil, nil, err
+	}
+
+	return strategic, []domain.PohonKinerja{tactical}, []domain.PohonKinerja{operational}, nil
 }

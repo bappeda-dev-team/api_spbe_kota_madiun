@@ -423,7 +423,7 @@ func (service *LayananSpbeServiceImpl) Update(ctx context.Context, request web.L
 	return helper.ToLayananSpbeRespons(layananSpbe)
 }
 
-func (service *LayananSpbeServiceImpl) Delete(ctx context.Context, layananspbeId int, kodeOPD string) error {
+func (service *LayananSpbeServiceImpl) Delete(ctx context.Context, layananspbeId int, kodeOPD string, role string) error {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
@@ -431,11 +431,18 @@ func (service *LayananSpbeServiceImpl) Delete(ctx context.Context, layananspbeId
 	layananSpbe, err := service.LayananspbeRepository.FindById(ctx, tx, layananspbeId)
 	helper.PanicIfError(err)
 
-	if layananSpbe.KodeOPD != kodeOPD {
-		panic(errors.New("layanan spbe tidak ditemukan untuk OPD ini"))
+	if role == "admin_kota" {
+		// Admin kota dapat menghapus semua data tanpa memeriksa kode OPD
+		service.LayananspbeRepository.Delete(ctx, tx, layananSpbe)
+	} else if role == "admin_opd" || role == "asn" {
+		// Admin OPD dan ASN hanya dapat menghapus data berdasarkan kode OPD mereka
+		if layananSpbe.KodeOPD != kodeOPD {
+			return errors.New("layanan spbe tidak ditemukan untuk OPD ini")
+		}
+		service.LayananspbeRepository.Delete(ctx, tx, layananSpbe)
+	} else {
+		return errors.New("role tidak memiliki izin untuk menghapus layanan spbe")
 	}
-
-	service.LayananspbeRepository.Delete(ctx, tx, layananSpbe)
 
 	return nil
 }

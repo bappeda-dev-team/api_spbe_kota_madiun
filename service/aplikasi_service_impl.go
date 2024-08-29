@@ -397,7 +397,7 @@ func (service *AplikasiServiceImpl) Update(ctx context.Context, request web.Apli
 	return helper.ToAplikasiRespons(aplikasi)
 }
 
-func (service *AplikasiServiceImpl) Delete(ctx context.Context, aplikasiId int, kodeOPD string) error {
+func (service *AplikasiServiceImpl) Delete(ctx context.Context, aplikasiId int, kodeOPD string, role string) error {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
@@ -405,10 +405,17 @@ func (service *AplikasiServiceImpl) Delete(ctx context.Context, aplikasiId int, 
 	aplikasi, err := service.AplikasiRepository.FindById(ctx, tx, aplikasiId)
 	helper.PanicIfError(err)
 
-	if aplikasi.KodeOPD != kodeOPD {
-		panic(errors.New("aplikasi tidak ditemukan untuk OPD ini"))
+	if role == "admin_kota" {
+		// Admin kota dapat menghapus semua data tanpa memeriksa kode OPD
+		service.AplikasiRepository.Delete(ctx, tx, aplikasi)
+	} else if role == "admin_opd" || role == "asn" {
+		// Admin OPD dan ASN hanya dapat menghapus data berdasarkan kode OPD mereka
+		if aplikasi.KodeOPD != kodeOPD {
+			return errors.New("aplikasi tidak ditemukan untuk OPD ini")
+		}
+		service.AplikasiRepository.Delete(ctx, tx, aplikasi)
+	} else {
+		return errors.New("role tidak memiliki izin untuk menghapus aplikasi")
 	}
-
-	service.AplikasiRepository.Delete(ctx, tx, aplikasi)
 	return nil
 }

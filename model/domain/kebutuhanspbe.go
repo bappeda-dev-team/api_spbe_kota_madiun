@@ -1,12 +1,17 @@
 package domain
 
+import "database/sql"
+
 type KebutuhanSPBE struct {
-	ID             int              `json:"id"`
-	KodeOpd        string           `json:"kode_opd"`
-	Tahun          int              `json:"tahun"`
-	NamaDomain     string           `json:"nama_domain"`
-	IdProsesbisnis int              `json:"id_prosesbisnis"`
-	JenisKebutuhan []JenisKebutuhan `json:"jenis_kebutuhan"`
+	ID              int              `json:"id"`
+	Keterangan      string           `json:"keterangan"`
+	KodeOpd         string           `json:"kode_opd"`
+	Tahun           int              `json:"tahun"`
+	NamaDomain      sql.NullString   `json:"nama_domain"`
+	IdProsesbisnis  int              `json:"id_prosesbisnis"`
+	JenisKebutuhan  []JenisKebutuhan `json:"jenis_kebutuhan"`
+	IndikatorPj     sql.NullString
+	PenanggungJawab sql.NullString
 }
 
 type JenisKebutuhan struct {

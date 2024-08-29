@@ -42,6 +42,8 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	//pohon kinerja
 	router.GET("/v1/pohonkinerja/:pohonId", pohonkinerja.FindById)
 	router.GET("/v1/pohonkinerja", pohonkinerja.FindAll)
+	router.GET("/v1/pohonkinerjahirarki/:pohonId", pohonkinerja.FindByOperational)
+	router.GET("/v1/pohonkinerjahirarki", pohonkinerja.FindByOperational)
 
 	//bidangurusan
 	router.GET("/v1/bidangurusan", bidangurusan.FindAll)
@@ -91,6 +93,8 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.GET("/v1/kebutuhanspbebyid/:kebutuhanSPBEId", kebutuhanSPBEController.FindById)
 	router.POST("/v1/createkebutuhanspbe", kebutuhanSPBEController.Create)
 	router.PUT("/v1/updatekebutuhanspbe/:kebutuhanSPBEId", kebutuhanSPBEController.Update)
+	router.PUT("/v1/updateketeranganGapKebutuhan/:kebutuhanSPBEId", kebutuhanSPBEController.UpdateKeterangan)
+	router.PUT("/v1/updatepjkebutuhanspbe/:kebutuhanSPBEId", kebutuhanSPBEController.UpdatePenanggungJawab)
 	router.DELETE("/v1/deletekebutuhanspbe/:kebutuhanSPBEId", kebutuhanSPBEController.Delete)
 
 	//fetch api
@@ -107,6 +111,7 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 
 	//OPD
 	router.GET("/v1/opd", opdController.FindAll)
+	router.GET("/v1/opdall", opdController.FindAllOPD)
 
 	//user
 	router.POST("/v1/login", userController.Login)

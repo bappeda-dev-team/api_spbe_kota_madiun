@@ -111,18 +111,11 @@ func (controller *LayananSpbeControllerImpl) Insert(writer http.ResponseWriter, 
 	LayananSpbeCreateRequest := web.LayananSpbeCreateRequest{}
 	helper.ReadFromRequestBody(request, &LayananSpbeCreateRequest)
 
-	kodeOPD, ok := request.Context().Value("kode_opd").(string)
-	if !ok {
-		webResponse := web.WebResponse{
-			Code:   http.StatusInternalServerError,
-			Status: "INTERNAL SERVER ERROR",
-			Data:   "Kode OPD tidak ditemukan",
-		}
-		helper.WriteToResponseBody(writer, webResponse)
-		return
+	role := request.Context().Value("roles").(string)
+	if role == "admin_opd" || role == "asn" {
+		kodeOPD := request.Context().Value("kode_opd").(string)
+		LayananSpbeCreateRequest.KodeOPD = kodeOPD
 	}
-
-	LayananSpbeCreateRequest.KodeOPD = kodeOPD
 
 	layananspbeResponse := controller.layananSpbeService.Insert(request.Context(), LayananSpbeCreateRequest)
 	webResponse := web.WebResponse{
@@ -137,40 +130,36 @@ func (controller *LayananSpbeControllerImpl) Update(writer http.ResponseWriter, 
 	role := request.Context().Value("roles").(string)
 	kodeOPD := request.Context().Value("kode_opd").(string)
 
-	if role != "asn" {
-		helper.WriteToResponseBody(writer, web.WebResponse{
-			Code:   http.StatusForbidden,
-			Status: "FORBIDDEN",
-			Data:   "Hanya pengguna ASN yang dapat memperbarui layanan spbe",
-		})
-		return
-	}
-
 	LayananSpbeUpdateRequest := web.LayananSpbeUpdateRequest{}
 	helper.ReadFromRequestBody(request, &LayananSpbeUpdateRequest)
 	layananspbeId := params.ByName("layananspbeId")
-
 	id, err := strconv.Atoi(layananspbeId)
-
 	helper.PanicIfError(err)
-
 	LayananSpbeUpdateRequest.Id = id
 
-	existingLayananSpbe, err := controller.layananSpbeService.FindById(request.Context(), id, kodeOPD)
-	if err != nil || existingLayananSpbe.KodeOPD != kodeOPD {
+	if role == "asn" || role == "admin_opd" {
+		existingLayananSpbe, err := controller.layananSpbeService.FindById(request.Context(), id, kodeOPD)
+		if err != nil || existingLayananSpbe.KodeOPD != kodeOPD {
+			helper.WriteToResponseBody(writer, web.WebResponse{
+				Code:   http.StatusForbidden,
+				Status: "FORBIDDEN",
+				Data:   "Anda tidak memiliki akses untuk memperbarui proses bisnis ini",
+			})
+			return
+		}
+		LayananSpbeUpdateRequest.KodeOPD = kodeOPD
+	} else if role == "admin_kota" {
+		// untuk admin_kota, tidak ada cek kode OPD
+	} else {
 		helper.WriteToResponseBody(writer, web.WebResponse{
-			Code:   http.StatusForbidden,
-			Status: "FORBIDDEN",
-			Data:   "Anda tidak memiliki akses untuk memperbarui layanan spbe ini",
+			Code:   http.StatusUnauthorized,
+			Status: "UNAUTHORIZED",
+			Data:   "Role tidak diizinkan untuk memperbarui proses bisnis",
 		})
 		return
 	}
 
-	LayananSpbeUpdateRequest.KodeOPD = kodeOPD
-
 	layananspbeResponse := controller.layananSpbeService.Update(request.Context(), LayananSpbeUpdateRequest)
-
-	LayananSpbeUpdateRequest.KodeOPD = kodeOPD
 
 	webResponse := web.WebResponse{
 		Code:   200,
@@ -186,18 +175,10 @@ func (controller *LayananSpbeControllerImpl) Delete(writer http.ResponseWriter, 
 	id, err := strconv.Atoi(layananspbeId)
 	helper.PanicIfError(err)
 
-	kodeOPD, ok := request.Context().Value("kode_opd").(string)
-	if !ok {
-		webResponse := web.WebResponse{
-			Code:   http.StatusInternalServerError,
-			Status: "INTERNAL SERVER ERROR",
-			Data:   "Kode OPD tidak ditemukan",
-		}
-		helper.WriteToResponseBody(writer, webResponse)
-		return
-	}
+	kodeOPD, _ := request.Context().Value("kode_opd").(string)
+	role, _ := request.Context().Value("roles").(string)
 
-	err = controller.layananSpbeService.Delete(request.Context(), id, kodeOPD)
+	err = controller.layananSpbeService.Delete(request.Context(), id, kodeOPD, role)
 	if err != nil {
 		if err.Error() == "layanan spbe tidak ditemukan untuk OPD ini" {
 			webResponse := web.WebResponse{

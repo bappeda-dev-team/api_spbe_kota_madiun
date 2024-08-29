@@ -439,7 +439,7 @@ func (service *DataDanInformasiServiceImpl) Update(ctx context.Context, request 
 
 }
 
-func (service *DataDanInformasiServiceImpl) Delete(ctx context.Context, dataId int, kodeOPD string) error {
+func (service *DataDanInformasiServiceImpl) Delete(ctx context.Context, dataId int, kodeOPD string, role string) error {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
@@ -447,10 +447,17 @@ func (service *DataDanInformasiServiceImpl) Delete(ctx context.Context, dataId i
 	dataInformasi, err := service.DataDanInformasiRepository.FindById(ctx, tx, dataId)
 	helper.PanicIfError(err)
 
-	if dataInformasi.KodeOPD != kodeOPD {
-		panic(errors.New("data informasi tidak ditemukan untuk OPD ini"))
+	if role == "admin_kota" {
+		// Admin kota dapat menghapus semua data tanpa memeriksa kode OPD
+		service.DataDanInformasiRepository.Delete(ctx, tx, dataInformasi)
+	} else if role == "admin_opd" || role == "asn" {
+		// Admin OPD dan ASN hanya dapat menghapus data berdasarkan kode OPD mereka
+		if dataInformasi.KodeOPD != kodeOPD {
+			return errors.New("data informasi tidak ditemukan untuk OPD ini")
+		}
+		service.DataDanInformasiRepository.Delete(ctx, tx, dataInformasi)
+	} else {
+		return errors.New("role tidak memiliki izin untuk menghapus data informasi")
 	}
-
-	service.DataDanInformasiRepository.Delete(ctx, tx, dataInformasi)
 	return nil
 }

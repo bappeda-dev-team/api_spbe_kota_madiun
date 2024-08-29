@@ -1,12 +1,15 @@
 package web
 
 type KebutuhanSPBEResponse struct {
-	ID             int                      `json:"id"`
-	KodeOpd        string                   `json:"kode_opd"`
-	Tahun          int                      `json:"tahun"`
-	NamaDomain     string                   `json:"nama_domain"`
-	ProsesBisnis   ProsesBisnisResponse     `json:"proses_bisnis"`
-	JenisKebutuhan []JenisKebutuhanResponse `json:"jenis_kebutuhan"`
+	ID              int                      `json:"id"`
+	KeteranganGap   string                   `json:"keterangan"`
+	KodeOpd         string                   `json:"kode_opd"`
+	Tahun           int                      `json:"tahun"`
+	NamaDomain      string                   `json:"nama_domain"`
+	ProsesBisnis    ProsesBisnisResponse     `json:"proses_bisnis"`
+	JenisKebutuhan  []JenisKebutuhanResponse `json:"jenis_kebutuhan"`
+	IndikatorPj     string                   `json:"indikator_pj"`
+	PenanggungJawab string                   `json:"penanggung_jawab"`
 }
 
 type ProsesBisnisResponse struct {
@@ -26,4 +29,15 @@ type KondisiAwalResponse struct {
 	JenisKebutuhanId int    `json:"jenis_kebutuhan_id"`
 	Keterangan       string `json:"keterangan"`
 	Tahun            int    `json:"tahun"`
+}
+
+type KebutuhanSPBEKeteranganResponse struct {
+	ID            int    `json:"id"`
+	KeteranganGap string `json:"keterangan"`
+}
+
+type KebutuhanSPBEPjResponse struct {
+	ID              int    `json:"id"`
+	IndikatorPj     string `json:"indikator_pj"`
+	PenanggungJawab string `json:"penanggung_jawab"`
 }

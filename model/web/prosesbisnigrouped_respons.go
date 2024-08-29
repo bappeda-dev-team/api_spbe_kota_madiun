@@ -14,6 +14,7 @@ type GapProsesBisnis struct {
 	Layanans         []GapLayanan          `json:"layanans"`
 	DataDanInformasi []GapDataDanInformasi `json:"data_dan_informasi"`
 	Aplikasi         []GapAplikasi         `json:"aplikasi"`
+	Keterangan       []GapKeterangan       `json:"keterangan"`
 }
 
 type GapLayanan struct {
@@ -28,8 +29,17 @@ type GapAplikasi struct {
 	NamaAplikasi NullString `json:"nama_aplikasi"`
 }
 
+type GapKeterangan struct {
+	IdKeterangan NullInt32  `json:"id_keterangan"`
+	Keterangan   NullString `json:"keterangan"`
+}
+
 type NullString struct {
 	sql.NullString
+}
+
+type NullInt32 struct {
+	sql.NullInt32
 }
 
 func (ns NullString) MarshalJSON() ([]byte, error) {
@@ -47,5 +57,26 @@ func (ns *NullString) UnmarshalJSON(b []byte) error {
 	}
 	ns.String = s
 	ns.Valid = true
+	return nil
+}
+
+func (ni NullInt32) MarshalJSON() ([]byte, error) {
+	if ni.Valid {
+		return json.Marshal(ni.Int32)
+	}
+	return json.Marshal(nil)
+}
+
+func (ni *NullInt32) UnmarshalJSON(b []byte) error {
+	var i *int32
+	if err := json.Unmarshal(b, &i); err != nil {
+		return err
+	}
+	if i != nil {
+		ni.Int32 = *i
+		ni.Valid = true
+	} else {
+		ni.Valid = false
+	}
 	return nil
 }

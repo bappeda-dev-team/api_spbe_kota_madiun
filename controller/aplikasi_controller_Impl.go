@@ -108,18 +108,11 @@ func (controller *AplikasiControllerImpl) Insert(writer http.ResponseWriter, req
 	aplikasiCreateRequest := web.AplikasiCreateRequest{}
 	helper.ReadFromRequestBody(request, &aplikasiCreateRequest)
 
-	kodeOPD, ok := request.Context().Value("kode_opd").(string)
-	if !ok {
-		webResponse := web.WebResponse{
-			Code:   http.StatusInternalServerError,
-			Status: "INTERNAL SERVER ERROR",
-			Data:   "Kode OPD tidak ditemukan",
-		}
-		helper.WriteToResponseBody(writer, webResponse)
-		return
+	role := request.Context().Value("roles").(string)
+	if role == "admin_opd" || role == "asn" {
+		kodeOPD := request.Context().Value("kode_opd").(string)
+		aplikasiCreateRequest.KodeOPD = kodeOPD
 	}
-
-	aplikasiCreateRequest.KodeOPD = kodeOPD
 
 	aplikasiResponse := controller.aplikasiService.Insert(request.Context(), aplikasiCreateRequest)
 	webResponse := web.WebResponse{
@@ -135,36 +128,36 @@ func (controller *AplikasiControllerImpl) Update(writer http.ResponseWriter, req
 	role := request.Context().Value("roles").(string)
 	kodeOPD := request.Context().Value("kode_opd").(string)
 
-	if role != "asn" {
-		webResponse := web.WebResponse{
-			Code:   http.StatusForbidden,
-			Status: "FORBIDDEN",
-			Data:   "Hanya pengguna ASN yang dapat memperbarui data dan informasi",
-		}
-		helper.WriteToResponseBody(writer, webResponse)
-		return
-	}
-
 	AplikasiUpdateRequest := web.AplikasiUpdateRequest{}
 	helper.ReadFromRequestBody(request, &AplikasiUpdateRequest)
 
-	layananspbeId := params.ByName("aplikasiId")
-	id, err := strconv.Atoi(layananspbeId)
+	aplikasiId := params.ByName("aplikasiId")
+	id, err := strconv.Atoi(aplikasiId)
 	helper.PanicIfError(err)
 
 	AplikasiUpdateRequest.Id = id
 
-	existingAplikasi, err := controller.aplikasiService.FindById(request.Context(), id, kodeOPD)
-	if err != nil || existingAplikasi.KodeOPD != kodeOPD {
+	if role == "asn" || role == "admin_opd" {
+		existingAplikasi, err := controller.aplikasiService.FindById(request.Context(), id, kodeOPD)
+		if err != nil || existingAplikasi.KodeOPD != kodeOPD {
+			helper.WriteToResponseBody(writer, web.WebResponse{
+				Code:   http.StatusForbidden,
+				Status: "FORBIDDEN",
+				Data:   "Anda tidak memiliki akses untuk memperbarui aplikasi ini",
+			})
+			return
+		}
+		AplikasiUpdateRequest.KodeOPD = kodeOPD
+	} else if role == "admin_kota" {
+		// untuk admin_kota, tidak ada cek kode OPD
+	} else {
 		helper.WriteToResponseBody(writer, web.WebResponse{
-			Code:   http.StatusForbidden,
-			Status: "FORBIDDEN",
-			Data:   "Anda tidak memiliki akses untuk memperbarui aplikasi ini",
+			Code:   http.StatusUnauthorized,
+			Status: "UNAUTHORIZED",
+			Data:   "Role tidak diizinkan untuk memperbarui proses bisnis",
 		})
 		return
 	}
-
-	AplikasiUpdateRequest.KodeOPD = kodeOPD
 
 	aplikasiResponse := controller.aplikasiService.Update(request.Context(), AplikasiUpdateRequest)
 
@@ -189,18 +182,10 @@ func (controller *AplikasiControllerImpl) Delete(writer http.ResponseWriter, req
 		return
 	}
 
-	kodeOPD, ok := request.Context().Value("kode_opd").(string)
-	if !ok {
-		webResponse := web.WebResponse{
-			Code:   http.StatusInternalServerError,
-			Status: "INTERNAL SERVER ERROR",
-			Data:   "Kode OPD tidak ditemukan",
-		}
-		helper.WriteToResponseBody(writer, webResponse)
-		return
-	}
+	kodeOPD, _ := request.Context().Value("kode_opd").(string)
+	role, _ := request.Context().Value("roles").(string)
 
-	err = controller.aplikasiService.Delete(request.Context(), id, kodeOPD)
+	err = controller.aplikasiService.Delete(request.Context(), id, kodeOPD, role)
 	if err != nil {
 		webResponse := web.WebResponse{
 			Code:   http.StatusInternalServerError,

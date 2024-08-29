@@ -459,7 +459,7 @@ func (service *ProsesBisnisServiceImpl) Update(ctx context.Context, request web.
 	return helper.ToProsesBisnisResponse(prosesBisnis)
 }
 
-func (service *ProsesBisnisServiceImpl) Delete(ctx context.Context, prosesbisnisId int, kodeOPD string) error {
+func (service *ProsesBisnisServiceImpl) Delete(ctx context.Context, prosesbisnisId int, kodeOPD string, role string) error {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
@@ -467,11 +467,18 @@ func (service *ProsesBisnisServiceImpl) Delete(ctx context.Context, prosesbisnis
 	prosesBisnis, err := service.ProsesBisnisRepository.FindById(ctx, tx, prosesbisnisId)
 	helper.PanicIfError(err)
 
-	if prosesBisnis.KodeOPD != kodeOPD {
-		panic(errors.New("proses bisnis tidak ditemukan untuk OPD ini"))
+	if role == "admin_kota" {
+		// Admin kota dapat menghapus semua data tanpa memeriksa kode OPD
+		service.ProsesBisnisRepository.Delete(ctx, tx, prosesBisnis)
+	} else if role == "admin_opd" || role == "asn" {
+		// Admin OPD dan ASN hanya dapat menghapus data berdasarkan kode OPD mereka
+		if prosesBisnis.KodeOPD != kodeOPD {
+			return errors.New("proses bisnis tidak ditemukan untuk OPD ini")
+		}
+		service.ProsesBisnisRepository.Delete(ctx, tx, prosesBisnis)
+	} else {
+		return errors.New("role tidak memiliki izin untuk menghapus proses bisnis")
 	}
-
-	service.ProsesBisnisRepository.Delete(ctx, tx, prosesBisnis)
 
 	return nil
 }
@@ -498,6 +505,7 @@ func (service *ProsesBisnisServiceImpl) GetProsesBisnisGrouped(ctx context.Conte
 				Layanans:         []web.GapLayanan{},
 				DataDanInformasi: []web.GapDataDanInformasi{},
 				Aplikasi:         []web.GapAplikasi{},
+				Keterangan:       []web.GapKeterangan{},
 			}
 		}
 
@@ -547,6 +555,30 @@ func (service *ProsesBisnisServiceImpl) GetProsesBisnisGrouped(ctx context.Conte
 				temAplikasi := web.GapAplikasi{NamaAplikasi: webNullString}
 				if !helper.ContainAplikasi(webPb.Aplikasi, temAplikasi) {
 					webPb.Aplikasi = append(webPb.Aplikasi, temAplikasi)
+				}
+			}
+		}
+
+		if pb.Keterangan != nil {
+			for _, k := range pb.Keterangan {
+				var webNullInt32 web.NullInt32
+				var webNullString web.NullString
+
+				if k.IdKeterangan.Valid {
+					webNullInt32.Int32 = k.IdKeterangan.Int32
+					webNullInt32.Valid = true
+				}
+				if k.Keterangan.Valid {
+					webNullString.String = k.Keterangan.String
+					webNullString.Valid = true
+				}
+
+				tempKeterangan := web.GapKeterangan{
+					IdKeterangan: webNullInt32,
+					Keterangan:   webNullString,
+				}
+				if !helper.ContainKeterangan(webPb.Keterangan, tempKeterangan) {
+					webPb.Keterangan = append(webPb.Keterangan, tempKeterangan)
 				}
 			}
 		}
