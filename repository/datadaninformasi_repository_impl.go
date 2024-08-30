@@ -29,6 +29,8 @@ func (repository *DataDanInformasiRepositoryImpl) FindByKodeOpd(ctx context.Cont
 		args = append(args, tahun)
 	}
 
+	script += " ORDER BY id DESC"
+
 	rows, err := tx.QueryContext(ctx, script, args...)
 	helper.PanicIfError(err)
 	defer rows.Close()

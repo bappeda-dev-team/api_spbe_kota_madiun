@@ -328,3 +328,62 @@ func (controller *KebutuhanSPBEControllerImpl) FindByKodeOpdAndTahun(writer http
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
+
+func (controller *KebutuhanSPBEControllerImpl) FindDataPemenuhanKebutuhan(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	tahunStr := request.URL.Query().Get("tahun")
+	tahun := 0
+	var err error
+	if tahunStr != "" {
+		tahun, err = strconv.Atoi(tahunStr)
+		if err != nil {
+			helper.WriteToResponseBody(writer, web.WebResponse{
+				Code:   http.StatusBadRequest,
+				Status: "Format tahun tidak valid",
+				Data:   nil,
+			})
+			return
+		}
+	}
+	prosesbisnisStr := request.URL.Query().Get("prosesbisnis")
+	prosesbisnis := 0
+	var err2 error
+	if prosesbisnisStr != "" {
+		prosesbisnis, err2 = strconv.Atoi(prosesbisnisStr)
+		if err2 != nil {
+			helper.WriteToResponseBody(writer, web.WebResponse{
+				Code:   http.StatusBadRequest,
+				Status: "Id prosesbisnis tidak valid",
+				Data:   nil,
+			})
+			return
+		}
+	}
+
+	role := request.Context().Value("roles").(string)
+	kodeOpd := ""
+
+	if role == "admin_kota" {
+		kodeOpd = request.URL.Query().Get("kode_opd")
+	} else {
+		kodeOpd = request.Context().Value("kode_opd").(string)
+	}
+
+	kebutuhanSPBEResponses, err := controller.KebutuhanSPBEService.FindDataPemenuhanKebutuhan(request.Context(), kodeOpd, tahun, prosesbisnis)
+	if err != nil {
+		webResponse := web.WebResponse{
+			Code:   500,
+			Status: "INTERNAL SERVER ERROR",
+			Data:   err.Error(),
+		}
+		helper.WriteToResponseBody(writer, webResponse)
+		return
+	}
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   kebutuhanSPBEResponses,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}

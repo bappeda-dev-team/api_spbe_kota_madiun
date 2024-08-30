@@ -29,6 +29,8 @@ func (repository *ProsesBisnisRepositoryImpl) FindByKodeOpd(ctx context.Context,
 		args = append(args, tahun)
 	}
 
+	script += " ORDER BY id DESC"
+
 	rows, err := tx.QueryContext(ctx, script, args...)
 	helper.PanicIfError(err)
 	defer rows.Close()
@@ -148,7 +150,7 @@ func (repository *ProsesBisnisRepositoryImpl) GapProsesBisnis(ctx context.Contex
 		args = append(args, tahun)
 	}
 
-	query += " ORDER BY pb.kode_opd, pb.id;"
+	query += " ORDER BY pb.kode_opd, pb.id desc;"
 
 	rows, err := tx.QueryContext(ctx, query, args...)
 	if err != nil {

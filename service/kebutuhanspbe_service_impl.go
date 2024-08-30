@@ -341,3 +341,89 @@ func (service *KebutuhanSPBEServiceImpl) FindByKodeOpdAndTahun(ctx context.Conte
 
 	return responses, nil
 }
+
+func (service *KebutuhanSPBEServiceImpl) FindDataPemenuhanKebutuhan(ctx context.Context, kodeOpd string, tahun int, prosesbisnis int) ([]web.KebutuhanSPBEResponse, error) {
+	tx, err := service.DB.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer helper.CommitOrRollback(tx)
+
+	kebutuhanSPBEs, err := service.KebutuhanSPBERepository.FindByKodeOpdAndTahun(ctx, tx, kodeOpd, tahun, prosesbisnis)
+	if err != nil {
+		return nil, err
+	}
+
+	var responses []web.KebutuhanSPBEResponse
+	for _, kebutuhanSPBE := range kebutuhanSPBEs {
+		jenisKebutuhan, err := service.KebutuhanSPBERepository.FindJenisKebutuhanByKebutuhanId(ctx, tx, kebutuhanSPBE.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		// Jika tidak ada jenis kebutuhan, lanjutkan ke iterasi berikutnya
+		if len(jenisKebutuhan) == 0 {
+			continue
+		}
+
+		var jenisKebutuhanResponses []web.JenisKebutuhanResponse
+		for _, jk := range jenisKebutuhan {
+			kondisiAwal, err := service.KebutuhanSPBERepository.FindKondisiAwalByJenisKebutuhanId(ctx, tx, jk.Id)
+			if err != nil {
+				return nil, err
+			}
+
+			var kondisiAwalResponses []web.KondisiAwalResponse
+			for _, ka := range kondisiAwal {
+				if ka.Keterangan != "" {
+					kondisiAwalResponses = append(kondisiAwalResponses, web.KondisiAwalResponse{
+						Id:               ka.Id,
+						JenisKebutuhanId: ka.JenisKebutuhanId,
+						Keterangan:       ka.Keterangan,
+						Tahun:            ka.Tahun,
+					})
+				}
+			}
+
+			if len(kondisiAwalResponses) > 0 {
+				jenisKebutuhanResponses = append(jenisKebutuhanResponses, web.JenisKebutuhanResponse{
+					Id:          jk.Id,
+					KebutuhanId: jk.KebutuhanId,
+					Kebutuhan:   jk.Kebutuhan,
+					KondisiAwal: kondisiAwalResponses,
+				})
+			}
+		}
+
+		// Jika tidak ada jenis kebutuhan yang valid, lanjutkan ke iterasi berikutnya
+		if len(jenisKebutuhanResponses) == 0 {
+			continue
+		}
+
+		prosesBisnis, err := service.ProsesBisnisRepository.FindById(ctx, tx, kebutuhanSPBE.IdProsesbisnis)
+		helper.PanicIfError(err)
+
+		response := web.KebutuhanSPBEResponse{
+			ID:            kebutuhanSPBE.ID,
+			KeteranganGap: kebutuhanSPBE.Keterangan,
+			KodeOpd:       kebutuhanSPBE.KodeOpd,
+			Tahun:         kebutuhanSPBE.Tahun,
+			ProsesBisnis: web.ProsesBisnisResponse{
+				ID:               prosesBisnis.ID,
+				NamaProsesBisnis: prosesBisnis.NamaProsesBisnis,
+			},
+			JenisKebutuhan:  jenisKebutuhanResponses,
+			IndikatorPj:     kebutuhanSPBE.IndikatorPj.String,
+			PenanggungJawab: kebutuhanSPBE.PenanggungJawab.String,
+		}
+
+		// Hanya tambahkan NamaDomain jika valid
+		if kebutuhanSPBE.NamaDomain.Valid && kebutuhanSPBE.NamaDomain.String != "" {
+			response.NamaDomain = kebutuhanSPBE.NamaDomain.String
+		}
+
+		responses = append(responses, response)
+	}
+
+	return responses, nil
+}

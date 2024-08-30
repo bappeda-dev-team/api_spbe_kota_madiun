@@ -79,6 +79,8 @@ func (repository *KebutuhanSPBERepositoryImpl) FindByKodeOpdAndTahun(ctx context
 		args = append(args, prosesbisnis)
 	}
 
+	script += " ORDER BY id DESC"
+
 	log.Println("Menjalankan query:", script, "dengan args:", args)
 
 	rows, err := tx.QueryContext(ctx, script, args...)

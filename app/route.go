@@ -96,6 +96,7 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.PUT("/v1/updateketeranganGapKebutuhan/:kebutuhanSPBEId", kebutuhanSPBEController.UpdateKeterangan)
 	router.PUT("/v1/updatepjkebutuhanspbe/:kebutuhanSPBEId", kebutuhanSPBEController.UpdatePenanggungJawab)
 	router.DELETE("/v1/deletekebutuhanspbe/:kebutuhanSPBEId", kebutuhanSPBEController.Delete)
+	router.GET("/v1/pemenuhankebutuhanspbe", kebutuhanSPBEController.FindDataPemenuhanKebutuhan)
 
 	//fetch api
 	router.GET("/sasarankotafetch", sasarankotaController.Insert)
