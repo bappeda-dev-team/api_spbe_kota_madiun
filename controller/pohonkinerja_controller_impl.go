@@ -70,7 +70,26 @@ func (controller *PohonKinerjaControllerImpl) FindAll(writer http.ResponseWriter
 }
 
 func (controller *PohonKinerjaControllerImpl) FetchApiPohon(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	pohonKinerjaApiResponse, err := controller.PohonKinerjaService.InsertApi(request.Context())
+	tahun := request.URL.Query().Get("tahun")
+	if tahun == "" {
+		helper.WriteToResponseBody(writer, web.WebResponse{
+			Code:   http.StatusBadRequest,
+			Status: "Format tahun tidak valid",
+			Data:   nil,
+		})
+		return
+	}
+
+	role := request.Context().Value("roles").(string)
+	kodeOPD := ""
+
+	if role == "admin_kota" {
+		kodeOPD = request.URL.Query().Get("kode_opd")
+	} else {
+		kodeOPD = request.Context().Value("kode_opd").(string)
+	}
+
+	_, err := controller.PohonKinerjaService.InsertApi(request.Context(), kodeOPD, tahun)
 	if err != nil {
 		helper.PanicIfError(err)
 	}
@@ -78,7 +97,7 @@ func (controller *PohonKinerjaControllerImpl) FetchApiPohon(writer http.Response
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "Success fetching and inserting Pohon Kinerja",
-		Data:   pohonKinerjaApiResponse,
+		Data:   "berhasil fetch",
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)
@@ -97,6 +116,39 @@ func (controller *PohonKinerjaControllerImpl) FindByOperational(writer http.Resp
 		Code:   200,
 		Status: "Berhasil",
 		Data:   pohonKinerjaResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+
+func (controller *PohonKinerjaControllerImpl) GetHierarchy(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	pohonId := params.ByName("pohonId")
+	id, err := strconv.Atoi(pohonId)
+	if err != nil {
+		webResponse := web.WebResponse{
+			Code:   400,
+			Status: "BAD REQUEST",
+			Data:   err.Error(),
+		}
+		helper.WriteToResponseBody(writer, webResponse)
+		return
+	}
+
+	hierarchyResponse, err := controller.PohonKinerjaService.GetHierarchy(request.Context(), id)
+	if err != nil {
+		webResponse := web.WebResponse{
+			Code:   500,
+			Status: "INTERNAL SERVER ERROR",
+			Data:   err.Error(),
+		}
+		helper.WriteToResponseBody(writer, webResponse)
+		return
+	}
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   hierarchyResponse,
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)

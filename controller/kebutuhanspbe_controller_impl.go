@@ -81,6 +81,64 @@ func (controller *KebutuhanSPBEControllerImpl) Create(writer http.ResponseWriter
 	helper.WriteToResponseBody(writer, webResponse)
 }
 
+// func (controller *KebutuhanSPBEControllerImpl) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+// 	role := request.Context().Value("roles").(string)
+// 	kodeOPD := request.Context().Value("kode_opd").(string)
+
+// 	kebutuhanSPBEUpdateRequest := web.KebutuhanSPBEUpdateRequest{}
+// 	helper.ReadFromRequestBody(request, &kebutuhanSPBEUpdateRequest)
+
+// 	kebutuhanSPBEId := params.ByName("kebutuhanSPBEId")
+// 	id, err := strconv.Atoi(kebutuhanSPBEId)
+// 	helper.PanicIfError(err)
+
+// 	kebutuhanSPBEUpdateRequest.ID = id
+
+// 	// cek == kode opd untuk roles asn dan admin_opd
+// 	if role == "admin_opd" || role == "asn" {
+// 		existingKebutuhanSPBE, err := controller.KebutuhanSPBEService.FindById(request.Context(), id, kodeOPD)
+// 		if err != nil || existingKebutuhanSPBE.KodeOpd != kodeOPD {
+// 			helper.WriteToResponseBody(writer, web.WebResponse{
+// 				Code:   http.StatusForbidden,
+// 				Status: "FORBIDDEN",
+// 				Data:   "Anda tidak memiliki akses untuk memperbarui Kebutuhan SPBE ini",
+// 			})
+// 			return
+// 		}
+// 		kebutuhanSPBEUpdateRequest.KodeOpd = kodeOPD
+// 	} else if role == "admin_kota" {
+// 		kebutuhanSPBEUpdateRequest.KodeOpd = request.URL.Query().Get("kode_opd")
+// 	} else {
+// 		helper.WriteToResponseBody(writer, web.WebResponse{
+// 			Code:   http.StatusUnauthorized,
+// 			Status: "UNAUTHORIZED",
+// 			Data:   "Role tidak diizinkan untuk memperbarui proses bisnis",
+// 		})
+// 		return
+// 	}
+
+// 	kebutuhanSPBEUpdateRequest.KodeOpd = kodeOPD
+
+// 	kebutuhanSPBEResponse, err := controller.KebutuhanSPBEService.Update(request.Context(), kebutuhanSPBEUpdateRequest)
+// 	if err != nil {
+// 		webResponse := web.WebResponse{
+// 			Code:   500,
+// 			Status: "INTERNAL SERVER ERROR",
+// 			Data:   err.Error(),
+// 		}
+// 		helper.WriteToResponseBody(writer, webResponse)
+// 		return
+// 	}
+
+// 	webResponse := web.WebResponse{
+// 		Code:   200,
+// 		Status: "OK",
+// 		Data:   kebutuhanSPBEResponse,
+// 	}
+
+// 	helper.WriteToResponseBody(writer, webResponse)
+// }
+
 func (controller *KebutuhanSPBEControllerImpl) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	role := request.Context().Value("roles").(string)
 	kodeOPD := request.Context().Value("kode_opd").(string)
@@ -94,8 +152,17 @@ func (controller *KebutuhanSPBEControllerImpl) Update(writer http.ResponseWriter
 
 	kebutuhanSPBEUpdateRequest.ID = id
 
-	// cek == kode opd untuk roles asn dan admin_opd
-	if role == "admin_opd" || role == "asn" {
+	if role == "admin_kota" {
+		kebutuhanSPBEUpdateRequest.KodeOpd = request.URL.Query().Get("kode_opd")
+
+		if kebutuhanSPBEUpdateRequest.IndikatorPj == "internal" {
+			kebutuhanSPBEUpdateRequest.PenanggungJawab = kebutuhanSPBEUpdateRequest.KodeOpd
+		}
+
+	} else if role == "admin_opd" || role == "asn" {
+		if kebutuhanSPBEUpdateRequest.IndikatorPj == "internal" {
+			kebutuhanSPBEUpdateRequest.PenanggungJawab = kodeOPD
+		}
 		existingKebutuhanSPBE, err := controller.KebutuhanSPBEService.FindById(request.Context(), id, kodeOPD)
 		if err != nil || existingKebutuhanSPBE.KodeOpd != kodeOPD {
 			helper.WriteToResponseBody(writer, web.WebResponse{
@@ -106,8 +173,6 @@ func (controller *KebutuhanSPBEControllerImpl) Update(writer http.ResponseWriter
 			return
 		}
 		kebutuhanSPBEUpdateRequest.KodeOpd = kodeOPD
-	} else if role == "admin_kota" {
-		kebutuhanSPBEUpdateRequest.KodeOpd = request.URL.Query().Get("kode_opd")
 	} else {
 		helper.WriteToResponseBody(writer, web.WebResponse{
 			Code:   http.StatusUnauthorized,
@@ -116,8 +181,6 @@ func (controller *KebutuhanSPBEControllerImpl) Update(writer http.ResponseWriter
 		})
 		return
 	}
-
-	kebutuhanSPBEUpdateRequest.KodeOpd = kodeOPD
 
 	kebutuhanSPBEResponse, err := controller.KebutuhanSPBEService.Update(request.Context(), kebutuhanSPBEUpdateRequest)
 	if err != nil {
@@ -383,6 +446,76 @@ func (controller *KebutuhanSPBEControllerImpl) FindDataPemenuhanKebutuhan(writer
 		Code:   200,
 		Status: "OK",
 		Data:   kebutuhanSPBEResponses,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+
+func (controller *KebutuhanSPBEControllerImpl) FindPenanggungJawab(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	role := request.Context().Value("roles").(string)
+	pj := ""
+
+	if role == "admin_kota" {
+		pj = request.URL.Query().Get("kode_opd")
+	} else {
+		pj = request.Context().Value("kode_opd").(string)
+	}
+
+	kebutuhanSPBEResponses, err := controller.KebutuhanSPBEService.FindPenanggungJawab(request.Context(), pj)
+	if err != nil {
+		webResponse := web.WebResponse{
+			Code:   500,
+			Status: "INTERNAL SERVER ERROR",
+			Data:   err.Error(),
+		}
+		helper.WriteToResponseBody(writer, webResponse)
+		return
+	}
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   kebutuhanSPBEResponses,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+
+func (controller *KebutuhanSPBEControllerImpl) FindByIdPenanggungJawab(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	kebutuhanId := params.ByName("kebutuhanId")
+	id, err := strconv.Atoi(kebutuhanId)
+	helper.PanicIfError(err)
+
+	role := request.Context().Value("roles").(string)
+	pj := ""
+	if role != "admin_kota" {
+		pj = request.Context().Value("kode_opd").(string)
+	}
+
+	kebutuhanSPBEResponse, err := controller.KebutuhanSPBEService.FindByIdPenanggungJawab(request.Context(), id, pj)
+	if err != nil {
+		if err.Error() == "data not found" {
+			webResponse := web.WebResponse{
+				Code:   404,
+				Status: "NOT FOUND",
+				Data:   "Data tidak ditemukan",
+			}
+			helper.WriteToResponseBody(writer, webResponse)
+			return
+		}
+		webResponse := web.WebResponse{
+			Code:   500,
+			Status: "INTERNAL SERVER ERROR",
+			Data:   err.Error(),
+		}
+		helper.WriteToResponseBody(writer, webResponse)
+		return
+	}
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   kebutuhanSPBEResponse,
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)

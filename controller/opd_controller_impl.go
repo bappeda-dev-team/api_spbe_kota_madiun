@@ -69,3 +69,36 @@ func (controller *OpdControllerImpl) FindAllOPD(writer http.ResponseWriter, requ
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
+
+func (controller *OpdControllerImpl) FindAllEksternal(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	// Ambil role dari context
+	role := request.Context().Value("roles").(string)
+
+	var kodeOPD string
+
+	// Cek role dan ambil kode_opd sesuai dengan rolenya
+	if role == "admin_kota" {
+		kodeOPD = request.URL.Query().Get("kode_opd")
+	} else {
+		kodeOPD = request.Context().Value("kode_opd").(string)
+	}
+
+	// Panggil service untuk mendapatkan semua OPD
+	allOPD := controller.OpdService.FindAll(request.Context(), "")
+
+	// Filter OPD yang kodenya tidak sama dengan kodeOPD yang diberikan
+	var filteredOPD []web.Opd
+	for _, opd := range allOPD {
+		if opd.KodeOpd != kodeOPD {
+			filteredOPD = append(filteredOPD, opd)
+		}
+	}
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "Berhasil mendapatkan daftar OPD eksternal",
+		Data:   filteredOPD,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}

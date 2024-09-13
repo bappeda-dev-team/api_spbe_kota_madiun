@@ -11,7 +11,20 @@ type RouteController struct {
 }
 
 func NewRouter(referensiarsitekturController controller.ReferensiArsitekturController,
-	prosesbisnisController controller.ProsesBisnisController, sasarankotaController controller.SasaranKotaController, pohonkinerja controller.PohonKinerjaController, bidangurusan controller.BidangUrusanController, opdController controller.OpdController, urusanController controller.UrusanController, layananspbeController controller.LayananSpbeController, datainformasiController controller.DataDanInformasiController, aplikasiController controller.AplikasiController, domainspbeController controller.DomainSPBEController, kebutuhanSPBEController controller.KebutuhanSPBEController, userController controller.UserController) *httprouter.Router {
+	prosesbisnisController controller.ProsesBisnisController,
+	sasarankotaController controller.SasaranKotaController,
+	pohonkinerja controller.PohonKinerjaController,
+	bidangurusan controller.BidangUrusanController,
+	opdController controller.OpdController,
+	urusanController controller.UrusanController,
+	layananspbeController controller.LayananSpbeController,
+	datainformasiController controller.DataDanInformasiController,
+	aplikasiController controller.AplikasiController,
+	domainspbeController controller.DomainSPBEController,
+	kebutuhanSPBEController controller.KebutuhanSPBEController,
+	userController controller.UserController,
+	sasarankinerjaPegawai controller.SasaranKinerjaPegawaiController,
+	rencanaPelaksanaanController controller.RencanaPelaksanaanController) *httprouter.Router {
 	router := httprouter.New()
 
 	//referensi arsitektur router
@@ -42,8 +55,7 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	//pohon kinerja
 	router.GET("/v1/pohonkinerja/:pohonId", pohonkinerja.FindById)
 	router.GET("/v1/pohonkinerja", pohonkinerja.FindAll)
-	router.GET("/v1/pohonkinerjahirarki/:pohonId", pohonkinerja.FindByOperational)
-	router.GET("/v1/pohonkinerjahirarki", pohonkinerja.FindByOperational)
+	router.GET("/v1/pohonkinerjahirarki/:pohonId", pohonkinerja.GetHierarchy)
 
 	//bidangurusan
 	router.GET("/v1/bidangurusan", bidangurusan.FindAll)
@@ -97,6 +109,8 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.PUT("/v1/updatepjkebutuhanspbe/:kebutuhanSPBEId", kebutuhanSPBEController.UpdatePenanggungJawab)
 	router.DELETE("/v1/deletekebutuhanspbe/:kebutuhanSPBEId", kebutuhanSPBEController.Delete)
 	router.GET("/v1/pemenuhankebutuhanspbe", kebutuhanSPBEController.FindDataPemenuhanKebutuhan)
+	router.GET("/v1/penanggungjawabkebutuhanspbe", kebutuhanSPBEController.FindPenanggungJawab)
+	router.GET("/v1/penanggungjawabkebutuhanspbe/:kebutuhanId", kebutuhanSPBEController.FindByIdPenanggungJawab)
 
 	//fetch api
 	router.GET("/sasarankotafetch", sasarankotaController.Insert)
@@ -105,6 +119,7 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.GET("/urusanfetch", urusanController.FetchApiUrusan)
 	router.GET("/bidangurusanfetch", bidangurusan.FetchBidangUrusan)
 	router.GET("/userapifetch", userController.InsertApi)
+	router.GET("/sasarankinerjapegawai", sasarankinerjaPegawai.FetchsasaranKinerja)
 
 	//GAP SPBE
 	router.GET("/v1/GapSPBE", prosesbisnisController.GetProsesBisnisGrouped)
@@ -113,9 +128,21 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	//OPD
 	router.GET("/v1/opd", opdController.FindAll)
 	router.GET("/v1/opdall", opdController.FindAllOPD)
+	router.GET("/v1/opdeksternal", opdController.FindAllEksternal)
 
 	//user
 	router.POST("/v1/login", userController.Login)
+
+	//sasaran kinerja pegawai
+	router.GET("/v1/sasaranKinerjaPegawai/:sasaranKinerjaId", sasarankinerjaPegawai.FindById)
+	router.GET("/v1/sasaranKinerjaPegawai", sasarankinerjaPegawai.FindByKodeOpdAndTahun)
+
+	//rencana pelaksanaan
+	router.GET("/v1/rencanaPelaksanaan", rencanaPelaksanaanController.FindAll)
+	router.GET("/v1/rencanaPelaksanaan/:rencanaId", rencanaPelaksanaanController.FindById)
+	router.POST("/v1/createrencanaPelaksanaan", rencanaPelaksanaanController.Create)
+	router.PUT("/v1/updaterencanaPelaksanaan/:rencanaId", rencanaPelaksanaanController.Update)
+	router.DELETE("/v1/deleterencanaPelaksanaan/:rencanaId", rencanaPelaksanaanController.Delete)
 
 	//export excel
 	router.GET("/exportexcelprosesbisnis", prosesbisnisController.ExportExcel)

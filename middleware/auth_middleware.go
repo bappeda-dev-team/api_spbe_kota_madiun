@@ -82,7 +82,6 @@ func (middleware *AuthMiddleware) ServeHTTP(writer http.ResponseWriter, request 
 		"/v1/pohonkinerja/:pohonId",
 		"/v1/bidangurusan",
 		"/sasarankotafetch",
-		"/pohonkinerjafetch",
 		"/opdafetch",
 		"/urusanfetch",
 		"/bidangurusanfetch",

@@ -85,6 +85,7 @@ func ToSasaranKotaResponse(sasaran domain.SasaranKota) web.SasaranKotaRespons {
 func ToPohonKinerjaResponse(pohon domain.PohonKinerja) web.PohonKinerjaRespons {
 	return web.PohonKinerjaRespons{
 		ID:         pohon.ID,
+		Parent:     pohon.Parent,
 		NamaPohon:  pohon.NamaPohon,
 		JenisPohon: pohon.JenisPohon,
 		LevelPohon: pohon.LevelPohon,
@@ -229,11 +230,50 @@ func ToAplikasiRespons(aplikasi domain.Aplikasi) web.AplikasiRespons {
 	return response
 }
 
+func ToSasaranKinerjaPegawaiResponse(sasaran domain.SasaranKinerja) web.SasaranKinerjaPegawaiResponse {
+	return web.SasaranKinerjaPegawaiResponse{
+		Id:                    sasaran.Id,
+		KodeOpd:               sasaran.KodeOpd,
+		KodeSasaran:           sasaran.KodeSasaran,
+		Tahun:                 sasaran.Tahun,
+		SasaranKinerjaPegawai: sasaran.SasaranKinerjaPegawai,
+		AnggaranSasaran:       sasaran.AnggaranSasaran,
+		PelaksanaSasaran:      sasaran.PelaksanaSasaran,
+		KodeSubKegiatan:       sasaran.KodeSubKegiatan,
+		SubKegiatan:           sasaran.SubKegiatan,
+	}
+}
+
 func ToOpdRespons(getOpd domain.Opd) web.Opd {
 	return web.Opd{
 		KodeOpd: getOpd.KodeOpd,
 		NamaOpd: getOpd.NamaOpd,
 	}
+}
+
+func ToRencanaPelaksanaanResponse(rencanaPelaksanaan domain.RencanaPelaksanaanPegawai) web.RencanaPelaksanaanResponse {
+	return web.RencanaPelaksanaanResponse{
+		Id:          rencanaPelaksanaan.Id,
+		KodeOpd:     rencanaPelaksanaan.KodeOpd,
+		IdKebutuhan: rencanaPelaksanaan.IdKebutuhan,
+		SasaranKinerja: web.SasaranKinerjaPegawaiResponse{
+			Id: rencanaPelaksanaan.IdSasaranKinerja,
+		},
+		IndikatorPD:      rencanaPelaksanaan.IndikatorPD,
+		PerangkatDaerah:  rencanaPelaksanaan.PerangkatDaerah,
+		TahunPelaksanaan: ToTahunPelaksanaanResponses(rencanaPelaksanaan.TahunPelaksanaan),
+	}
+}
+
+func ToTahunPelaksanaanResponses(tahunPelaksanaan []domain.TahunPelaksanaan) []web.TahunPelaksanaanResponse {
+	var tahunPelaksanaanResponses []web.TahunPelaksanaanResponse
+	for _, tahun := range tahunPelaksanaan {
+		tahunPelaksanaanResponses = append(tahunPelaksanaanResponses, web.TahunPelaksanaanResponse{
+			Id:    tahun.Id,
+			Tahun: tahun.Tahun,
+		})
+	}
+	return tahunPelaksanaanResponses
 }
 
 // get all
@@ -277,34 +317,13 @@ func ToOpdResponses(getOpd []domain.Opd) []web.Opd {
 	return opdResponses
 }
 
-// func ToKebutuhanSPBERespons(kebutuhanSPBE domain.KebutuhanSPBE) web.KebutuhanSPBEResponse {
-// 	var jenisKebutuhanResponses []web.JenisKebutuhanResponse
-// 	for _, jk := range kebutuhanSPBE.JenisKebutuhan {
-// 		var kondisiAwalResponses []web.KondisiAwalResponse
-// 		for _, ka := range jk.KondisiAwal {
-// 			kondisiAwalResponses = append(kondisiAwalResponses, web.KondisiAwalResponse{
-// 				Id:               ka.Id,
-// 				JenisKebutuhanId: ka.JenisKebutuhanId,
-// 				Keterangan:       ka.Keterangan,
-// 				Tahun:            ka.Tahun,
-// 			})
-// 		}
-// 		jenisKebutuhanResponses = append(jenisKebutuhanResponses, web.JenisKebutuhanResponse{
-// 			Id:          jk.Id,
-// 			KebutuhanId: jk.KebutuhanId,
-// 			Kebutuhan:   jk.Kebutuhan,
-// 			KondisiAwal: kondisiAwalResponses,
-// 		})
-// 	}
-// 	return web.KebutuhanSPBEResponse{
-// 		ID:             kebutuhanSPBE.ID,
-// 		KodeOpd:        kebutuhanSPBE.KodeOpd,
-// 		Tahun:          kebutuhanSPBE.Tahun,
-// 		NamaDomain:     kebutuhanSPBE.NamaDomain,
-// 		IdProsesbisnis: kebutuhanSPBE.IdProsesbisnis,
-// 		JenisKebutuhan: jenisKebutuhanResponses,
-// 	}
-// }
+func ToSasaranKinerjaResponses(sasaran []domain.SasaranKinerja) []web.SasaranKinerjaPegawaiResponse {
+	var sasaranKinerjaResponses []web.SasaranKinerjaPegawaiResponse
+	for _, sasaranKinerja := range sasaran {
+		sasaranKinerjaResponses = append(sasaranKinerjaResponses, ToSasaranKinerjaPegawaiResponse(sasaranKinerja))
+	}
+	return sasaranKinerjaResponses
+}
 
 func ToKebutuhanSPBEResponse(kebutuhanSPBE domain.KebutuhanSPBE) web.KebutuhanSPBEResponse {
 	return web.KebutuhanSPBEResponse{
@@ -316,9 +335,12 @@ func ToKebutuhanSPBEResponse(kebutuhanSPBE domain.KebutuhanSPBE) web.KebutuhanSP
 		ProsesBisnis: web.ProsesBisnisResponse{
 			ID: kebutuhanSPBE.IdProsesbisnis,
 		},
-		JenisKebutuhan: ToJenisKebutuhanResponses(kebutuhanSPBE.JenisKebutuhan),
+		JenisKebutuhan:  ToJenisKebutuhanResponses(kebutuhanSPBE.JenisKebutuhan),
+		IndikatorPj:     kebutuhanSPBE.IndikatorPj.String,
+		PenanggungJawab: kebutuhanSPBE.PenanggungJawab.String,
 	}
 }
+
 func ToKebutuhanSPBEKeteranganResponse(kebutuhanSPBE domain.KebutuhanSPBE) web.KebutuhanSPBEKeteranganResponse {
 	return web.KebutuhanSPBEKeteranganResponse{
 		ID:            kebutuhanSPBE.ID,
