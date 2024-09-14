@@ -1,13 +1,15 @@
 package web
 
 type KebutuhanSPBEUpdateRequest struct {
-	ID             int                    `validate:"required" json:"id"`
-	KeteranganGap  string                 `validate:"required" json:"keterangan_gap"`
-	KodeOpd        string                 `validate:"required" json:"kode_opd"`
-	Tahun          int                    `validate:"required" json:"tahun"`
-	NamaDomain     string                 `validate:"required" json:"nama_domain"`
-	IdProsesbisnis int                    `validate:"required" json:"id_prosesbisnis"`
-	JenisKebutuhan []JenisKebutuhanUpdate `validate:"required" json:"jenis_kebutuhan"`
+	ID              int                    `validate:"required" json:"id"`
+	KeteranganGap   string                 `validate:"required" json:"keterangan_gap"`
+	KodeOpd         string                 `validate:"required" json:"kode_opd"`
+	Tahun           int                    `validate:"required" json:"tahun"`
+	NamaDomain      string                 `validate:"required" json:"nama_domain"`
+	IdProsesbisnis  int                    `validate:"required" json:"id_prosesbisnis"`
+	JenisKebutuhan  []JenisKebutuhanUpdate `validate:"required" json:"jenis_kebutuhan"`
+	IndikatorPj     string                 `json:"indikator_pj"`
+	PenanggungJawab string                 `json:"penanggung_jawab"`
 }
 
 type JenisKebutuhanUpdate struct {

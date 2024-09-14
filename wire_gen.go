@@ -57,12 +57,18 @@ func InitializeServer() *http.Server {
 	domainSPBEServiceImpl := service.NewDomainSPBEServiceImpl(domainSPBERepositoryImpl, db, validate)
 	domainSPBEControllerImpl := controller.NewDomainSPBEControllerImpl(domainSPBEServiceImpl)
 	kebutuhanSPBERepositoryImpl := repository.NewKebutuhanSPBERepositoryImpl()
-	kebutuhanSPBEServiceImpl := service.NewKebutuhanSPBEServiceImpl(kebutuhanSPBERepositoryImpl, prosesBisnisRepositoryImpl, db)
+	rencanaPelaksanaanRepositoryImpl := repository.NewRencanaPelaksanaanRepositoryImpl()
+	sasaranKinerjaPegawaiRepositoryImpl := repository.NewSasaranKinerjaPegawaiRepositoryImpl()
+	kebutuhanSPBEServiceImpl := service.NewKebutuhanSPBEServiceImpl(kebutuhanSPBERepositoryImpl, prosesBisnisRepositoryImpl, db, rencanaPelaksanaanRepositoryImpl, sasaranKinerjaPegawaiRepositoryImpl)
 	kebutuhanSPBEControllerImpl := controller.NewKebutuhanSPBEControllerImpl(kebutuhanSPBEServiceImpl)
 	userRepositoryImpl := repository.NewUserRepositoryImpl()
 	userServiceImpl := service.NewUserServiceImpl(userRepositoryImpl, db)
 	userControllerImpl := controller.NewUserControllerImpl(userServiceImpl)
-	router := app.NewRouter(referensiArsitekturControllerImpl, prosesBisnisControllerImpl, sasaranKotaControllerImpl, pohonKinerjaControllerImpl, bidangUrusanControllerImpl, opdControllerImpl, urusanControllerImpl, layananSpbeControllerImpl, dataDanInformasiControllerImpl, aplikasiControllerImpl, domainSPBEControllerImpl, kebutuhanSPBEControllerImpl, userControllerImpl)
+	sasaranKinerjaPegawaiServiceImpl := service.NewSasaranKinerjaPegawaiServiceImpl(sasaranKinerjaPegawaiRepositoryImpl, db)
+	sasaranKinerjaPegawaiControllerImpl := controller.NewSasaranKinerjaPegawaiControllerImpl(sasaranKinerjaPegawaiServiceImpl)
+	rencanaPelaksanaanServiceImpl := service.NewRencanaPelaksanaanServiceImpl(rencanaPelaksanaanRepositoryImpl, sasaranKinerjaPegawaiRepositoryImpl, kebutuhanSPBERepositoryImpl, db)
+	rencanaPelaksanaanControllerImpl := controller.NewRencanaPelaksanaanControllerImpl(rencanaPelaksanaanServiceImpl)
+	router := app.NewRouter(referensiArsitekturControllerImpl, prosesBisnisControllerImpl, sasaranKotaControllerImpl, pohonKinerjaControllerImpl, bidangUrusanControllerImpl, opdControllerImpl, urusanControllerImpl, layananSpbeControllerImpl, dataDanInformasiControllerImpl, aplikasiControllerImpl, domainSPBEControllerImpl, kebutuhanSPBEControllerImpl, userControllerImpl, sasaranKinerjaPegawaiControllerImpl, rencanaPelaksanaanControllerImpl)
 	authMiddleware := middleware.NewAuthMiddleware(router)
 	server := NewServer(authMiddleware)
 	return server
@@ -98,4 +104,8 @@ var domainspbeSet = wire.NewSet(repository.NewDomainSPBERepositoryImpl, wire.Bin
 
 var kebutuhanspbeSet = wire.NewSet(repository.NewKebutuhanSPBERepositoryImpl, wire.Bind(new(repository.KebutuhanSPBERepository), new(*repository.KebutuhanSPBERepositoryImpl)), service.NewKebutuhanSPBEServiceImpl, wire.Bind(new(service.KebutuhanSPBEService), new(*service.KebutuhanSPBEServiceImpl)), controller.NewKebutuhanSPBEControllerImpl, wire.Bind(new(controller.KebutuhanSPBEController), new(*controller.KebutuhanSPBEControllerImpl)))
 
+var sasarankinerjaSet = wire.NewSet(repository.NewSasaranKinerjaPegawaiRepositoryImpl, wire.Bind(new(repository.SasaranKinerjaPegawaiRepository), new(*repository.SasaranKinerjaPegawaiRepositoryImpl)), service.NewSasaranKinerjaPegawaiServiceImpl, wire.Bind(new(service.SasaranKinerjaPegawaiService), new(*service.SasaranKinerjaPegawaiServiceImpl)), controller.NewSasaranKinerjaPegawaiControllerImpl, wire.Bind(new(controller.SasaranKinerjaPegawaiController), new(*controller.SasaranKinerjaPegawaiControllerImpl)))
+
 var userSet = wire.NewSet(repository.NewUserRepositoryImpl, wire.Bind(new(repository.UserRepository), new(*repository.UserRepositoryImpl)), service.NewUserServiceImpl, wire.Bind(new(service.UserService), new(*service.UserServiceImpl)), controller.NewUserControllerImpl, wire.Bind(new(controller.UserController), new(*controller.UserControllerImpl)))
+
+var rencanaPelaksanaanSet = wire.NewSet(repository.NewRencanaPelaksanaanRepositoryImpl, wire.Bind(new(repository.RencanaPelaksanaanRepository), new(*repository.RencanaPelaksanaanRepositoryImpl)), service.NewRencanaPelaksanaanServiceImpl, wire.Bind(new(service.RencanaPelaksanaanService), new(*service.RencanaPelaksanaanServiceImpl)), controller.NewRencanaPelaksanaanControllerImpl, wire.Bind(new(controller.RencanaPelaksanaanController), new(*controller.RencanaPelaksanaanControllerImpl)))

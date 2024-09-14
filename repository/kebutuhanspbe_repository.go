@@ -16,4 +16,6 @@ type KebutuhanSPBERepository interface {
 	FindById(ctx context.Context, tx *sql.Tx, kebutuhanSPBEId int) (domain.KebutuhanSPBE, error)
 	FindJenisKebutuhanByKebutuhanId(ctx context.Context, tx *sql.Tx, kebutuhanId int) ([]domain.JenisKebutuhan, error)
 	FindKondisiAwalByJenisKebutuhanId(ctx context.Context, tx *sql.Tx, jenisKebutuhanId int) ([]domain.KondisiAwal, error)
+	FindPenanggungJawab(ctx context.Context, tx *sql.Tx, pj string) ([]domain.KebutuhanSPBE, error)
+	FindIdPenanggungJawab(ctx context.Context, tx *sql.Tx, kebutuhanId int, pj string) (domain.KebutuhanSPBE, error)
 }

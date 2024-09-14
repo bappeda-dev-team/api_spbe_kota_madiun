@@ -14,4 +14,7 @@ type KebutuhanSPBEController interface {
 	Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	FindByKodeOpdAndTahun(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
+	FindDataPemenuhanKebutuhan(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
+	FindPenanggungJawab(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
+	FindByIdPenanggungJawab(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 }

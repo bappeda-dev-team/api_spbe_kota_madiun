@@ -124,6 +124,15 @@ var kebutuhanspbeSet = wire.NewSet(
 	wire.Bind(new(controller.KebutuhanSPBEController), new(*controller.KebutuhanSPBEControllerImpl)),
 )
 
+var sasarankinerjaSet = wire.NewSet(
+	repository.NewSasaranKinerjaPegawaiRepositoryImpl,
+	wire.Bind(new(repository.SasaranKinerjaPegawaiRepository), new(*repository.SasaranKinerjaPegawaiRepositoryImpl)),
+	service.NewSasaranKinerjaPegawaiServiceImpl,
+	wire.Bind(new(service.SasaranKinerjaPegawaiService), new(*service.SasaranKinerjaPegawaiServiceImpl)),
+	controller.NewSasaranKinerjaPegawaiControllerImpl,
+	wire.Bind(new(controller.SasaranKinerjaPegawaiController), new(*controller.SasaranKinerjaPegawaiControllerImpl)),
+)
+
 var userSet = wire.NewSet(
 	repository.NewUserRepositoryImpl,
 	wire.Bind(new(repository.UserRepository), new(*repository.UserRepositoryImpl)),
@@ -131,6 +140,15 @@ var userSet = wire.NewSet(
 	wire.Bind(new(service.UserService), new(*service.UserServiceImpl)),
 	controller.NewUserControllerImpl,
 	wire.Bind(new(controller.UserController), new(*controller.UserControllerImpl)),
+)
+
+var rencanaPelaksanaanSet = wire.NewSet(
+	repository.NewRencanaPelaksanaanRepositoryImpl,
+	wire.Bind(new(repository.RencanaPelaksanaanRepository), new(*repository.RencanaPelaksanaanRepositoryImpl)),
+	service.NewRencanaPelaksanaanServiceImpl,
+	wire.Bind(new(service.RencanaPelaksanaanService), new(*service.RencanaPelaksanaanServiceImpl)),
+	controller.NewRencanaPelaksanaanControllerImpl,
+	wire.Bind(new(controller.RencanaPelaksanaanController), new(*controller.RencanaPelaksanaanControllerImpl)),
 )
 
 func InitializeServer() *http.Server {
@@ -150,7 +168,9 @@ func InitializeServer() *http.Server {
 		kebutuhanspbeSet,
 		pohonkinerjaSet,
 		sasarankotaSet,
-		userSet, // Added userSet here
+		sasarankinerjaSet,
+		userSet,
+		rencanaPelaksanaanSet,
 		app.NewRouter,
 		wire.Bind(new(http.Handler), new(*httprouter.Router)),
 		middleware.NewAuthMiddleware,

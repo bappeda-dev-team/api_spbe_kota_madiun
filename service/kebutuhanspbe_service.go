@@ -13,4 +13,7 @@ type KebutuhanSPBEService interface {
 	Delete(ctx context.Context, kebutuhanSPBEId int, kodeOpd string, role string) error
 	FindById(ctx context.Context, kebutuhanSPBEId int, kodeOPD string) (web.KebutuhanSPBEResponse, error)
 	FindByKodeOpdAndTahun(ctx context.Context, kodeOpd string, tahun int, prosesbisnis int) ([]web.KebutuhanSPBEResponse, error)
+	FindDataPemenuhanKebutuhan(ctx context.Context, kodeOpd string, tahun int, prosesbisnis int) ([]web.KebutuhanSPBEResponse, error)
+	FindPenanggungJawab(ctx context.Context, pj string) ([]web.PjKebutuhanSPBEResponse, error)
+	FindByIdPenanggungJawab(ctx context.Context, kebutuhanId int, pj string) (web.PjKebutuhanSPBEResponse, error)
 }

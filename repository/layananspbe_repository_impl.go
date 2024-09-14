@@ -21,11 +21,11 @@ func (repository *LayananSPBERepositoryImpl) FindByKodeOpd(ctx context.Context, 
 	var args []interface{}
 
 	if kodeOPD != "" {
-		script += " AND kode_opd = ?"
+		script += " AND kode_opd = ? order by id desc"
 		args = append(args, kodeOPD)
 	}
 	if tahun != 0 {
-		script += " AND tahun = ?"
+		script += " AND tahun = ? order by id desc"
 		args = append(args, tahun)
 	}
 

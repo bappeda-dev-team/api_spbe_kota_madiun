@@ -12,16 +12,20 @@ import (
 )
 
 type KebutuhanSPBEServiceImpl struct {
-	KebutuhanSPBERepository repository.KebutuhanSPBERepository
-	ProsesBisnisRepository  repository.ProsesBisnisRepository
-	DB                      *sql.DB
+	KebutuhanSPBERepository      repository.KebutuhanSPBERepository
+	ProsesBisnisRepository       repository.ProsesBisnisRepository
+	DB                           *sql.DB
+	RencanaPelaksanaanRepository repository.RencanaPelaksanaanRepository
+	SasaranKinerjaRepository     repository.SasaranKinerjaPegawaiRepository
 }
 
-func NewKebutuhanSPBEServiceImpl(kebutuhanSPBERepository repository.KebutuhanSPBERepository, prosesBisnisRepository repository.ProsesBisnisRepository, DB *sql.DB) *KebutuhanSPBEServiceImpl {
+func NewKebutuhanSPBEServiceImpl(kebutuhanSPBERepository repository.KebutuhanSPBERepository, prosesBisnisRepository repository.ProsesBisnisRepository, DB *sql.DB, rencanaPelaksanaanRepository repository.RencanaPelaksanaanRepository, sasaranKinerjaRepository repository.SasaranKinerjaPegawaiRepository) *KebutuhanSPBEServiceImpl {
 	return &KebutuhanSPBEServiceImpl{
-		KebutuhanSPBERepository: kebutuhanSPBERepository,
-		ProsesBisnisRepository:  prosesBisnisRepository,
-		DB:                      DB,
+		KebutuhanSPBERepository:      kebutuhanSPBERepository,
+		ProsesBisnisRepository:       prosesBisnisRepository,
+		DB:                           DB,
+		RencanaPelaksanaanRepository: rencanaPelaksanaanRepository,
+		SasaranKinerjaRepository:     sasaranKinerjaRepository,
 	}
 }
 
@@ -94,6 +98,15 @@ func (service *KebutuhanSPBEServiceImpl) Update(ctx context.Context, request web
 		Valid:  request.NamaDomain != "",
 	}
 	kebutuhanSPBE.IdProsesbisnis = request.IdProsesbisnis
+
+	kebutuhanSPBE.IndikatorPj = sql.NullString{
+		String: request.IndikatorPj,
+		Valid:  request.IndikatorPj != "",
+	}
+	kebutuhanSPBE.PenanggungJawab = sql.NullString{
+		String: request.PenanggungJawab,
+		Valid:  request.PenanggungJawab != "",
+	}
 
 	for _, jk := range request.JenisKebutuhan {
 		jenisKebutuhan := domain.JenisKebutuhan{
@@ -340,4 +353,316 @@ func (service *KebutuhanSPBEServiceImpl) FindByKodeOpdAndTahun(ctx context.Conte
 	}
 
 	return responses, nil
+}
+
+func (service *KebutuhanSPBEServiceImpl) FindDataPemenuhanKebutuhan(ctx context.Context, kodeOpd string, tahun int, prosesbisnis int) ([]web.KebutuhanSPBEResponse, error) {
+	tx, err := service.DB.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer helper.CommitOrRollback(tx)
+
+	kebutuhanSPBEs, err := service.KebutuhanSPBERepository.FindByKodeOpdAndTahun(ctx, tx, kodeOpd, tahun, prosesbisnis)
+	if err != nil {
+		return nil, err
+	}
+
+	var responses []web.KebutuhanSPBEResponse
+	for _, kebutuhanSPBE := range kebutuhanSPBEs {
+		jenisKebutuhan, err := service.KebutuhanSPBERepository.FindJenisKebutuhanByKebutuhanId(ctx, tx, kebutuhanSPBE.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		// Jika tidak ada jenis kebutuhan, lanjutkan ke iterasi berikutnya
+		if len(jenisKebutuhan) == 0 {
+			continue
+		}
+
+		var jenisKebutuhanResponses []web.JenisKebutuhanResponse
+		for _, jk := range jenisKebutuhan {
+			kondisiAwal, err := service.KebutuhanSPBERepository.FindKondisiAwalByJenisKebutuhanId(ctx, tx, jk.Id)
+			if err != nil {
+				return nil, err
+			}
+
+			var kondisiAwalResponses []web.KondisiAwalResponse
+			for _, ka := range kondisiAwal {
+				if ka.Keterangan != "" {
+					kondisiAwalResponses = append(kondisiAwalResponses, web.KondisiAwalResponse{
+						Id:               ka.Id,
+						JenisKebutuhanId: ka.JenisKebutuhanId,
+						Keterangan:       ka.Keterangan,
+						Tahun:            ka.Tahun,
+					})
+				}
+			}
+
+			if len(kondisiAwalResponses) > 0 {
+				jenisKebutuhanResponses = append(jenisKebutuhanResponses, web.JenisKebutuhanResponse{
+					Id:          jk.Id,
+					KebutuhanId: jk.KebutuhanId,
+					Kebutuhan:   jk.Kebutuhan,
+					KondisiAwal: kondisiAwalResponses,
+				})
+			}
+		}
+
+		// Jika tidak ada jenis kebutuhan yang valid, lanjutkan ke iterasi berikutnya
+		if len(jenisKebutuhanResponses) == 0 {
+			continue
+		}
+
+		prosesBisnis, err := service.ProsesBisnisRepository.FindById(ctx, tx, kebutuhanSPBE.IdProsesbisnis)
+		helper.PanicIfError(err)
+
+		response := web.KebutuhanSPBEResponse{
+			ID:            kebutuhanSPBE.ID,
+			KeteranganGap: kebutuhanSPBE.Keterangan,
+			KodeOpd:       kebutuhanSPBE.KodeOpd,
+			Tahun:         kebutuhanSPBE.Tahun,
+			ProsesBisnis: web.ProsesBisnisResponse{
+				ID:               prosesBisnis.ID,
+				NamaProsesBisnis: prosesBisnis.NamaProsesBisnis,
+			},
+			JenisKebutuhan:  jenisKebutuhanResponses,
+			IndikatorPj:     kebutuhanSPBE.IndikatorPj.String,
+			PenanggungJawab: kebutuhanSPBE.PenanggungJawab.String,
+		}
+
+		// Hanya tambahkan NamaDomain jika valid
+		if kebutuhanSPBE.NamaDomain.Valid && kebutuhanSPBE.NamaDomain.String != "" {
+			response.NamaDomain = kebutuhanSPBE.NamaDomain.String
+		}
+
+		responses = append(responses, response)
+	}
+
+	return responses, nil
+}
+
+func (service *KebutuhanSPBEServiceImpl) FindPenanggungJawab(ctx context.Context, pj string) ([]web.PjKebutuhanSPBEResponse, error) {
+	tx, err := service.DB.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer helper.CommitOrRollback(tx)
+
+	kebutuhanSPBEs, err := service.KebutuhanSPBERepository.FindPenanggungJawab(ctx, tx, pj)
+	if err != nil {
+		return nil, err
+	}
+
+	var responses []web.PjKebutuhanSPBEResponse
+	for _, kebutuhanSPBE := range kebutuhanSPBEs {
+		jenisKebutuhan, err := service.KebutuhanSPBERepository.FindJenisKebutuhanByKebutuhanId(ctx, tx, kebutuhanSPBE.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		var jenisKebutuhanResponses []web.JenisKebutuhanResponse
+		for _, jk := range jenisKebutuhan {
+			kondisiAwal, err := service.KebutuhanSPBERepository.FindKondisiAwalByJenisKebutuhanId(ctx, tx, jk.Id)
+			if err != nil {
+				return nil, err
+			}
+
+			var kondisiAwalResponses []web.KondisiAwalResponse
+			for _, ka := range kondisiAwal {
+				kondisiAwalResponses = append(kondisiAwalResponses, web.KondisiAwalResponse{
+					Id:               ka.Id,
+					JenisKebutuhanId: ka.JenisKebutuhanId,
+					Keterangan:       ka.Keterangan,
+					Tahun:            ka.Tahun,
+				})
+			}
+
+			jenisKebutuhanResponses = append(jenisKebutuhanResponses, web.JenisKebutuhanResponse{
+				Id:          jk.Id,
+				KebutuhanId: jk.KebutuhanId,
+				Kebutuhan:   jk.Kebutuhan,
+				KondisiAwal: kondisiAwalResponses,
+			})
+		}
+
+		prosesBisnis, err := service.ProsesBisnisRepository.FindById(ctx, tx, kebutuhanSPBE.IdProsesbisnis)
+		helper.PanicIfError(err)
+
+		// Tambahkan pencarian rencana pelaksanaan
+		rencanaPelaksanaan, err := service.RencanaPelaksanaanRepository.FindByKebutuhanId(ctx, tx, kebutuhanSPBE.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		var rencanaPelaksanaanResponses []web.RencanaPelaksanaanResponse
+		for _, rp := range rencanaPelaksanaan {
+			tahunPelaksanaan, err := service.RencanaPelaksanaanRepository.FindIdTahunPelaksanaan(ctx, tx, rp.Id)
+			if err != nil {
+				return nil, err
+			}
+
+			var tahunPelaksanaanResponses []web.TahunPelaksanaanResponse
+			for _, tp := range tahunPelaksanaan {
+				tahunPelaksanaanResponses = append(tahunPelaksanaanResponses, web.TahunPelaksanaanResponse{
+					Id:    tp.Id,
+					Tahun: tp.Tahun,
+				})
+			}
+
+			sasaranKinerja, err := service.SasaranKinerjaRepository.FindById(ctx, tx, rp.IdSasaranKinerja)
+			helper.PanicIfError(err)
+
+			rencanaPelaksanaanResponses = append(rencanaPelaksanaanResponses, web.RencanaPelaksanaanResponse{
+				Id:          rp.Id,
+				KodeOpd:     rp.KodeOpd,
+				IdKebutuhan: rp.IdKebutuhan,
+				SasaranKinerja: web.SasaranKinerjaPegawaiResponse{
+					Id:                    sasaranKinerja.Id,
+					KodeOpd:               sasaranKinerja.KodeOpd,
+					KodeSasaran:           sasaranKinerja.KodeSasaran,
+					SasaranKinerjaPegawai: sasaranKinerja.SasaranKinerjaPegawai,
+					PelaksanaSasaran:      sasaranKinerja.PelaksanaSasaran,
+					Tahun:                 sasaranKinerja.Tahun,
+					AnggaranSasaran:       sasaranKinerja.AnggaranSasaran,
+					KodeSubKegiatan:       sasaranKinerja.KodeSubKegiatan,
+					SubKegiatan:           sasaranKinerja.SubKegiatan,
+				},
+				IndikatorPD:      rp.IndikatorPD,
+				PerangkatDaerah:  rp.PerangkatDaerah,
+				TahunPelaksanaan: tahunPelaksanaanResponses,
+			})
+		}
+
+		responses = append(responses, web.PjKebutuhanSPBEResponse{
+			ID:            kebutuhanSPBE.ID,
+			KeteranganGap: kebutuhanSPBE.Keterangan,
+			KodeOpd:       kebutuhanSPBE.KodeOpd,
+			Tahun:         kebutuhanSPBE.Tahun,
+			NamaDomain:    kebutuhanSPBE.NamaDomain.String,
+			ProsesBisnis: web.ProsesBisnisResponse{
+				ID:               prosesBisnis.ID,
+				NamaProsesBisnis: prosesBisnis.NamaProsesBisnis,
+			},
+			JenisKebutuhan:     jenisKebutuhanResponses,
+			IndikatorPj:        kebutuhanSPBE.IndikatorPj.String,
+			PenanggungJawab:    kebutuhanSPBE.PenanggungJawab.String,
+			RencanaPelaksanaan: rencanaPelaksanaanResponses,
+		})
+	}
+
+	return responses, nil
+}
+
+func (service *KebutuhanSPBEServiceImpl) FindByIdPenanggungJawab(ctx context.Context, kebutuhanId int, pj string) (web.PjKebutuhanSPBEResponse, error) {
+	tx, err := service.DB.Begin()
+	if err != nil {
+		return web.PjKebutuhanSPBEResponse{}, err
+	}
+	defer helper.CommitOrRollback(tx)
+
+	kebutuhanSPBE, err := service.KebutuhanSPBERepository.FindById(ctx, tx, kebutuhanId)
+	if err != nil {
+		return web.PjKebutuhanSPBEResponse{}, err
+	}
+
+	// Periksa apakah penanggung jawab sesuai
+	if kebutuhanSPBE.PenanggungJawab.String != pj {
+		return web.PjKebutuhanSPBEResponse{}, errors.New("penanggung jawab tidak sesuai")
+	}
+
+	jenisKebutuhan, err := service.KebutuhanSPBERepository.FindJenisKebutuhanByKebutuhanId(ctx, tx, kebutuhanSPBE.ID)
+	if err != nil {
+		return web.PjKebutuhanSPBEResponse{}, err
+	}
+
+	var jenisKebutuhanResponses []web.JenisKebutuhanResponse
+	for _, jk := range jenisKebutuhan {
+		kondisiAwal, err := service.KebutuhanSPBERepository.FindKondisiAwalByJenisKebutuhanId(ctx, tx, jk.Id)
+		if err != nil {
+			return web.PjKebutuhanSPBEResponse{}, err
+		}
+
+		var kondisiAwalResponses []web.KondisiAwalResponse
+		for _, ka := range kondisiAwal {
+			kondisiAwalResponses = append(kondisiAwalResponses, web.KondisiAwalResponse{
+				Id:               ka.Id,
+				JenisKebutuhanId: ka.JenisKebutuhanId,
+				Keterangan:       ka.Keterangan,
+				Tahun:            ka.Tahun,
+			})
+		}
+
+		jenisKebutuhanResponses = append(jenisKebutuhanResponses, web.JenisKebutuhanResponse{
+			Id:          jk.Id,
+			KebutuhanId: jk.KebutuhanId,
+			Kebutuhan:   jk.Kebutuhan,
+			KondisiAwal: kondisiAwalResponses,
+		})
+	}
+
+	prosesBisnis, err := service.ProsesBisnisRepository.FindById(ctx, tx, kebutuhanSPBE.IdProsesbisnis)
+	helper.PanicIfError(err)
+
+	// Tambahkan pencarian rencana pelaksanaan
+	rencanaPelaksanaan, err := service.RencanaPelaksanaanRepository.FindByKebutuhanId(ctx, tx, kebutuhanSPBE.ID)
+	if err != nil {
+		return web.PjKebutuhanSPBEResponse{}, err
+	}
+
+	var rencanaPelaksanaanResponses []web.RencanaPelaksanaanResponse
+	for _, rp := range rencanaPelaksanaan {
+		tahunPelaksanaan, err := service.RencanaPelaksanaanRepository.FindIdTahunPelaksanaan(ctx, tx, rp.Id)
+		if err != nil {
+			return web.PjKebutuhanSPBEResponse{}, err
+		}
+
+		var tahunPelaksanaanResponses []web.TahunPelaksanaanResponse
+		for _, tp := range tahunPelaksanaan {
+			tahunPelaksanaanResponses = append(tahunPelaksanaanResponses, web.TahunPelaksanaanResponse{
+				Id:    tp.Id,
+				Tahun: tp.Tahun,
+			})
+		}
+
+		sasaranKinerja, err := service.SasaranKinerjaRepository.FindById(ctx, tx, rp.IdSasaranKinerja)
+		helper.PanicIfError(err)
+
+		rencanaPelaksanaanResponses = append(rencanaPelaksanaanResponses, web.RencanaPelaksanaanResponse{
+			Id:          rp.Id,
+			KodeOpd:     rp.KodeOpd,
+			IdKebutuhan: rp.IdKebutuhan,
+			SasaranKinerja: web.SasaranKinerjaPegawaiResponse{
+				Id:                    sasaranKinerja.Id,
+				KodeOpd:               sasaranKinerja.KodeOpd,
+				KodeSasaran:           sasaranKinerja.KodeSasaran,
+				SasaranKinerjaPegawai: sasaranKinerja.SasaranKinerjaPegawai,
+				PelaksanaSasaran:      sasaranKinerja.PelaksanaSasaran,
+				Tahun:                 sasaranKinerja.Tahun,
+				AnggaranSasaran:       sasaranKinerja.AnggaranSasaran,
+				KodeSubKegiatan:       sasaranKinerja.KodeSubKegiatan,
+				SubKegiatan:           sasaranKinerja.SubKegiatan,
+			},
+			IndikatorPD:      rp.IndikatorPD,
+			PerangkatDaerah:  rp.PerangkatDaerah,
+			TahunPelaksanaan: tahunPelaksanaanResponses,
+		})
+	}
+
+	response := web.PjKebutuhanSPBEResponse{
+		ID:            kebutuhanSPBE.ID,
+		KeteranganGap: kebutuhanSPBE.Keterangan,
+		KodeOpd:       kebutuhanSPBE.KodeOpd,
+		Tahun:         kebutuhanSPBE.Tahun,
+		NamaDomain:    kebutuhanSPBE.NamaDomain.String,
+		ProsesBisnis: web.ProsesBisnisResponse{
+			ID:               prosesBisnis.ID,
+			NamaProsesBisnis: prosesBisnis.NamaProsesBisnis,
+		},
+		JenisKebutuhan:     jenisKebutuhanResponses,
+		IndikatorPj:        kebutuhanSPBE.IndikatorPj.String,
+		PenanggungJawab:    kebutuhanSPBE.PenanggungJawab.String,
+		RencanaPelaksanaan: rencanaPelaksanaanResponses,
+	}
+
+	return response, nil
 }

@@ -68,8 +68,8 @@ func (controller *AplikasiControllerImpl) FindByKodeOPD(writer http.ResponseWrit
 }
 
 func (controller *AplikasiControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	dataId := params.ByName("aplikasiId")
-	id, err := strconv.Atoi(dataId)
+	aplikasiId := params.ByName("aplikasiId")
+	id, err := strconv.Atoi(aplikasiId)
 	if err != nil {
 		webResponse := web.WebResponse{
 			Code:   http.StatusBadRequest,
