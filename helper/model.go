@@ -259,8 +259,10 @@ func ToRencanaPelaksanaanResponse(rencanaPelaksanaan domain.RencanaPelaksanaanPe
 		SasaranKinerja: web.SasaranKinerjaPegawaiResponse{
 			Id: rencanaPelaksanaan.IdSasaranKinerja,
 		},
-		IndikatorPD:      rencanaPelaksanaan.IndikatorPD,
-		PerangkatDaerah:  rencanaPelaksanaan.PerangkatDaerah,
+		IndikatorPD: rencanaPelaksanaan.IndikatorPD,
+		PerangkatDaerah: web.OpdRespons{
+			KodeOpd: rencanaPelaksanaan.PerangkatDaerah,
+		},
 		TahunPelaksanaan: ToTahunPelaksanaanResponses(rencanaPelaksanaan.TahunPelaksanaan),
 	}
 }

@@ -7,6 +7,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"io"
 	"log"
 	"net/http"
@@ -105,4 +106,25 @@ func (repository *OpdRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, ko
 		opd = append(opd, getOpd)
 	}
 	return opd
+}
+
+func (repository *OpdRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, kodeOpd string) (domain.Opd, error) {
+	script := "SELECT id, kode_opd, nama_opd FROM opd WHERE kode_opd = ?"
+	rows, err := tx.QueryContext(ctx, script, kodeOpd)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+
+	opd := domain.Opd{}
+	if rows.Next() {
+		err := rows.Scan(&opd.Id, &opd.KodeOpd, &opd.NamaOpd)
+		if err != nil {
+			panic(err)
+		}
+		return opd, nil
+	} else {
+		return opd, errors.New("opd tidak ditemukan")
+	}
+
 }

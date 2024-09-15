@@ -21,7 +21,7 @@ type PjKebutuhanSPBEResponse struct {
 	ProsesBisnis       ProsesBisnisResponse         `json:"proses_bisnis"`
 	JenisKebutuhan     []JenisKebutuhanResponse     `json:"jenis_kebutuhan"`
 	IndikatorPj        string                       `json:"indikator_pj"`
-	PenanggungJawab    string                       `json:"penanggung_jawab"`
+	PenanggungJawab    OpdRespons                   `json:"penanggung_jawab"`
 	RencanaPelaksanaan []RencanaPelaksanaanResponse `json:"rencana_pelaksanaan"`
 }
 

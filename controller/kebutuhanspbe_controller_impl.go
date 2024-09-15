@@ -4,6 +4,7 @@ import (
 	"api_spbe_kota_madiun/helper"
 	"api_spbe_kota_madiun/model/web"
 	"api_spbe_kota_madiun/service"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -488,15 +489,30 @@ func (controller *KebutuhanSPBEControllerImpl) FindByIdPenanggungJawab(writer ht
 
 	role := request.Context().Value("roles").(string)
 	pj := ""
-	if role != "admin_kota" {
+
+	if role == "admin_kota" {
+		pj = request.URL.Query().Get("kode_opd")
+	} else {
 		pj = request.Context().Value("kode_opd").(string)
 	}
 
-	kebutuhanSPBEResponse, err := controller.KebutuhanSPBEService.FindByIdPenanggungJawab(request.Context(), id, pj)
+	// Tambahkan logging untuk debug
+	log.Printf("Controller - Role: %s, PJ: %s", role, pj)
+
+	kebutuhanSPBEResponse, err := controller.KebutuhanSPBEService.FindByIdPenanggungJawab(request.Context(), id, role, pj)
 	if err != nil {
+		if err.Error() == "penanggung jawab tidak sesuai" {
+			webResponse := web.WebResponse{
+				Code:   http.StatusForbidden,
+				Status: "FORBIDDEN",
+				Data:   "Anda tidak memiliki akses ke data ini",
+			}
+			helper.WriteToResponseBody(writer, webResponse)
+			return
+		}
 		if err.Error() == "data not found" {
 			webResponse := web.WebResponse{
-				Code:   404,
+				Code:   http.StatusNotFound,
 				Status: "NOT FOUND",
 				Data:   "Data tidak ditemukan",
 			}
@@ -504,7 +520,7 @@ func (controller *KebutuhanSPBEControllerImpl) FindByIdPenanggungJawab(writer ht
 			return
 		}
 		webResponse := web.WebResponse{
-			Code:   500,
+			Code:   http.StatusInternalServerError,
 			Status: "INTERNAL SERVER ERROR",
 			Data:   err.Error(),
 		}
@@ -513,7 +529,7 @@ func (controller *KebutuhanSPBEControllerImpl) FindByIdPenanggungJawab(writer ht
 	}
 
 	webResponse := web.WebResponse{
-		Code:   200,
+		Code:   http.StatusOK,
 		Status: "OK",
 		Data:   kebutuhanSPBEResponse,
 	}

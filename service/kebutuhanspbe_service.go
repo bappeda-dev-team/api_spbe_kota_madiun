@@ -15,5 +15,5 @@ type KebutuhanSPBEService interface {
 	FindByKodeOpdAndTahun(ctx context.Context, kodeOpd string, tahun int, prosesbisnis int) ([]web.KebutuhanSPBEResponse, error)
 	FindDataPemenuhanKebutuhan(ctx context.Context, kodeOpd string, tahun int, prosesbisnis int) ([]web.KebutuhanSPBEResponse, error)
 	FindPenanggungJawab(ctx context.Context, pj string) ([]web.PjKebutuhanSPBEResponse, error)
-	FindByIdPenanggungJawab(ctx context.Context, kebutuhanId int, pj string) (web.PjKebutuhanSPBEResponse, error)
+	FindByIdPenanggungJawab(ctx context.Context, kebutuhanId int, pj string, role string) (web.PjKebutuhanSPBEResponse, error)
 }
