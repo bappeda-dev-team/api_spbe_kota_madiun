@@ -540,7 +540,7 @@ func (service *KebutuhanSPBEServiceImpl) FindPenanggungJawab(ctx context.Context
 				},
 				IndikatorPD: rp.IndikatorPD,
 				PerangkatDaerah: web.OpdRespons{
-					KodeOpd: rp.KodeOpd,
+					KodeOpd: rpOpd.KodeOpd,
 					NamaOpd: rpOpd.NamaOpd,
 				},
 				TahunPelaksanaan: tahunPelaksanaanResponses,
@@ -659,7 +659,7 @@ func (service *KebutuhanSPBEServiceImpl) FindByIdPenanggungJawab(ctx context.Con
 		sasaranKinerja, err := service.SasaranKinerjaRepository.FindById(ctx, tx, rp.IdSasaranKinerja)
 		helper.PanicIfError(err)
 
-		rpOpd, err := service.OpdRepository.FindById(ctx, tx, rp.KodeOpd)
+		rpOpd, err := service.OpdRepository.FindById(ctx, tx, rp.PerangkatDaerah)
 		helper.PanicIfError(err)
 
 		rencanaPelaksanaanResponses = append(rencanaPelaksanaanResponses, web.RencanaPelaksanaanResponse{
@@ -679,7 +679,7 @@ func (service *KebutuhanSPBEServiceImpl) FindByIdPenanggungJawab(ctx context.Con
 			},
 			IndikatorPD: rp.IndikatorPD,
 			PerangkatDaerah: web.OpdRespons{
-				KodeOpd: rp.KodeOpd,
+				KodeOpd: rpOpd.KodeOpd,
 				NamaOpd: rpOpd.NamaOpd,
 			},
 			TahunPelaksanaan: tahunPelaksanaanResponses,
