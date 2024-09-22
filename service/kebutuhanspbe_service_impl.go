@@ -501,6 +501,12 @@ func (service *KebutuhanSPBEServiceImpl) FindPenanggungJawab(ctx context.Context
 
 		var rencanaPelaksanaanResponses []web.RencanaPelaksanaanResponse
 		for _, rp := range rencanaPelaksanaan {
+			rpOpd, err := service.OpdRepository.FindById(ctx, tx, rp.PerangkatDaerah)
+			if err != nil {
+				log.Printf("Error finding OPD for rencana pelaksanaan: %v", err)
+				continue
+			}
+
 			tahunPelaksanaan, err := service.RencanaPelaksanaanRepository.FindIdTahunPelaksanaan(ctx, tx, rp.Id)
 			if err != nil {
 				return nil, err
@@ -515,9 +521,6 @@ func (service *KebutuhanSPBEServiceImpl) FindPenanggungJawab(ctx context.Context
 			}
 
 			sasaranKinerja, err := service.SasaranKinerjaRepository.FindById(ctx, tx, rp.IdSasaranKinerja)
-			helper.PanicIfError(err)
-
-			rpOpd, err := service.OpdRepository.FindById(ctx, tx, rp.KodeOpd)
 			helper.PanicIfError(err)
 
 			rencanaPelaksanaanResponses = append(rencanaPelaksanaanResponses, web.RencanaPelaksanaanResponse{
@@ -537,7 +540,7 @@ func (service *KebutuhanSPBEServiceImpl) FindPenanggungJawab(ctx context.Context
 				},
 				IndikatorPD: rp.IndikatorPD,
 				PerangkatDaerah: web.OpdRespons{
-					KodeOpd: rpOpd.KodeOpd,
+					KodeOpd: rp.KodeOpd,
 					NamaOpd: rpOpd.NamaOpd,
 				},
 				TahunPelaksanaan: tahunPelaksanaanResponses,
@@ -676,7 +679,7 @@ func (service *KebutuhanSPBEServiceImpl) FindByIdPenanggungJawab(ctx context.Con
 			},
 			IndikatorPD: rp.IndikatorPD,
 			PerangkatDaerah: web.OpdRespons{
-				KodeOpd: rpOpd.KodeOpd,
+				KodeOpd: rp.KodeOpd,
 				NamaOpd: rpOpd.NamaOpd,
 			},
 			TahunPelaksanaan: tahunPelaksanaanResponses,
@@ -696,7 +699,7 @@ func (service *KebutuhanSPBEServiceImpl) FindByIdPenanggungJawab(ctx context.Con
 		JenisKebutuhan: jenisKebutuhanResponses,
 		IndikatorPj:    kebutuhanSPBE.IndikatorPj.String,
 		PenanggungJawab: web.OpdRespons{
-			KodeOpd: opdPenanggungJawab.KodeOpd,
+			KodeOpd: kebutuhanSPBE.PenanggungJawab.String,
 			NamaOpd: opdPenanggungJawab.NamaOpd,
 		},
 		RencanaPelaksanaan: rencanaPelaksanaanResponses,

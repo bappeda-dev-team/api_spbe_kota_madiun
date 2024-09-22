@@ -228,7 +228,7 @@ func (service *RencanaPelaksanaanServiceImpl) FindAll(ctx context.Context, kodeO
 		sasaranKinerja, err := service.sasaranKinerjaRepository.FindById(ctx, tx, rencana.IdSasaranKinerja)
 		helper.PanicIfError(err)
 
-		opd, err := service.opdRepository.FindById(ctx, tx, rencana.KodeOpd)
+		opd, err := service.opdRepository.FindById(ctx, tx, rencana.PerangkatDaerah)
 		helper.PanicIfError(err)
 
 		responses = append(responses, web.RencanaPelaksanaanResponse{

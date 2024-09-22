@@ -278,6 +278,24 @@ func ToTahunPelaksanaanResponses(tahunPelaksanaan []domain.TahunPelaksanaan) []w
 	return tahunPelaksanaanResponses
 }
 
+func ToUserResponse(users domain.User) web.UserResponse {
+	return web.UserResponse{
+		ID:      users.ID,
+		NIP:     users.NIP,
+		Nama:    users.Nama,
+		KodeOPD: users.KodeOPD,
+		Jabatan: users.Jabatan.String,
+	}
+}
+
+func ToUserResponses(users []domain.User) []web.UserResponse {
+	var userResponses []web.UserResponse
+	for _, users := range users {
+		userResponses = append(userResponses, ToUserResponse(users))
+	}
+	return userResponses
+}
+
 // get all
 func ToSasaranResponses(sasaran []domain.SasaranKota) []web.SasaranKotaRespons {
 	var sasaranKotaResponses []web.SasaranKotaRespons
