@@ -129,11 +129,13 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.GET("/v1/opd", opdController.FindAll)
 	router.GET("/v1/opdall", opdController.FindAllOPD)
 	router.GET("/v1/opdeksternal", opdController.FindAllEksternal)
+	router.GET("/v1/opd-urusan", opdController.FindKodeOpdUrusan)
 
 	//user
 	router.POST("/v1/login", userController.Login)
 	router.POST("/v1/changepassword", userController.ChangePassword)
 	router.POST("/v1/changepassword/:userId", userController.ChangePassword)
+	router.POST("/v1/resetpassword/:userId", userController.ResetPassword)
 
 	//sasaran kinerja pegawai
 	router.GET("/v1/sasaranKinerjaPegawai/:sasaranKinerjaId", sasarankinerjaPegawai.FindById)

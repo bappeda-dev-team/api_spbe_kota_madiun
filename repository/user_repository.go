@@ -14,4 +14,5 @@ type UserRepository interface {
 	FindAll(ctx context.Context, tx *sql.Tx) []domain.User
 	FindByID(ctx context.Context, tx *sql.Tx, userID int) (domain.User, error)
 	UpdatePassword(ctx context.Context, tx *sql.Tx, userID int, newPassword string) error
+	ResetPassword(ctx context.Context, tx *sql.Tx, userID int) error
 }

@@ -147,3 +147,26 @@ func (repository *BidangUrusanRepositoryImpl) FetchBidangUrusan(ctx context.Cont
 	log.Println("Data successfully fetched and saved.")
 	return web.BidangUrusanOPD{}, nil
 }
+
+func (repository *BidangUrusanRepositoryImpl) FindByBidangUrusan(ctx context.Context, tx *sql.Tx, bidangUrusan string) (domain.BidangUrusan, error) {
+	script := "select  id, kode_bidang_urusan, bidang_urusan, created_at, updated_at  from bidang_urusan where bidang_urusan = ?"
+	rows, err := tx.QueryContext(ctx, script, bidangUrusan)
+	if err != nil {
+		log.Printf("Error executing query: %v", err)
+		helper.PanicIfError(err)
+	}
+	defer rows.Close()
+
+	bidang := domain.BidangUrusan{}
+	if rows.Next() {
+		err := rows.Scan(&bidang.ID, &bidang.KodeBidangUrusan, &bidang.BidangUrusan, &bidang.CreatedAt, &bidang.UpdatedAt)
+		if err != nil {
+			log.Printf("Error scanning row: %v", err)
+			helper.PanicIfError(err)
+		}
+		log.Printf("Successfully retrieved Bidang urusan: %+v", bidang)
+		return bidang, nil
+	} else {
+		return bidang, errors.New("bidang urusan is not found")
+	}
+}

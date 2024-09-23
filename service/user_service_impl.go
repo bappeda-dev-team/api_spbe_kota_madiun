@@ -125,6 +125,17 @@ func (service *UserServiceImpl) FindByNIP(ctx context.Context, nip string) (web.
 	return helper.ToUserResponse(user), nil
 }
 
+func (service *UserServiceImpl) FindByID(ctx context.Context, userID int) (web.UserResponse, error) {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	users, err := service.UserRepository.FindByID(ctx, tx, userID)
+	helper.PanicIfError(err)
+
+	return helper.ToUserResponse(users), nil
+}
+
 func (service *UserServiceImpl) ChangePassword(ctx context.Context, userID int, request web.ChangePasswordRequest) (web.LoginResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
@@ -188,6 +199,52 @@ func (service *UserServiceImpl) ChangePassword(ctx context.Context, userID int, 
 			Nama:    user.Nama,
 			KodeOPD: user.KodeOPD,
 			Jabatan: user.Jabatan.String, // Gunakan .String untuk mengakses nilai string
+			Roles:   webRoles,
+		},
+	}, nil
+}
+
+func (service *UserServiceImpl) ResetPassword(ctx context.Context, userID int) (web.LoginResponse, error) {
+	tx, err := service.DB.Begin()
+	if err != nil {
+		return web.LoginResponse{}, err
+	}
+	defer tx.Rollback()
+
+	err = service.UserRepository.ResetPassword(ctx, tx, userID)
+	if err != nil {
+		return web.LoginResponse{}, err
+	}
+
+	user, err := service.UserRepository.FindByID(ctx, tx, userID)
+	if err != nil {
+		return web.LoginResponse{}, err
+	}
+
+	roles, err := service.UserRepository.GetUserRoles(ctx, tx, user.ID)
+	if err != nil {
+		return web.LoginResponse{}, err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return web.LoginResponse{}, err
+	}
+
+	webRoles := make([]web.Role, len(roles))
+	for i, role := range roles {
+		webRoles[i] = web.Role{
+			ID:   role.ID,
+			Nama: role.Nama,
+		}
+	}
+
+	return web.LoginResponse{
+		User: web.UserResponse{
+			ID:      user.ID,
+			NIP:     user.NIP,
+			Nama:    user.Nama,
+			KodeOPD: user.KodeOPD,
+			Jabatan: user.Jabatan.String,
 			Roles:   webRoles,
 		},
 	}, nil

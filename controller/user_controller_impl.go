@@ -78,70 +78,93 @@ func (controller *UserControllerImpl) InsertApi(writer http.ResponseWriter, requ
 }
 
 func (controller *UserControllerImpl) ChangePassword(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	// Decode request body
 	var changePasswordRequest web.ChangePasswordRequest
 	err := json.NewDecoder(request.Body).Decode(&changePasswordRequest)
 	if err != nil {
 		helper.WriteToResponseBody(writer, web.WebResponse{
 			Code:   http.StatusBadRequest,
-			Status: "BAD REQUEST",
-			Data:   "Format permintaan tidak valid",
+			Status: "Format permintaan tidak valid",
+			Data:   nil,
 		})
 		return
 	}
 
-	role := request.Context().Value("roles").(string)
-	var userID int
+	// Ambil user ID dari context (diasumsikan telah diset oleh middleware autentikasi)
+	userIDFloat64 := request.Context().Value("user_id").(float64)
+	userID := int(userIDFloat64)
 
-	if role == "admin_kota" {
-		userID, err = strconv.Atoi(params.ByName("userId"))
-		if err != nil {
-			helper.WriteToResponseBody(writer, web.WebResponse{
-				Code:   http.StatusBadRequest,
-				Status: "BAD REQUEST",
-				Data:   "ID pengguna tidak valid",
-			})
-			return
-		}
-	} else {
-		userIDValue := request.Context().Value("user_id")
-		switch v := userIDValue.(type) {
-		case int:
-			userID = v
-		case float64:
-			userID = int(v)
-		case string:
-			userID, err = strconv.Atoi(v)
-			if err != nil {
-				helper.WriteToResponseBody(writer, web.WebResponse{
-					Code:   http.StatusInternalServerError,
-					Status: "INTERNAL SERVER ERROR",
-					Data:   "ID pengguna tidak valid dalam token",
-				})
-				return
-			}
-		default:
-			helper.WriteToResponseBody(writer, web.WebResponse{
-				Code:   http.StatusInternalServerError,
-				Status: "INTERNAL SERVER ERROR",
-				Data:   "Tipe ID pengguna tidak valid",
-			})
-			return
-		}
-	}
-
+	// Panggil service untuk mengubah password
 	loginResponse, err := controller.userService.ChangePassword(request.Context(), userID, changePasswordRequest)
 	if err != nil {
 		helper.WriteToResponseBody(writer, web.WebResponse{
-			Code:   http.StatusInternalServerError,
-			Status: "INTERNAL SERVER ERROR",
-			Data:   err.Error(),
+			Code:   http.StatusBadRequest,
+			Status: err.Error(),
+			Data:   nil,
 		})
 		return
 	}
 
+	// Kirim response sukses
 	helper.WriteToResponseBody(writer, web.WebResponse{
 		Code:   http.StatusOK,
-		Status: "OK",
+		Status: "Password berhasil diubah",
 		Data:   loginResponse,
+	})
+}
+
+func (controller *UserControllerImpl) ResetPassword(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	// Ambil user ID dari parameter
+	userID, err := strconv.Atoi(params.ByName("userId"))
+	if err != nil {
+		helper.WriteToResponseBody(writer, web.WebResponse{
+			Code:   http.StatusBadRequest,
+			Status: "ID pengguna tidak valid",
+			Data:   nil,
+		})
+		return
+	}
+
+	// Ambil role dan kodeOPD dari context
+	role := request.Context().Value("roles").(string)
+	kodeOPD := request.Context().Value("kode_opd").(string)
+
+	// Panggil service untuk mendapatkan user
+	user, err := controller.userService.FindByID(request.Context(), userID)
+	if err != nil {
+		helper.WriteToResponseBody(writer, web.WebResponse{
+			Code:   http.StatusBadRequest,
+			Status: "Pengguna tidak ditemukan",
+			Data:   nil,
+		})
+		return
+	}
+
+	// Pengecekan role
+	if role != "admin_kota" && (role != "admin_opd" || user.KodeOPD != kodeOPD) {
+		helper.WriteToResponseBody(writer, web.WebResponse{
+			Code:   http.StatusForbidden,
+			Status: "Tidak memiliki izin untuk mereset password",
+			Data:   nil,
+		})
+		return
+	}
+
+	// Panggil service untuk reset password
+	resetResponse, err := controller.userService.ResetPassword(request.Context(), userID)
+	if err != nil {
+		helper.WriteToResponseBody(writer, web.WebResponse{
+			Code:   http.StatusBadRequest,
+			Status: err.Error(),
+			Data:   nil,
+		})
+		return
+	}
+
+	// Kirim response sukses
+	helper.WriteToResponseBody(writer, web.WebResponse{
+		Code:   http.StatusOK,
+		Status: "Password berhasil direset",
+		Data:   resetResponse,
 	})
 }
