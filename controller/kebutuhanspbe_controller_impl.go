@@ -462,7 +462,22 @@ func (controller *KebutuhanSPBEControllerImpl) FindPenanggungJawab(writer http.R
 		pj = request.Context().Value("kode_opd").(string)
 	}
 
-	kebutuhanSPBEResponses, err := controller.KebutuhanSPBEService.FindPenanggungJawab(request.Context(), pj)
+	tahunStr := request.URL.Query().Get("tahun")
+	tahun := 0
+	var err error
+	if tahunStr != "" {
+		tahun, err = strconv.Atoi(tahunStr)
+		if err != nil {
+			helper.WriteToResponseBody(writer, web.WebResponse{
+				Code:   http.StatusBadRequest,
+				Status: "Format tahun tidak valid",
+				Data:   nil,
+			})
+			return
+		}
+	}
+
+	kebutuhanSPBEResponses, err := controller.KebutuhanSPBEService.FindPenanggungJawab(request.Context(), pj, tahun)
 	if err != nil {
 		webResponse := web.WebResponse{
 			Code:   500,

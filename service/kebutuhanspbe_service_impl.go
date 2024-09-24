@@ -444,14 +444,14 @@ func (service *KebutuhanSPBEServiceImpl) FindDataPemenuhanKebutuhan(ctx context.
 	return responses, nil
 }
 
-func (service *KebutuhanSPBEServiceImpl) FindPenanggungJawab(ctx context.Context, pj string) ([]web.PjKebutuhanSPBEResponse, error) {
+func (service *KebutuhanSPBEServiceImpl) FindPenanggungJawab(ctx context.Context, pj string, tahun int) ([]web.PjKebutuhanSPBEResponse, error) {
 	tx, err := service.DB.Begin()
 	if err != nil {
 		return nil, err
 	}
 	defer helper.CommitOrRollback(tx)
 
-	kebutuhanSPBEs, err := service.KebutuhanSPBERepository.FindPenanggungJawab(ctx, tx, pj)
+	kebutuhanSPBEs, err := service.KebutuhanSPBERepository.FindPenanggungJawab(ctx, tx, pj, tahun)
 	if err != nil {
 		return nil, err
 	}
