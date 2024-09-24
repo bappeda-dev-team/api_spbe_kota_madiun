@@ -58,7 +58,7 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.GET("/v1/pohonkinerjahirarki/:pohonId", pohonkinerja.GetHierarchy)
 
 	//bidangurusan
-	router.GET("/v1/bidangurusan", bidangurusan.FindAll)
+	router.GET("/v1/bidangurusanopd", bidangurusan.FindBidangUrusanOPD)
 
 	//layanan spbe
 	router.GET("/v1/layananspbe", layananspbeController.FindByKodeOPD)

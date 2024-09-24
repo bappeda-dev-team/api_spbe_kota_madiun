@@ -170,3 +170,26 @@ func (repository *BidangUrusanRepositoryImpl) FindByBidangUrusan(ctx context.Con
 		return bidang, errors.New("bidang urusan is not found")
 	}
 }
+
+func (repository *BidangUrusanRepositoryImpl) FindBidangUrusanOPD(ctx context.Context, tx *sql.Tx, kodeOPD string) ([]domain.OpdUrusanBidang, error) {
+	script := "select id, kode_opd, bidang_urusan from urusan_bidang_opd where 1=1"
+	args := []interface{}{}
+
+	if kodeOPD != "" {
+		script += " AND kode_opd = ?"
+		args = append(args, kodeOPD)
+	}
+
+	rows, err := tx.QueryContext(ctx, script, args...)
+	helper.PanicIfError(err)
+	defer rows.Close()
+
+	var opd []domain.OpdUrusanBidang
+	for rows.Next() {
+		getOpd := domain.OpdUrusanBidang{}
+		err := rows.Scan(&getOpd.ID, &getOpd.KodeOpd, &getOpd.BidangUrusan)
+		helper.PanicIfError(err)
+		opd = append(opd, getOpd)
+	}
+	return opd, nil
+}
