@@ -185,9 +185,16 @@ func (repository *UserRepositoryImpl) InsertApi(ctx context.Context, tx *sql.Tx,
 	return result, nil
 }
 
-func (repository *UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.User {
-	script := "SELECT id, nip, nama, kode_opd, jabatan, password FROM users"
-	rows, err := tx.QueryContext(ctx, script)
+func (repository *UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, kodeOPD string) []domain.User {
+	script := "SELECT id, nip, nama, kode_opd, jabatan, password FROM users WHERE 1=1"
+	var args []interface{}
+
+	if kodeOPD != "" {
+		script += " AND kode_opd = ?"
+		args = append(args, kodeOPD)
+	}
+
+	rows, err := tx.QueryContext(ctx, script, args...)
 	helper.PanicIfError(err)
 	defer rows.Close()
 
@@ -201,9 +208,16 @@ func (repository *UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) [
 	return users
 }
 
-func (repository *UserRepositoryImpl) FindByID(ctx context.Context, tx *sql.Tx, userID int) (domain.User, error) {
+func (repository *UserRepositoryImpl) FindByID(ctx context.Context, tx *sql.Tx, userID int, kodeOPD string) (domain.User, error) {
 	SQL := "SELECT id, nip, nama, kode_opd, password, jabatan FROM users WHERE id = ?"
-	row := tx.QueryRowContext(ctx, SQL, userID)
+	args := []interface{}{userID}
+
+	if kodeOPD != "" {
+		SQL += " AND kode_opd = ?"
+		args = append(args, kodeOPD)
+	}
+
+	row := tx.QueryRowContext(ctx, SQL, args...)
 
 	var user domain.User
 	err := row.Scan(&user.ID, &user.NIP, &user.Nama, &user.KodeOPD, &user.Password, &user.Jabatan)

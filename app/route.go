@@ -136,6 +136,8 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.POST("/v1/changepassword", userController.ChangePassword)
 	router.POST("/v1/changepassword/:userId", userController.ChangePassword)
 	router.POST("/v1/resetpassword/:userId", userController.ResetPassword)
+	router.GET("/v1/user", userController.FindAll)
+	router.GET("/v1/user/:userId", userController.FindByID)
 
 	//sasaran kinerja pegawai
 	router.GET("/v1/sasaranKinerjaPegawai/:sasaranKinerjaId", sasarankinerjaPegawai.FindById)

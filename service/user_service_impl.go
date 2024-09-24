@@ -104,12 +104,12 @@ func (service *UserServiceImpl) InsertApi(ctx context.Context, kodeOPD string, t
 	return result, nil
 }
 
-func (service *UserServiceImpl) FindAll(ctx context.Context) []web.UserResponse {
+func (service *UserServiceImpl) FindAll(ctx context.Context, kodeOPD string) []web.UserResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	users := service.UserRepository.FindAll(ctx, tx)
+	users := service.UserRepository.FindAll(ctx, tx, kodeOPD)
 	return helper.ToUserResponses(users)
 
 }
@@ -125,15 +125,22 @@ func (service *UserServiceImpl) FindByNIP(ctx context.Context, nip string) (web.
 	return helper.ToUserResponse(user), nil
 }
 
-func (service *UserServiceImpl) FindByID(ctx context.Context, userID int) (web.UserResponse, error) {
+func (service *UserServiceImpl) FindByID(ctx context.Context, userID int, kodeOPD string) (web.UserResponse, error) {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	users, err := service.UserRepository.FindByID(ctx, tx, userID)
-	helper.PanicIfError(err)
+	user, err := service.UserRepository.FindByID(ctx, tx, userID, kodeOPD)
+	if err != nil {
+		return web.UserResponse{}, err
+	}
 
-	return helper.ToUserResponse(users), nil
+	// Tambahkan pengecekan kesesuaian kodeOPD
+	if kodeOPD != "" && user.KodeOPD != kodeOPD {
+		return web.UserResponse{}, errors.New("akses ditolak")
+	}
+
+	return helper.ToUserResponse(user), nil
 }
 
 func (service *UserServiceImpl) ChangePassword(ctx context.Context, userID int, request web.ChangePasswordRequest) (web.LoginResponse, error) {
@@ -143,7 +150,7 @@ func (service *UserServiceImpl) ChangePassword(ctx context.Context, userID int, 
 	}
 	defer tx.Rollback()
 
-	user, err := service.UserRepository.FindByID(ctx, tx, userID)
+	user, err := service.UserRepository.FindByID(ctx, tx, userID, "")
 	if err != nil {
 		return web.LoginResponse{}, err
 	}
@@ -216,7 +223,7 @@ func (service *UserServiceImpl) ResetPassword(ctx context.Context, userID int) (
 		return web.LoginResponse{}, err
 	}
 
-	user, err := service.UserRepository.FindByID(ctx, tx, userID)
+	user, err := service.UserRepository.FindByID(ctx, tx, userID, "")
 	if err != nil {
 		return web.LoginResponse{}, err
 	}
