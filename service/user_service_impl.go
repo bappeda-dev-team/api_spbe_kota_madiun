@@ -104,14 +104,13 @@ func (service *UserServiceImpl) InsertApi(ctx context.Context, kodeOPD string, t
 	return result, nil
 }
 
-func (service *UserServiceImpl) FindAll(ctx context.Context, kodeOPD string) []web.UserResponse {
+func (service *UserServiceImpl) FindAll(ctx context.Context, kodeOPD string, rolesID int) []web.UserResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	users := service.UserRepository.FindAll(ctx, tx, kodeOPD)
+	users := service.UserRepository.FindAll(ctx, tx, kodeOPD, rolesID)
 	return helper.ToUserResponses(users)
-
 }
 
 func (service *UserServiceImpl) FindByNIP(ctx context.Context, nip string) (web.UserResponse, error) {

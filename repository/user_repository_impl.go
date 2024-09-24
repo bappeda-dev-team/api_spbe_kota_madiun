@@ -185,13 +185,24 @@ func (repository *UserRepositoryImpl) InsertApi(ctx context.Context, tx *sql.Tx,
 	return result, nil
 }
 
-func (repository *UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, kodeOPD string) []domain.User {
-	script := "SELECT id, nip, nama, kode_opd, jabatan, password FROM users WHERE 1=1"
+func (repository *UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, kodeOPD string, rolesID int) []domain.User {
+	script := `
+		SELECT u.id, u.nip, u.nama, u.kode_opd, u.jabatan, u.password, r.id as role_id, r.nama as role_nama
+		FROM users u
+		JOIN users_roles ur ON u.id = ur.user_id
+		JOIN role r ON ur.role_id = r.id
+		WHERE 1=1
+	`
 	var args []interface{}
 
 	if kodeOPD != "" {
-		script += " AND kode_opd = ?"
+		script += " AND u.kode_opd = ?"
 		args = append(args, kodeOPD)
+	}
+
+	if rolesID != 0 {
+		script += " AND ur.role_id = ?"
+		args = append(args, rolesID)
 	}
 
 	rows, err := tx.QueryContext(ctx, script, args...)
@@ -201,8 +212,10 @@ func (repository *UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, k
 	var users []domain.User
 	for rows.Next() {
 		var user domain.User
-		err := rows.Scan(&user.ID, &user.NIP, &user.Nama, &user.KodeOPD, &user.Jabatan, &user.Password)
+		var role domain.Role
+		err := rows.Scan(&user.ID, &user.NIP, &user.Nama, &user.KodeOPD, &user.Jabatan, &user.Password, &role.ID, &role.Nama)
 		helper.PanicIfError(err)
+		user.Roles = append(user.Roles, role)
 		users = append(users, user)
 	}
 	return users

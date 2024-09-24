@@ -278,13 +278,22 @@ func ToTahunPelaksanaanResponses(tahunPelaksanaan []domain.TahunPelaksanaan) []w
 	return tahunPelaksanaanResponses
 }
 
-func ToUserResponse(users domain.User) web.UserResponse {
+func ToUserResponse(user domain.User) web.UserResponse {
+	var roles []web.Role
+	for _, role := range user.Roles {
+		roles = append(roles, web.Role{
+			ID:   role.ID,
+			Nama: role.Nama,
+		})
+	}
+
 	return web.UserResponse{
-		ID:      users.ID,
-		NIP:     users.NIP,
-		Nama:    users.Nama,
-		KodeOPD: users.KodeOPD,
-		Jabatan: users.Jabatan.String,
+		ID:      user.ID,
+		NIP:     user.NIP,
+		Nama:    user.Nama,
+		KodeOPD: user.KodeOPD,
+		Jabatan: user.Jabatan.String,
+		Roles:   roles,
 	}
 }
 

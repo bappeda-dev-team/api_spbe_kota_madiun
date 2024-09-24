@@ -50,11 +50,27 @@ func (controller *UserControllerImpl) Login(writer http.ResponseWriter, request 
 func (controller *UserControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	role := request.Context().Value("roles").(string)
 	kodeOPD := ""
+	rolesID := 0
 
 	if role == "admin_kota" {
 		kodeOPD = request.URL.Query().Get("kode_opd")
+		rolesIDParam := request.URL.Query().Get("roles_id")
+		if rolesIDParam != "" {
+			var err error
+			rolesID, err = strconv.Atoi(rolesIDParam)
+			if err != nil {
+				helper.WriteToResponseBody(writer, web.WebResponse{
+					Code:   http.StatusBadRequest,
+					Status: "Format roles_id tidak valid",
+					Data:   nil,
+				})
+				return
+			}
+		}
 	} else if role == "admin_opd" {
 		kodeOPD = request.Context().Value("kode_opd").(string)
+		// Admin OPD hanya bisa melihat pengguna di OPD mereka sendiri
+		// Kita tidak perlu menetapkan rolesID di sini
 	} else {
 		helper.WriteToResponseBody(writer, web.WebResponse{
 			Code:   http.StatusForbidden,
@@ -64,7 +80,7 @@ func (controller *UserControllerImpl) FindAll(writer http.ResponseWriter, reques
 		return
 	}
 
-	users := controller.userService.FindAll(request.Context(), kodeOPD)
+	users := controller.userService.FindAll(request.Context(), kodeOPD, rolesID)
 
 	// Kirim response sukses
 	helper.WriteToResponseBody(writer, web.WebResponse{
