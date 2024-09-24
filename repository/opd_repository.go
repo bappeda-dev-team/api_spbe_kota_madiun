@@ -8,6 +8,8 @@ import (
 )
 
 type OpdRepository interface {
-	FetchKodeOpd(ctx context.Context, tx *sql.Tx) (web.Opd, error)
+	FetchAllData(ctx context.Context, tx *sql.Tx) ([]web.Opd, error)
 	FindAll(ctx context.Context, tx *sql.Tx, kodeOPD string) []domain.Opd
+	FindById(ctx context.Context, tx *sql.Tx, opdId string) (domain.Opd, error)
+	FindKodeOpdUrusan(ctx context.Context, tx *sql.Tx, kodeOPD string) ([]domain.OpdUrusanBidang, error)
 }

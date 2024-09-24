@@ -20,7 +20,7 @@ func NewOpdControllerImpl(opdService service.OpdService) *OpdControllerImpl {
 }
 
 func (controller *OpdControllerImpl) FetchApiOpd(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	opdApiesponse, err := controller.OpdService.FetchKodeOpd(request.Context())
+	opdApiesponse, err := controller.OpdService.FetchAllData(request.Context())
 	if err != nil {
 		helper.PanicIfError(err)
 	}
@@ -46,10 +46,18 @@ func (controller *OpdControllerImpl) FindAll(writer http.ResponseWriter, request
 
 	opdResponses := controller.OpdService.FindAll(request.Context(), kodeOPD)
 
+	// Filter untuk menghapus OPD dengan kode "super_admin"
+	var filteredOpdResponses []web.Opd
+	for _, opd := range opdResponses {
+		if opd.KodeOpd != "super_admin" {
+			filteredOpdResponses = append(filteredOpdResponses, opd)
+		}
+	}
+
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "Berhasil mendapatkan kode opd",
-		Data:   opdResponses,
+		Data:   filteredOpdResponses,
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)
@@ -89,7 +97,7 @@ func (controller *OpdControllerImpl) FindAllEksternal(writer http.ResponseWriter
 	// Filter OPD yang kodenya tidak sama dengan kodeOPD yang diberikan
 	var filteredOPD []web.Opd
 	for _, opd := range allOPD {
-		if opd.KodeOpd != kodeOPD {
+		if opd.KodeOpd != kodeOPD && opd.KodeOpd != "super_admin" {
 			filteredOPD = append(filteredOPD, opd)
 		}
 	}
@@ -98,6 +106,38 @@ func (controller *OpdControllerImpl) FindAllEksternal(writer http.ResponseWriter
 		Code:   200,
 		Status: "Berhasil mendapatkan daftar OPD eksternal",
 		Data:   filteredOPD,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+
+func (controller *OpdControllerImpl) FindKodeOpdUrusan(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	role := request.Context().Value("roles").(string)
+	kodeOPD := ""
+
+	if role == "admin_kota" {
+		kodeOPD = request.URL.Query().Get("kode_opd")
+	} else {
+		kodeOPD = request.Context().Value("kode_opd").(string)
+	}
+
+	opdUrusanResponses, err := controller.OpdService.FindKodeOpdUrusan(request.Context(), kodeOPD)
+	if err != nil {
+		helper.PanicIfError(err)
+	}
+
+	// Filter untuk menghapus OPD dengan kode "super_admin"
+	var filteredOpdUrusanResponses []web.OPD
+	for _, opd := range opdUrusanResponses {
+		if opd.KodeOpd != "super_admin" {
+			filteredOpdUrusanResponses = append(filteredOpdUrusanResponses, opd)
+		}
+	}
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "Berhasil mendapatkan kode opd",
+		Data:   filteredOpdUrusanResponses,
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)

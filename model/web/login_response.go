@@ -10,6 +10,7 @@ type UserResponse struct {
 	NIP     string `json:"nip"`
 	Nama    string `json:"nama"`
 	KodeOPD string `json:"kode_opd"`
+	Jabatan string `json:"jabatan"`
 	Roles   []Role `json:"roles"`
 }
 

@@ -1,10 +1,12 @@
 package repository
 
 import (
+	"api_spbe_kota_madiun/model/domain"
 	"api_spbe_kota_madiun/model/web"
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"io"
 	"log"
 	"net/http"
@@ -82,4 +84,24 @@ func (repository *UrusanRepositoryImpl) FetchUrusan(ctx context.Context, tx *sql
 
 	log.Println("Data successfully fetched and saved.")
 	return web.UrusanOPD{}, nil
+}
+func (repository *UrusanRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, kodeUrusan string) (domain.Urusan, error) {
+	script := "SELECT id, kode_urusan, urusan FROM urusan WHERE kode_urusan = ?"
+	rows, err := tx.QueryContext(ctx, script, kodeUrusan)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+
+	urusan := domain.Urusan{}
+	if rows.Next() {
+		err := rows.Scan(&urusan.Id, &urusan.KodeUrusan, &urusan.Urusan)
+		if err != nil {
+			panic(err)
+		}
+		return urusan, nil
+	} else {
+		return urusan, errors.New("urusan tidak ditemukan")
+	}
+
 }

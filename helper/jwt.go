@@ -2,11 +2,7 @@ package helper
 
 import (
 	"api_spbe_kota_madiun/model/domain"
-	"errors"
-	"fmt"
-	"net/http"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -57,52 +53,52 @@ func ValidateJWTToken(tokenString string) (jwt.MapClaims, error) {
 	return nil, jwt.ErrSignatureInvalid
 }
 
-func RequestKodeOpd(request *http.Request) (role string, kodeOPD string, tahun int, err error) {
-	// Ambil role dari middleware
-	role, ok := request.Context().Value("roles").(string)
-	if !ok {
-		return "", "", 0, errors.New("gagal mendapatkan roles dari JWT")
-	}
+// func RequestKodeOpd(request *http.Request) (role string, kodeOPD string, tahun int, err error) {
+// 	// Ambil role dari middleware
+// 	role, ok := request.Context().Value("roles").(string)
+// 	if !ok {
+// 		return "", "", 0, errors.New("gagal mendapatkan roles dari JWT")
+// 	}
 
-	// Ambil kode OPD dari token
-	kodeOPDFromToken, ok := request.Context().Value("kode_opd").(string)
-	if !ok {
-		return "", "", 0, errors.New("kode OPD tidak ditemukan dalam context")
-	}
+// 	// Ambil kode OPD dari token
+// 	kodeOPDFromToken, ok := request.Context().Value("kode_opd").(string)
+// 	if !ok {
+// 		return "", "", 0, errors.New("kode OPD tidak ditemukan dalam context")
+// 	}
 
-	// Tentukan kode OPD berdasarkan role
-	if role == "admin_kota" {
-		kodeOPD = request.URL.Query().Get("kode_opd")
-	} else {
-		kodeOPD = kodeOPDFromToken
-	}
+// 	// Tentukan kode OPD berdasarkan role
+// 	if role == "admin_kota" {
+// 		kodeOPD = request.URL.Query().Get("kode_opd")
+// 	} else {
+// 		kodeOPD = kodeOPDFromToken
+// 	}
 
-	// Ambil tahun dari query parameter
-	tahunStr := request.URL.Query().Get("tahun")
-	if tahunStr != "" {
-		tahun, err = strconv.Atoi(tahunStr)
-		if err != nil {
-			return "", "", 0, errors.New("tahun harus berupa angka")
-		}
-	}
+// 	// Ambil tahun dari query parameter
+// 	tahunStr := request.URL.Query().Get("tahun")
+// 	if tahunStr != "" {
+// 		tahun, err = strconv.Atoi(tahunStr)
+// 		if err != nil {
+// 			return "", "", 0, errors.New("tahun harus berupa angka")
+// 		}
+// 	}
 
-	return role, kodeOPD, tahun, nil
-}
+// 	return role, kodeOPD, tahun, nil
+// }
 
-func CheckRoleAndOPD(request *http.Request, allowedRole string) (string, string, error) {
-	role, ok := request.Context().Value("roles").(string)
-	if !ok {
-		return "", "", errors.New("gagal mendapatkan peran pengguna")
-	}
+// func CheckRoleAndOPD(request *http.Request, allowedRole string) (string, string, error) {
+// 	role, ok := request.Context().Value("roles").(string)
+// 	if !ok {
+// 		return "", "", errors.New("gagal mendapatkan peran pengguna")
+// 	}
 
-	kodeOPD, ok := request.Context().Value("kode_opd").(string)
-	if !ok {
-		return "", "", errors.New("gagal mendapatkan kode OPD")
-	}
+// 	kodeOPD, ok := request.Context().Value("kode_opd").(string)
+// 	if !ok {
+// 		return "", "", errors.New("gagal mendapatkan kode OPD")
+// 	}
 
-	if role != allowedRole {
-		return "", "", fmt.Errorf("hanya pengguna dengan peran %s yang diizinkan", allowedRole)
-	}
+// 	if role != allowedRole {
+// 		return "", "", fmt.Errorf("hanya pengguna dengan peran %s yang diizinkan", allowedRole)
+// 	}
 
-	return role, kodeOPD, nil
-}
+// 	return role, kodeOPD, nil
+// }

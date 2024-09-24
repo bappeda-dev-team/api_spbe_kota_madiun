@@ -16,14 +16,16 @@ type RencanaPelaksanaanServiceImpl struct {
 	rencanaPelaksanaanRepository repository.RencanaPelaksanaanRepository
 	sasaranKinerjaRepository     repository.SasaranKinerjaPegawaiRepository
 	kebutuhanSPBERepository      repository.KebutuhanSPBERepository
+	opdRepository                repository.OpdRepository
 	DB                           *sql.DB
 }
 
-func NewRencanaPelaksanaanServiceImpl(rencanaPelaksanaanRepository repository.RencanaPelaksanaanRepository, sasaranKinerjaRepository repository.SasaranKinerjaPegawaiRepository, kebutuhanSPBERepository repository.KebutuhanSPBERepository, DB *sql.DB) *RencanaPelaksanaanServiceImpl {
+func NewRencanaPelaksanaanServiceImpl(rencanaPelaksanaanRepository repository.RencanaPelaksanaanRepository, sasaranKinerjaRepository repository.SasaranKinerjaPegawaiRepository, kebutuhanSPBERepository repository.KebutuhanSPBERepository, opdRepository repository.OpdRepository, DB *sql.DB) *RencanaPelaksanaanServiceImpl {
 	return &RencanaPelaksanaanServiceImpl{
 		rencanaPelaksanaanRepository: rencanaPelaksanaanRepository,
 		sasaranKinerjaRepository:     sasaranKinerjaRepository,
 		kebutuhanSPBERepository:      kebutuhanSPBERepository,
+		opdRepository:                opdRepository,
 		DB:                           DB,
 	}
 }
@@ -172,6 +174,9 @@ func (service *RencanaPelaksanaanServiceImpl) FindById(ctx context.Context, renc
 	sasaranKinerja, err := service.sasaranKinerjaRepository.FindById(ctx, tx, rencanaPelaksanaan.IdSasaranKinerja)
 	helper.PanicIfError(err)
 
+	opd, err := service.opdRepository.FindById(ctx, tx, rencanaPelaksanaan.KodeOpd)
+	helper.PanicIfError(err)
+
 	return web.RencanaPelaksanaanResponse{
 		Id:          rencanaPelaksanaan.Id,
 		KodeOpd:     rencanaPelaksanaan.KodeOpd,
@@ -183,8 +188,11 @@ func (service *RencanaPelaksanaanServiceImpl) FindById(ctx context.Context, renc
 			KodeSubKegiatan:       sasaranKinerja.KodeSubKegiatan,
 			SubKegiatan:           sasaranKinerja.SubKegiatan,
 		},
-		IndikatorPD:      rencanaPelaksanaan.IndikatorPD,
-		PerangkatDaerah:  rencanaPelaksanaan.PerangkatDaerah,
+		IndikatorPD: rencanaPelaksanaan.IndikatorPD,
+		PerangkatDaerah: web.OpdRespons{
+			KodeOpd: opd.KodeOpd,
+			NamaOpd: opd.NamaOpd,
+		},
 		TahunPelaksanaan: tahunPelaksanaanResponses,
 	}, nil
 }
@@ -220,6 +228,9 @@ func (service *RencanaPelaksanaanServiceImpl) FindAll(ctx context.Context, kodeO
 		sasaranKinerja, err := service.sasaranKinerjaRepository.FindById(ctx, tx, rencana.IdSasaranKinerja)
 		helper.PanicIfError(err)
 
+		opd, err := service.opdRepository.FindById(ctx, tx, rencana.PerangkatDaerah)
+		helper.PanicIfError(err)
+
 		responses = append(responses, web.RencanaPelaksanaanResponse{
 			Id:          rencana.Id,
 			KodeOpd:     rencana.KodeOpd,
@@ -232,8 +243,11 @@ func (service *RencanaPelaksanaanServiceImpl) FindAll(ctx context.Context, kodeO
 				KodeSubKegiatan:       sasaranKinerja.KodeSubKegiatan,
 				SubKegiatan:           sasaranKinerja.SubKegiatan,
 			},
-			IndikatorPD:      rencana.IndikatorPD,
-			PerangkatDaerah:  rencana.PerangkatDaerah,
+			IndikatorPD: rencana.IndikatorPD,
+			PerangkatDaerah: web.OpdRespons{
+				KodeOpd: opd.KodeOpd,
+				NamaOpd: opd.NamaOpd,
+			},
 			TahunPelaksanaan: tahunPelaksanaanResponses,
 		})
 	}

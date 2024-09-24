@@ -254,7 +254,7 @@ func (repository *KebutuhanSPBERepositoryImpl) Delete(ctx context.Context, tx *s
 	return err
 }
 
-func (repository *KebutuhanSPBERepositoryImpl) FindPenanggungJawab(ctx context.Context, tx *sql.Tx, pj string) ([]domain.KebutuhanSPBE, error) {
+func (repository *KebutuhanSPBERepositoryImpl) FindPenanggungJawab(ctx context.Context, tx *sql.Tx, pj string, tahun int) ([]domain.KebutuhanSPBE, error) {
 	log.Println("Menjalankan Find Penanggung jawab dengan pj:", pj)
 
 	script := "SELECT id, keterangan, kode_opd, tahun, nama_domain, id_prosesbisnis, indikator_pj, pj FROM kebutuhan_spbe WHERE 1=1"
@@ -263,6 +263,11 @@ func (repository *KebutuhanSPBERepositoryImpl) FindPenanggungJawab(ctx context.C
 	if pj != "" {
 		script += " AND pj = ?"
 		args = append(args, pj)
+	}
+
+	if tahun != 0 {
+		script += " AND tahun = ?"
+		args = append(args, tahun)
 	}
 
 	script += " ORDER BY id DESC"

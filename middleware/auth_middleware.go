@@ -45,6 +45,12 @@ func (middleware *AuthMiddleware) ServeHTTP(writer http.ResponseWriter, request 
 		return
 	}
 
+	userID, ok := claims["user_id"].(float64)
+	if !ok {
+		middleware.sendUnauthorizedResponse(writer, "User ID tidak valid")
+		return
+	}
+
 	// Fungsi untuk menentukan prioritas peran
 	getPriorityRole := func(roles []interface{}) string {
 		priorityOrder := map[string]int{
@@ -72,7 +78,7 @@ func (middleware *AuthMiddleware) ServeHTTP(writer http.ResponseWriter, request 
 	// Menyimpan role dan kode OPD ke dalam context
 	ctx := context.WithValue(request.Context(), "roles", role)
 	ctx = context.WithValue(ctx, "kode_opd", kodeOPD)
-
+	ctx = context.WithValue(ctx, "user_id", userID)
 	publicEndpoints := []string{
 		"/v1/referensiarsitektur",
 		"/v1/referensiarsitektur/:kodeReferensi",

@@ -6,6 +6,7 @@ import (
 )
 
 type OpdService interface {
-	FetchKodeOpd(ctx context.Context) (web.Opd, error)
+	FetchAllData(ctx context.Context) ([]web.Opd, error)
 	FindAll(ctx context.Context, kodeOPD string) []web.Opd
+	FindKodeOpdUrusan(ctx context.Context, kodeOPD string) ([]web.OPD, error)
 }

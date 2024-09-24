@@ -8,4 +8,5 @@ import (
 type BidangUrusanService interface {
 	FindAll(ctx context.Context) []web.BidangUrusanRespons
 	FetchUrusan(ctx context.Context) (web.BidangUrusanOPD, error)
+	FindBidangUrusanOPD(ctx context.Context, kodeOPD string) ([]web.BidangUrusanRespons, error)
 }

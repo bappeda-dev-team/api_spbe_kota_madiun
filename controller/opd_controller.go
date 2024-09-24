@@ -11,4 +11,5 @@ type OpdController interface {
 	FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	FindAllOPD(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	FindAllEksternal(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
+	FindKodeOpdUrusan(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 }
