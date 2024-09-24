@@ -60,7 +60,7 @@ func (service *OpdServiceImpl) FindAll(ctx context.Context, kodeOPD string) []we
 	return helper.ToOpdResponses(opd)
 }
 
-func (service *OpdServiceImpl) FindKodeOpdUrusan(ctx context.Context, kodeOPD string) ([]web.Opd, error) {
+func (service *OpdServiceImpl) FindKodeOpdUrusan(ctx context.Context, kodeOPD string) ([]web.OPD, error) {
 	tx, err := service.DB.BeginTx(ctx, nil)
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
@@ -71,8 +71,8 @@ func (service *OpdServiceImpl) FindKodeOpdUrusan(ctx context.Context, kodeOPD st
 		return nil, err
 	}
 
-	var opds []web.Opd
-	opdMap := make(map[string]*web.Opd)
+	var opds []web.OPD
+	opdMap := make(map[string]*web.OPD)
 
 	for _, opdUrusanBidang := range opdUrusanBidangDomain {
 		opd, err := service.OpdRepository.FindById(ctx, tx, opdUrusanBidang.KodeOpd.String)
@@ -85,7 +85,7 @@ func (service *OpdServiceImpl) FindKodeOpdUrusan(ctx context.Context, kodeOPD st
 		helper.PanicIfError(err)
 
 		if _, exists := opdMap[opd.KodeOpd]; !exists {
-			opdMap[opd.KodeOpd] = &web.Opd{
+			opdMap[opd.KodeOpd] = &web.OPD{
 				KodeOpd: opd.KodeOpd,
 				NamaOpd: opd.NamaOpd,
 			}
@@ -97,7 +97,7 @@ func (service *OpdServiceImpl) FindKodeOpdUrusan(ctx context.Context, kodeOPD st
 		for i, urusanEntry := range opdEntry.UrusanOPD {
 			if urusanEntry.KodeUrusan == urusan.KodeUrusan {
 				urusanExists = true
-				opdEntry.UrusanOPD[i].BidangUrusanOPD = append(opdEntry.UrusanOPD[i].BidangUrusanOPD, web.BidangUrusanOPD{
+				opdEntry.UrusanOPD[i].BidangUrusanOPD = append(opdEntry.UrusanOPD[i].BidangUrusanOPD, web.BIDANGURUSANOPD{
 					KodeBidangUrusan: bidangUrusan.KodeBidangUrusan,
 					BidangUrusan:     bidangUrusan.BidangUrusan,
 				})
@@ -106,11 +106,13 @@ func (service *OpdServiceImpl) FindKodeOpdUrusan(ctx context.Context, kodeOPD st
 		}
 
 		if !urusanExists {
-			opdEntry.UrusanOPD = append(opdEntry.UrusanOPD, web.UrusanOPD{
+			opdEntry.UrusanOPD = append(opdEntry.UrusanOPD, web.URUSANOPD{
+				Id:         urusan.Id,
 				KodeUrusan: urusan.KodeUrusan,
 				Urusan:     urusan.Urusan,
-				BidangUrusanOPD: []web.BidangUrusanOPD{
+				BidangUrusanOPD: []web.BIDANGURUSANOPD{
 					{
+						Id:               bidangUrusan.ID,
 						KodeBidangUrusan: bidangUrusan.KodeBidangUrusan,
 						BidangUrusan:     bidangUrusan.BidangUrusan,
 					},

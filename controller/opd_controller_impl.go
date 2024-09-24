@@ -127,7 +127,7 @@ func (controller *OpdControllerImpl) FindKodeOpdUrusan(writer http.ResponseWrite
 	}
 
 	// Filter untuk menghapus OPD dengan kode "super_admin"
-	var filteredOpdUrusanResponses []web.Opd
+	var filteredOpdUrusanResponses []web.OPD
 	for _, opd := range opdUrusanResponses {
 		if opd.KodeOpd != "super_admin" {
 			filteredOpdUrusanResponses = append(filteredOpdUrusanResponses, opd)

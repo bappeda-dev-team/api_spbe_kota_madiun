@@ -146,8 +146,15 @@ func (controller *UserControllerImpl) InsertApi(writer http.ResponseWriter, requ
 
 	if role == "admin_kota" {
 		kodeOPD = request.URL.Query().Get("kode_opd")
-	} else {
+	} else if role == "admin_opd" {
 		kodeOPD = request.Context().Value("kode_opd").(string)
+	} else {
+		helper.WriteToResponseBody(writer, web.WebResponse{
+			Code:   http.StatusForbidden,
+			Status: "Akses ditolak",
+			Data:   nil,
+		})
+		return
 	}
 
 	result, err := controller.userService.InsertApi(request.Context(), kodeOPD, tahun)
