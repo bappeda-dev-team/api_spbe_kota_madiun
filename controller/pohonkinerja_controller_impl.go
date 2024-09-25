@@ -51,11 +51,9 @@ func (controller *PohonKinerjaControllerImpl) FindAll(writer http.ResponseWriter
 	role := request.Context().Value("roles").(string)
 	kodeOPD := request.Context().Value("kode_opd").(string)
 
-	// Hanya admin_kota yang dapat menggunakan parameter kode_opd
+	// Untuk admin_kota, kodeOPD diatur ke "" jika tidak ada parameter kode_opd
 	if role == "admin_kota" {
-		if paramKodeOPD := request.URL.Query().Get("kode_opd"); paramKodeOPD != "" {
-			kodeOPD = paramKodeOPD
-		}
+		kodeOPD = request.URL.Query().Get("kode_opd")
 	}
 
 	pohonResponse := controller.PohonKinerjaService.FindAll(request.Context(), kodeOPD, tahun)
