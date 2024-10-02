@@ -155,7 +155,7 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.DELETE("/v1/deleterencanaPelaksanaan/:rencanaId", rencanaPelaksanaanController.Delete)
 
 	//petarencana
-	router.GET("/v1/petarencanspbe", petarencanaController.FindAll)
+	router.GET("/v1/petarencanaspbe", petarencanaController.FindAll)
 
 	//keterangan gao
 	router.GET("/v1/keteranganGap/:id", keterangangapController.FindById)
