@@ -24,7 +24,10 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	kebutuhanSPBEController controller.KebutuhanSPBEController,
 	userController controller.UserController,
 	sasarankinerjaPegawai controller.SasaranKinerjaPegawaiController,
-	rencanaPelaksanaanController controller.RencanaPelaksanaanController) *httprouter.Router {
+	rencanaPelaksanaanController controller.RencanaPelaksanaanController,
+	petarencanaController controller.PetarencanaController,
+	keterangangapController controller.KeteranganGapController,
+) *httprouter.Router {
 	router := httprouter.New()
 
 	//referensi arsitektur router
@@ -107,7 +110,8 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.PUT("/v1/updatekebutuhanspbe/:kebutuhanSPBEId", kebutuhanSPBEController.Update)
 	router.PUT("/v1/updateketeranganGapKebutuhan/:kebutuhanSPBEId", kebutuhanSPBEController.UpdateKeterangan)
 	router.PUT("/v1/updatepjkebutuhanspbe/:kebutuhanSPBEId", kebutuhanSPBEController.UpdatePenanggungJawab)
-	router.DELETE("/v1/deletekebutuhanspbe/:kebutuhanSPBEId", kebutuhanSPBEController.Delete)
+	router.DELETE("/v1/alldeletekebutuhanspbe/:kebutuhanSPBEId", kebutuhanSPBEController.Delete)
+	router.DELETE("/v1/deletekebutuhanspbe/:kebutuhanSPBEId", kebutuhanSPBEController.DeleteKeteranganKebutuhan)
 	router.GET("/v1/pemenuhankebutuhanspbe", kebutuhanSPBEController.FindDataPemenuhanKebutuhan)
 	router.GET("/v1/penanggungjawabkebutuhanspbe", kebutuhanSPBEController.FindPenanggungJawab)
 	router.GET("/v1/penanggungjawabkebutuhanspbe/:kebutuhanId", kebutuhanSPBEController.FindByIdPenanggungJawab)
@@ -149,6 +153,15 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.POST("/v1/createrencanaPelaksanaan", rencanaPelaksanaanController.Create)
 	router.PUT("/v1/updaterencanaPelaksanaan/:rencanaId", rencanaPelaksanaanController.Update)
 	router.DELETE("/v1/deleterencanaPelaksanaan/:rencanaId", rencanaPelaksanaanController.Delete)
+
+	//petarencana
+	router.GET("/v1/petarencanspbe", petarencanaController.FindAll)
+
+	//keterangan gao
+	router.GET("/v1/keteranganGap/:id", keterangangapController.FindById)
+	router.POST("/v1/createketeranganGap", keterangangapController.Insert)
+	router.PUT("/v1/updateketeranganGap/:id", keterangangapController.Update)
+	router.DELETE("/v1/deleteketeranganGap/:id", keterangangapController.Delete)
 
 	//export excel
 	router.GET("/exportexcelprosesbisnis", prosesbisnisController.ExportExcel)

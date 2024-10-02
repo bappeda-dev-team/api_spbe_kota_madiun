@@ -224,6 +224,30 @@ func (service *KebutuhanSPBEServiceImpl) Delete(ctx context.Context, kebutuhanSP
 	return nil
 }
 
+func (service *KebutuhanSPBEServiceImpl) DeleteKeteranganKebutuhan(ctx context.Context, kebutuhanSPBEId int, kodeOPD string, role string) error {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	kebutuhanspbe, err := service.KebutuhanSPBERepository.FindById(ctx, tx, kebutuhanSPBEId)
+	helper.PanicIfError(err)
+
+	if role == "admin_kota" {
+		// Admin kota dapat menghapus semua data tanpa memeriksa kode OPD
+		service.KebutuhanSPBERepository.DeleteKeteranganKebutuhan(ctx, tx, kebutuhanSPBEId)
+	} else if role == "admin_opd" || role == "asn" {
+		// Admin OPD dan ASN hanya dapat menghapus data berdasarkan kode OPD mereka
+		if kebutuhanspbe.KodeOpd != kodeOPD {
+			return errors.New("kebutuhan spbe tidak ditemukan untuk OPD ini")
+		}
+		service.KebutuhanSPBERepository.Delete(ctx, tx, kebutuhanSPBEId)
+	} else {
+		return errors.New("role tidak memiliki izin untuk menghapus kebutuhan spbe")
+	}
+
+	return nil
+}
+
 // fix by id
 func (service *KebutuhanSPBEServiceImpl) FindById(ctx context.Context, kebutuhanSPBEId int, kodeOpd string) (web.KebutuhanSPBEResponse, error) {
 	tx, err := service.DB.Begin()
@@ -274,12 +298,19 @@ func (service *KebutuhanSPBEServiceImpl) FindById(ctx context.Context, kebutuhan
 	prosesBisnis, err := service.ProsesBisnisRepository.FindById(ctx, tx, kebutuhanSPBE.IdProsesbisnis)
 	helper.PanicIfError(err)
 
+	opd, err := service.OpdRepository.FindById(ctx, tx, kebutuhanSPBE.KodeOpd)
+	helper.PanicIfError(err)
+
 	response := web.KebutuhanSPBEResponse{
 		ID:            kebutuhanSPBE.ID,
 		KeteranganGap: kebutuhanSPBE.Keterangan,
 		KodeOpd:       kebutuhanSPBE.KodeOpd,
-		Tahun:         kebutuhanSPBE.Tahun,
-		NamaDomain:    kebutuhanSPBE.NamaDomain.String,
+		PerangkatDaerah: web.OpdRespons{
+			KodeOpd: opd.KodeOpd,
+			NamaOpd: opd.NamaOpd,
+		},
+		Tahun:      kebutuhanSPBE.Tahun,
+		NamaDomain: kebutuhanSPBE.NamaDomain.String,
 		ProsesBisnis: web.ProsesBisnisResponse{
 			ID:               prosesBisnis.ID,
 			NamaProsesBisnis: prosesBisnis.NamaProsesBisnis,
@@ -300,9 +331,7 @@ func (service *KebutuhanSPBEServiceImpl) FindByKodeOpdAndTahun(ctx context.Conte
 	defer helper.CommitOrRollback(tx)
 
 	kebutuhanSPBEs, err := service.KebutuhanSPBERepository.FindByKodeOpdAndTahun(ctx, tx, kodeOpd, tahun, prosesbisnis)
-	if err != nil {
-		return nil, err
-	}
+	helper.PanicIfError(err)
 
 	var responses []web.KebutuhanSPBEResponse
 	for _, kebutuhanSPBE := range kebutuhanSPBEs {
@@ -339,12 +368,19 @@ func (service *KebutuhanSPBEServiceImpl) FindByKodeOpdAndTahun(ctx context.Conte
 		prosesBisnis, err := service.ProsesBisnisRepository.FindById(ctx, tx, kebutuhanSPBE.IdProsesbisnis)
 		helper.PanicIfError(err)
 
+		opd, err := service.OpdRepository.FindById(ctx, tx, kebutuhanSPBE.KodeOpd)
+		helper.PanicIfError(err)
+
 		responses = append(responses, web.KebutuhanSPBEResponse{
 			ID:            kebutuhanSPBE.ID,
 			KeteranganGap: kebutuhanSPBE.Keterangan,
 			KodeOpd:       kebutuhanSPBE.KodeOpd,
-			Tahun:         kebutuhanSPBE.Tahun,
-			NamaDomain:    kebutuhanSPBE.NamaDomain.String,
+			PerangkatDaerah: web.OpdRespons{
+				KodeOpd: opd.KodeOpd,
+				NamaOpd: opd.NamaOpd,
+			},
+			Tahun:      kebutuhanSPBE.Tahun,
+			NamaDomain: kebutuhanSPBE.NamaDomain.String,
 			ProsesBisnis: web.ProsesBisnisResponse{
 				ID:               prosesBisnis.ID,
 				NamaProsesBisnis: prosesBisnis.NamaProsesBisnis,
@@ -489,7 +525,9 @@ func (service *KebutuhanSPBEServiceImpl) FindPenanggungJawab(ctx context.Context
 		prosesBisnis, err := service.ProsesBisnisRepository.FindById(ctx, tx, kebutuhanSPBE.IdProsesbisnis)
 		helper.PanicIfError(err)
 
-		// Tambahkan pencarian rencana pelaksanaan
+		opdPerangkatDaerah, err := service.OpdRepository.FindById(ctx, tx, kebutuhanSPBE.KodeOpd)
+		helper.PanicIfError(err)
+
 		rencanaPelaksanaan, err := service.RencanaPelaksanaanRepository.FindByKebutuhanId(ctx, tx, kebutuhanSPBE.ID)
 		helper.PanicIfError(err)
 
@@ -501,11 +539,6 @@ func (service *KebutuhanSPBEServiceImpl) FindPenanggungJawab(ctx context.Context
 
 		var rencanaPelaksanaanResponses []web.RencanaPelaksanaanResponse
 		for _, rp := range rencanaPelaksanaan {
-			rpOpd, err := service.OpdRepository.FindById(ctx, tx, rp.PerangkatDaerah)
-			if err != nil {
-				log.Printf("Error finding OPD for rencana pelaksanaan: %v", err)
-				continue
-			}
 
 			tahunPelaksanaan, err := service.RencanaPelaksanaanRepository.FindIdTahunPelaksanaan(ctx, tx, rp.Id)
 			if err != nil {
@@ -538,11 +571,6 @@ func (service *KebutuhanSPBEServiceImpl) FindPenanggungJawab(ctx context.Context
 					KodeSubKegiatan:       sasaranKinerja.KodeSubKegiatan,
 					SubKegiatan:           sasaranKinerja.SubKegiatan,
 				},
-				IndikatorPD: rp.IndikatorPD,
-				PerangkatDaerah: web.OpdRespons{
-					KodeOpd: rpOpd.KodeOpd,
-					NamaOpd: rpOpd.NamaOpd,
-				},
 				TahunPelaksanaan: tahunPelaksanaanResponses,
 			})
 		}
@@ -551,8 +579,12 @@ func (service *KebutuhanSPBEServiceImpl) FindPenanggungJawab(ctx context.Context
 			ID:            kebutuhanSPBE.ID,
 			KeteranganGap: kebutuhanSPBE.Keterangan,
 			KodeOpd:       kebutuhanSPBE.KodeOpd,
-			Tahun:         kebutuhanSPBE.Tahun,
-			NamaDomain:    kebutuhanSPBE.NamaDomain.String,
+			PerangkatDaerah: web.OpdRespons{
+				KodeOpd: opdPerangkatDaerah.KodeOpd,
+				NamaOpd: opdPerangkatDaerah.NamaOpd,
+			},
+			Tahun:      kebutuhanSPBE.Tahun,
+			NamaDomain: kebutuhanSPBE.NamaDomain.String,
 			ProsesBisnis: web.ProsesBisnisResponse{
 				ID:               prosesBisnis.ID,
 				NamaProsesBisnis: prosesBisnis.NamaProsesBisnis,
@@ -629,6 +661,9 @@ func (service *KebutuhanSPBEServiceImpl) FindByIdPenanggungJawab(ctx context.Con
 	prosesBisnis, err := service.ProsesBisnisRepository.FindById(ctx, tx, kebutuhanSPBE.IdProsesbisnis)
 	helper.PanicIfError(err)
 
+	opdPerangkatDaerah, err := service.OpdRepository.FindById(ctx, tx, kebutuhanSPBE.KodeOpd)
+	helper.PanicIfError(err)
+
 	// Tambahkan pencarian rencana pelaksanaan
 	rencanaPelaksanaan, err := service.RencanaPelaksanaanRepository.FindByKebutuhanId(ctx, tx, kebutuhanSPBE.ID)
 	if err != nil {
@@ -659,9 +694,6 @@ func (service *KebutuhanSPBEServiceImpl) FindByIdPenanggungJawab(ctx context.Con
 		sasaranKinerja, err := service.SasaranKinerjaRepository.FindById(ctx, tx, rp.IdSasaranKinerja)
 		helper.PanicIfError(err)
 
-		rpOpd, err := service.OpdRepository.FindById(ctx, tx, rp.PerangkatDaerah)
-		helper.PanicIfError(err)
-
 		rencanaPelaksanaanResponses = append(rencanaPelaksanaanResponses, web.RencanaPelaksanaanResponse{
 			Id:          rp.Id,
 			KodeOpd:     rp.KodeOpd,
@@ -677,11 +709,6 @@ func (service *KebutuhanSPBEServiceImpl) FindByIdPenanggungJawab(ctx context.Con
 				KodeSubKegiatan:       sasaranKinerja.KodeSubKegiatan,
 				SubKegiatan:           sasaranKinerja.SubKegiatan,
 			},
-			IndikatorPD: rp.IndikatorPD,
-			PerangkatDaerah: web.OpdRespons{
-				KodeOpd: rpOpd.KodeOpd,
-				NamaOpd: rpOpd.NamaOpd,
-			},
 			TahunPelaksanaan: tahunPelaksanaanResponses,
 		})
 	}
@@ -690,8 +717,12 @@ func (service *KebutuhanSPBEServiceImpl) FindByIdPenanggungJawab(ctx context.Con
 		ID:            kebutuhanSPBE.ID,
 		KeteranganGap: kebutuhanSPBE.Keterangan,
 		KodeOpd:       kebutuhanSPBE.KodeOpd,
-		Tahun:         kebutuhanSPBE.Tahun,
-		NamaDomain:    kebutuhanSPBE.NamaDomain.String,
+		PerangkatDaerah: web.OpdRespons{
+			KodeOpd: opdPerangkatDaerah.KodeOpd,
+			NamaOpd: opdPerangkatDaerah.NamaOpd,
+		},
+		Tahun:      kebutuhanSPBE.Tahun,
+		NamaDomain: kebutuhanSPBE.NamaDomain.String,
 		ProsesBisnis: web.ProsesBisnisResponse{
 			ID:               prosesBisnis.ID,
 			NamaProsesBisnis: prosesBisnis.NamaProsesBisnis,

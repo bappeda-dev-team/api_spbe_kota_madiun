@@ -68,7 +68,13 @@ func InitializeServer() *http.Server {
 	sasaranKinerjaPegawaiControllerImpl := controller.NewSasaranKinerjaPegawaiControllerImpl(sasaranKinerjaPegawaiServiceImpl)
 	rencanaPelaksanaanServiceImpl := service.NewRencanaPelaksanaanServiceImpl(rencanaPelaksanaanRepositoryImpl, sasaranKinerjaPegawaiRepositoryImpl, kebutuhanSPBERepositoryImpl, opdRepositoryImpl, db)
 	rencanaPelaksanaanControllerImpl := controller.NewRencanaPelaksanaanControllerImpl(rencanaPelaksanaanServiceImpl)
-	router := app.NewRouter(referensiArsitekturControllerImpl, prosesBisnisControllerImpl, sasaranKotaControllerImpl, pohonKinerjaControllerImpl, bidangUrusanControllerImpl, opdControllerImpl, urusanControllerImpl, layananSpbeControllerImpl, dataDanInformasiControllerImpl, aplikasiControllerImpl, domainSPBEControllerImpl, kebutuhanSPBEControllerImpl, userControllerImpl, sasaranKinerjaPegawaiControllerImpl, rencanaPelaksanaanControllerImpl)
+	petarencanaRepositoryImpl := repository.NewPetarencanaRepositoryImpl()
+	petarencanaServiceImpl := service.NewPetarencanaServiceImpl(petarencanaRepositoryImpl, kebutuhanSPBERepositoryImpl, rencanaPelaksanaanRepositoryImpl, sasaranKinerjaPegawaiRepositoryImpl, opdRepositoryImpl, db)
+	petarencanaControllerImpl := controller.NewPetarencanaControllerImpl(petarencanaServiceImpl)
+	keteranganGapRepositoryImpl := repository.NewKeteranganGapRepositoryImpl()
+	keteranganGapServiceImpl := service.NewKeteranganGapServiceImpl(keteranganGapRepositoryImpl, db)
+	keteranganGapControllerImpl := controller.NewKeteranganGapControllerImpl(keteranganGapServiceImpl)
+	router := app.NewRouter(referensiArsitekturControllerImpl, prosesBisnisControllerImpl, sasaranKotaControllerImpl, pohonKinerjaControllerImpl, bidangUrusanControllerImpl, opdControllerImpl, urusanControllerImpl, layananSpbeControllerImpl, dataDanInformasiControllerImpl, aplikasiControllerImpl, domainSPBEControllerImpl, kebutuhanSPBEControllerImpl, userControllerImpl, sasaranKinerjaPegawaiControllerImpl, rencanaPelaksanaanControllerImpl, petarencanaControllerImpl, keteranganGapControllerImpl)
 	authMiddleware := middleware.NewAuthMiddleware(router)
 	server := NewServer(authMiddleware)
 	return server
@@ -109,3 +115,7 @@ var sasarankinerjaSet = wire.NewSet(repository.NewSasaranKinerjaPegawaiRepositor
 var userSet = wire.NewSet(repository.NewUserRepositoryImpl, wire.Bind(new(repository.UserRepository), new(*repository.UserRepositoryImpl)), service.NewUserServiceImpl, wire.Bind(new(service.UserService), new(*service.UserServiceImpl)), controller.NewUserControllerImpl, wire.Bind(new(controller.UserController), new(*controller.UserControllerImpl)))
 
 var rencanaPelaksanaanSet = wire.NewSet(repository.NewRencanaPelaksanaanRepositoryImpl, wire.Bind(new(repository.RencanaPelaksanaanRepository), new(*repository.RencanaPelaksanaanRepositoryImpl)), service.NewRencanaPelaksanaanServiceImpl, wire.Bind(new(service.RencanaPelaksanaanService), new(*service.RencanaPelaksanaanServiceImpl)), controller.NewRencanaPelaksanaanControllerImpl, wire.Bind(new(controller.RencanaPelaksanaanController), new(*controller.RencanaPelaksanaanControllerImpl)))
+
+var petarencanaSet = wire.NewSet(repository.NewPetarencanaRepositoryImpl, wire.Bind(new(repository.PetarencanaRepository), new(*repository.PetarencanaRepositoryImpl)), service.NewPetarencanaServiceImpl, wire.Bind(new(service.PetarencanaService), new(*service.PetarencanaServiceImpl)), controller.NewPetarencanaControllerImpl, wire.Bind(new(controller.PetarencanaController), new(*controller.PetarencanaControllerImpl)))
+
+var keterangangapSet = wire.NewSet(repository.NewKeteranganGapRepositoryImpl, wire.Bind(new(repository.KeteranganGapRepository), new(*repository.KeteranganGapRepositoryImpl)), service.NewKeteranganGapServiceImpl, wire.Bind(new(service.KeteranganGapService), new(*service.KeteranganGapServiceImpl)), controller.NewKeteranganGapControllerImpl, wire.Bind(new(controller.KeteranganGapController), new(*controller.KeteranganGapControllerImpl)))

@@ -43,17 +43,11 @@ func (controller *RencanaPelaksanaanControllerImpl) Create(writer http.ResponseW
 
 	if role == "admin_kota" {
 		rencanaPelaksanaanCreateRequest.KodeOpd = request.URL.Query().Get("kode_opd")
-		if rencanaPelaksanaanCreateRequest.IndikatorPD == "internal" {
-			rencanaPelaksanaanCreateRequest.PerangkatDaerah = rencanaPelaksanaanCreateRequest.KodeOpd
-		}
 	}
 
 	if role == "admin_opd" || role == "asn" {
 		kodeOpd := request.Context().Value("kode_opd").(string)
 		rencanaPelaksanaanCreateRequest.KodeOpd = kodeOpd
-		if rencanaPelaksanaanCreateRequest.IndikatorPD == "internal" {
-			rencanaPelaksanaanCreateRequest.PerangkatDaerah = kodeOpd
-		}
 	}
 
 	rencanaPelaksanaanCreateResponse, err := controller.rencanaPelaksanaanService.Create(request.Context(), rencanaPelaksanaanCreateRequest)
@@ -91,9 +85,6 @@ func (controller *RencanaPelaksanaanControllerImpl) Update(writer http.ResponseW
 
 	// cek == kode opd untuk roles asn dan admin_opd
 	if role == "admin_opd" || role == "asn" {
-		if rencanaPelaksanaanUpdateRequest.IndikatorPD == "internal" {
-			rencanaPelaksanaanUpdateRequest.PerangkatDaerah = kodeOPD
-		}
 		existingRencanaPelaksanaan, err := controller.rencanaPelaksanaanService.FindById(request.Context(), id, kodeOPD)
 		if err != nil || existingRencanaPelaksanaan.KodeOpd != kodeOPD {
 			helper.WriteToResponseBody(writer, web.WebResponse{
@@ -107,10 +98,6 @@ func (controller *RencanaPelaksanaanControllerImpl) Update(writer http.ResponseW
 	} else if role == "admin_kota" {
 		kodeOPD = request.URL.Query().Get("kode_opd")
 		rencanaPelaksanaanUpdateRequest.KodeOpd = kodeOPD
-
-		if rencanaPelaksanaanUpdateRequest.IndikatorPD == "internal" {
-			rencanaPelaksanaanUpdateRequest.PerangkatDaerah = rencanaPelaksanaanUpdateRequest.KodeOpd
-		}
 	} else {
 		helper.WriteToResponseBody(writer, web.WebResponse{
 			Code:   http.StatusUnauthorized,

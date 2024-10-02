@@ -4,6 +4,7 @@ type KebutuhanSPBEResponse struct {
 	ID              int                      `json:"id"`
 	KeteranganGap   string                   `json:"keterangan"`
 	KodeOpd         string                   `json:"kode_opd"`
+	PerangkatDaerah OpdRespons               `json:"perangkat_daerah"`
 	Tahun           int                      `json:"tahun"`
 	NamaDomain      string                   `json:"nama_domain"`
 	ProsesBisnis    ProsesBisnisResponse     `json:"proses_bisnis"`
@@ -16,6 +17,7 @@ type PjKebutuhanSPBEResponse struct {
 	ID                 int                          `json:"id"`
 	KeteranganGap      string                       `json:"keterangan"`
 	KodeOpd            string                       `json:"kode_opd"`
+	PerangkatDaerah    OpdRespons                   `json:"perangkat_daerah"`
 	Tahun              int                          `json:"tahun"`
 	NamaDomain         string                       `json:"nama_domain"`
 	ProsesBisnis       ProsesBisnisResponse         `json:"proses_bisnis"`

@@ -259,10 +259,6 @@ func ToRencanaPelaksanaanResponse(rencanaPelaksanaan domain.RencanaPelaksanaanPe
 		SasaranKinerja: web.SasaranKinerjaPegawaiResponse{
 			Id: rencanaPelaksanaan.IdSasaranKinerja,
 		},
-		IndikatorPD: rencanaPelaksanaan.IndikatorPD,
-		PerangkatDaerah: web.OpdRespons{
-			KodeOpd: rencanaPelaksanaan.PerangkatDaerah,
-		},
 		TahunPelaksanaan: ToTahunPelaksanaanResponses(rencanaPelaksanaan.TahunPelaksanaan),
 	}
 }
@@ -417,6 +413,25 @@ func ToKondisiAwalResponse(kondisiAwal domain.KondisiAwal) web.KondisiAwalRespon
 		Keterangan:       kondisiAwal.Keterangan,
 		Tahun:            kondisiAwal.Tahun,
 	}
+}
+
+// ... kode yang sudah ada ...
+
+func ToKeteranganGapResponse(keteranganGap domain.KeteranganGap) web.KeteranganGapRespons {
+	return web.KeteranganGapRespons{
+		Id:             keteranganGap.Id,
+		KodeOpd:        keteranganGap.KodeOpd,
+		IdProsesBisnis: keteranganGap.IdProsesBisnis,
+		KeteranganGap:  keteranganGap.KeteranganGap,
+	}
+}
+
+func ToKeteranganGapResponses(keteranganGaps []domain.KeteranganGap) []web.KeteranganGapRespons {
+	var keteranganGapResponses []web.KeteranganGapRespons
+	for _, keteranganGap := range keteranganGaps {
+		keteranganGapResponses = append(keteranganGapResponses, ToKeteranganGapResponse(keteranganGap))
+	}
+	return keteranganGapResponses
 }
 
 func nullInt32ToInt(n sql.NullInt32) int {
