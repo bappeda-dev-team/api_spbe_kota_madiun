@@ -168,6 +168,7 @@ func NewRouter(referensiarsitekturController controller.ReferensiArsitekturContr
 	router.GET("/exportexcelLayananspbe", layananspbeController.ExportExcel)
 	router.GET("/exportexcelDataInformasi", datainformasiController.ExportExcel)
 	router.GET("/exportexcelaplikasi", aplikasiController.ExportExcel)
+	router.GET("/exportexcelpetarencana", petarencanaController.ExportExcel)
 
 	router.PanicHandler = exception.ErrorHandler
 

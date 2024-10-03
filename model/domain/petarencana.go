@@ -1,9 +1,12 @@
 package domain
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 type Petarencana struct {
 	ID               int                       `json:"id"`
+	GeneratedID      string                    `json:"generated_id"`
 	KodeOpd          string                    `json:"kode_opd"`
 	Tahun            int                       `json:"tahun"`
 	NamaProsesBisnis string                    `json:"nama_proses_bisnis"`

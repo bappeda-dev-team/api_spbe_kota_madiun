@@ -15,7 +15,8 @@ func NewPetarencanaRepositoryImpl() *PetarencanaRepositoryImpl {
 
 func (repository *PetarencanaRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, kodeOpd string, tahun int) ([]domain.Petarencana, error) {
 	query := `
-	SELECT
+SELECT
+	CONCAT(pb.id, '-', COALESCE(l.id, 0), '-', COALESCE(d.id, 0), '-', COALESCE(a.id, 0)) AS generated_id,
 	pb.id,
 	pb.kode_opd,
 	pb.tahun,
@@ -45,7 +46,6 @@ func (repository *PetarencanaRepositoryImpl) FindAll(ctx context.Context, tx *sq
 	AND l.nama_layanan IS NOT NULL
 	AND d.nama_data IS NOT NULL
 	AND a.nama_aplikasi IS NOT NULL
-
 	`
 
 	var args []interface{}
@@ -58,7 +58,7 @@ func (repository *PetarencanaRepositoryImpl) FindAll(ctx context.Context, tx *sq
 		args = append(args, tahun)
 	}
 
-	query += " ORDER BY pb.kode_opd DESC, pb.id DESC;"
+	query += " ORDER BY generated_id DESC"
 
 	rows, err := tx.QueryContext(ctx, query, args...)
 	if err != nil {
@@ -69,6 +69,7 @@ func (repository *PetarencanaRepositoryImpl) FindAll(ctx context.Context, tx *sq
 	var petarencanaList []domain.Petarencana
 	for rows.Next() {
 		var id int
+		var generatedID string
 		var kodeOpd string
 		var tahun int
 		var namaProsesBisnis, kodeProsesBisnis string
@@ -76,6 +77,7 @@ func (repository *PetarencanaRepositoryImpl) FindAll(ctx context.Context, tx *sq
 		var idKeterangan sql.NullInt32
 
 		if err := rows.Scan(
+			&generatedID,
 			&id,
 			&kodeOpd,
 			&tahun,
@@ -91,6 +93,7 @@ func (repository *PetarencanaRepositoryImpl) FindAll(ctx context.Context, tx *sq
 
 		petarencana := domain.Petarencana{
 			ID:               id,
+			GeneratedID:      generatedID,
 			KodeOpd:          kodeOpd,
 			Tahun:            tahun,
 			NamaProsesBisnis: namaProsesBisnis,

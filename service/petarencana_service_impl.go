@@ -44,118 +44,13 @@ func (service *PetarencanaServiceImpl) FindAll(ctx context.Context, kodeOpd stri
 	}
 
 	petarencanaMap := make(map[int]web.PetarencanaRespons)
+	kebutuhanMap := make(map[int]web.PjKebutuhanSPBEResponse)
 
 	for _, petarencana := range petarencanas {
-		kebutuhanSPBE, err := service.KebutuhanspbeRepository.FindIdForPetarencana(ctx, tx, int(petarencana.Keterangan[0].IdKeterangan.Int32), kodeOpd, kodeOpd)
-		if err != nil {
-			log.Printf("Error saat mencari kebutuhan SPBE: %v", err)
-			return nil, err
-		}
-		if kebutuhanSPBE.ID == 0 {
-			log.Printf("Tidak ada kebutuhan SPBE yang ditemukan untuk ID: %d, Kode OPD: %s", int(petarencana.Keterangan[0].IdKeterangan.Int32), kodeOpd)
-			continue // Lanjutkan ke petarencana berikutnya
-		}
-
-		jenisKebutuhan, err := service.KebutuhanspbeRepository.FindJenisKebutuhanByKebutuhanId(ctx, tx, kebutuhanSPBE.ID)
-		if err != nil {
-			log.Printf("Gagal menemukan jenis kebutuhan: %v", err)
-			return nil, err
-		}
-
-		var jenisKebutuhanResponses []web.JenisKebutuhanResponse
-		for _, jk := range jenisKebutuhan {
-			kondisiAwal, err := service.KebutuhanspbeRepository.FindKondisiAwalByJenisKebutuhanId(ctx, tx, jk.Id)
-			if err != nil {
-				log.Printf("Gagal menemukan kondisi awal: %v", err)
-				return nil, err
-			}
-
-			var kondisiAwalResponses []web.KondisiAwalResponse
-			for _, ka := range kondisiAwal {
-				kondisiAwalResponses = append(kondisiAwalResponses, web.KondisiAwalResponse{
-					Id:               ka.Id,
-					JenisKebutuhanId: ka.JenisKebutuhanId,
-					Keterangan:       ka.Keterangan,
-					Tahun:            ka.Tahun,
-				})
-			}
-
-			jenisKebutuhanResponses = append(jenisKebutuhanResponses, web.JenisKebutuhanResponse{
-				Id:          jk.Id,
-				KebutuhanId: jk.KebutuhanId,
-				Kebutuhan:   jk.Kebutuhan,
-				KondisiAwal: kondisiAwalResponses,
-			})
-		}
-
-		rencanaPelaksanaan, err := service.RencanaPelaksanaanRepository.FindByKebutuhanId(ctx, tx, kebutuhanSPBE.ID)
-		if err != nil {
-			log.Printf("Gagal menemukan rencana pelaksanaan: %v", err)
-			return nil, err
-		}
-
-		opdPetarencana, err := service.OpdRepository.FindById(ctx, tx, kebutuhanSPBE.PenanggungJawab.String)
-		helper.PanicIfError(err)
-
-		var rencanaPelaksanaanResponses []web.RencanaPelaksanaanResponse
-		for _, rp := range rencanaPelaksanaan {
-			if rp.KodeOpd == kebutuhanSPBE.PenanggungJawab.String {
-				tahunPelaksanaan, err := service.RencanaPelaksanaanRepository.FindIdTahunPelaksanaan(ctx, tx, rp.Id)
-				helper.PanicIfError(err)
-				var tahunPelaksanaanResponses []web.TahunPelaksanaanResponse
-				for _, tp := range tahunPelaksanaan {
-					tahunPelaksanaanResponses = append(tahunPelaksanaanResponses, web.TahunPelaksanaanResponse{
-						Id:    tp.Id,
-						Tahun: tp.Tahun,
-					})
-				}
-
-				sasaranKinerja, err := service.SasaranKinerjaRepository.FindById(ctx, tx, rp.IdSasaranKinerja)
-				helper.PanicIfError(err)
-
-				rencanaPelaksanaanResponses = append(rencanaPelaksanaanResponses, web.RencanaPelaksanaanResponse{
-					Id:          rp.Id,
-					KodeOpd:     rp.KodeOpd,
-					IdKebutuhan: rp.IdKebutuhan,
-					SasaranKinerja: web.SasaranKinerjaPegawaiResponse{
-						Id:                    sasaranKinerja.Id,
-						KodeOpd:               sasaranKinerja.KodeOpd,
-						SasaranKinerjaPegawai: sasaranKinerja.SasaranKinerjaPegawai,
-						AnggaranSasaran:       sasaranKinerja.AnggaranSasaran,
-						PelaksanaSasaran:      sasaranKinerja.PelaksanaSasaran,
-						KodeSubKegiatan:       sasaranKinerja.KodeSubKegiatan,
-						SubKegiatan:           sasaranKinerja.SubKegiatan,
-					},
-					TahunPelaksanaan: tahunPelaksanaanResponses,
-				})
-			}
-		}
-
-		opdKebutuhan, err := service.OpdRepository.FindById(ctx, tx, kebutuhanSPBE.KodeOpd)
-		helper.PanicIfError(err)
-
-		keteranganResponse := web.PjKebutuhanSPBEResponse{
-			ID:            kebutuhanSPBE.ID,
-			KeteranganGap: kebutuhanSPBE.Keterangan,
-			KodeOpd:       kebutuhanSPBE.KodeOpd,
-			PerangkatDaerah: web.OpdRespons{
-				KodeOpd: opdKebutuhan.KodeOpd,
-				NamaOpd: opdKebutuhan.NamaOpd,
-			},
-			Tahun:          kebutuhanSPBE.Tahun,
-			NamaDomain:     kebutuhanSPBE.NamaDomain.String,
-			ProsesBisnis:   web.ProsesBisnisResponse{ID: kebutuhanSPBE.IdProsesbisnis, NamaProsesBisnis: petarencana.NamaProsesBisnis},
-			JenisKebutuhan: jenisKebutuhanResponses,
-			IndikatorPj:    kebutuhanSPBE.IndikatorPj.String,
-			PenanggungJawab: web.OpdRespons{
-				KodeOpd: opdPetarencana.KodeOpd,
-				NamaOpd: opdPetarencana.NamaOpd},
-			RencanaPelaksanaan: rencanaPelaksanaanResponses,
-		}
-
 		petarencanaResponse, exists := petarencanaMap[petarencana.ID]
 		if !exists {
 			petarencanaResponse = web.PetarencanaRespons{
+				GeneratedID:      petarencana.GeneratedID,
 				ID:               petarencana.ID,
 				KodeOpd:          petarencana.KodeOpd,
 				Tahun:            petarencana.Tahun,
@@ -165,6 +60,123 @@ func (service *PetarencanaServiceImpl) FindAll(ctx context.Context, kodeOpd stri
 				DataDanInformasi: []web.RencanaDataDanInformasi{},
 				Aplikasi:         []web.RencanaAplikasi{},
 				Keterangan:       []web.PjKebutuhanSPBEResponse{},
+			}
+		}
+
+		if len(petarencana.Keterangan) > 0 && petarencana.Keterangan[0].IdKeterangan.Valid {
+			idKeterangan := int(petarencana.Keterangan[0].IdKeterangan.Int32)
+			_, exists := kebutuhanMap[idKeterangan]
+
+			if !exists {
+				// Proses kebutuhan SPBE baru
+				kebutuhanSPBE, err := service.KebutuhanspbeRepository.FindIdForPetarencana(ctx, tx, idKeterangan, kodeOpd, kodeOpd)
+				if err != nil {
+					log.Printf("Error saat mencari kebutuhan SPBE: %v", err)
+					return nil, err
+				}
+				if kebutuhanSPBE.ID != 0 {
+					jenisKebutuhan, err := service.KebutuhanspbeRepository.FindJenisKebutuhanByKebutuhanId(ctx, tx, kebutuhanSPBE.ID)
+					if err != nil {
+						log.Printf("Gagal menemukan jenis kebutuhan: %v", err)
+						return nil, err
+					}
+
+					var jenisKebutuhanResponses []web.JenisKebutuhanResponse
+					for _, jk := range jenisKebutuhan {
+						kondisiAwal, err := service.KebutuhanspbeRepository.FindKondisiAwalByJenisKebutuhanId(ctx, tx, jk.Id)
+						if err != nil {
+							log.Printf("Gagal menemukan kondisi awal: %v", err)
+							return nil, err
+						}
+
+						var kondisiAwalResponses []web.KondisiAwalResponse
+						for _, ka := range kondisiAwal {
+							kondisiAwalResponses = append(kondisiAwalResponses, web.KondisiAwalResponse{
+								Id:               ka.Id,
+								JenisKebutuhanId: ka.JenisKebutuhanId,
+								Keterangan:       ka.Keterangan,
+								Tahun:            ka.Tahun,
+							})
+						}
+
+						jenisKebutuhanResponses = append(jenisKebutuhanResponses, web.JenisKebutuhanResponse{
+							Id:          jk.Id,
+							KebutuhanId: jk.KebutuhanId,
+							Kebutuhan:   jk.Kebutuhan,
+							KondisiAwal: kondisiAwalResponses,
+						})
+					}
+
+					rencanaPelaksanaan, err := service.RencanaPelaksanaanRepository.FindByKebutuhanId(ctx, tx, kebutuhanSPBE.ID)
+					if err != nil {
+						log.Printf("Gagal menemukan rencana pelaksanaan: %v", err)
+						return nil, err
+					}
+
+					opdPetarencana, err := service.OpdRepository.FindById(ctx, tx, kebutuhanSPBE.PenanggungJawab.String)
+					helper.PanicIfError(err)
+
+					var rencanaPelaksanaanResponses []web.RencanaPelaksanaanResponse
+					for _, rp := range rencanaPelaksanaan {
+						if rp.KodeOpd == kebutuhanSPBE.PenanggungJawab.String {
+							tahunPelaksanaan, err := service.RencanaPelaksanaanRepository.FindIdTahunPelaksanaan(ctx, tx, rp.Id)
+							helper.PanicIfError(err)
+							var tahunPelaksanaanResponses []web.TahunPelaksanaanResponse
+							for _, tp := range tahunPelaksanaan {
+								tahunPelaksanaanResponses = append(tahunPelaksanaanResponses, web.TahunPelaksanaanResponse{
+									Id:    tp.Id,
+									Tahun: tp.Tahun,
+								})
+							}
+
+							sasaranKinerja, err := service.SasaranKinerjaRepository.FindById(ctx, tx, rp.IdSasaranKinerja)
+							helper.PanicIfError(err)
+
+							rencanaPelaksanaanResponses = append(rencanaPelaksanaanResponses, web.RencanaPelaksanaanResponse{
+								Id:          rp.Id,
+								KodeOpd:     rp.KodeOpd,
+								IdKebutuhan: rp.IdKebutuhan,
+								SasaranKinerja: web.SasaranKinerjaPegawaiResponse{
+									Id:                    sasaranKinerja.Id,
+									KodeOpd:               sasaranKinerja.KodeOpd,
+									KodeSasaran:           sasaranKinerja.KodeSasaran,
+									Tahun:                 sasaranKinerja.Tahun,
+									SasaranKinerjaPegawai: sasaranKinerja.SasaranKinerjaPegawai,
+									AnggaranSasaran:       sasaranKinerja.AnggaranSasaran,
+									PelaksanaSasaran:      sasaranKinerja.PelaksanaSasaran,
+									KodeSubKegiatan:       sasaranKinerja.KodeSubKegiatan,
+									SubKegiatan:           sasaranKinerja.SubKegiatan,
+								},
+								TahunPelaksanaan: tahunPelaksanaanResponses,
+							})
+						}
+					}
+
+					opdKebutuhan, err := service.OpdRepository.FindById(ctx, tx, kebutuhanSPBE.KodeOpd)
+					helper.PanicIfError(err)
+
+					kebutuhanSpbeRespons := web.PjKebutuhanSPBEResponse{
+						ID:            kebutuhanSPBE.ID,
+						KeteranganGap: kebutuhanSPBE.Keterangan,
+						KodeOpd:       kebutuhanSPBE.KodeOpd,
+						PerangkatDaerah: web.OpdRespons{
+							KodeOpd: opdKebutuhan.KodeOpd,
+							NamaOpd: opdKebutuhan.NamaOpd,
+						},
+						Tahun:          kebutuhanSPBE.Tahun,
+						NamaDomain:     kebutuhanSPBE.NamaDomain.String,
+						ProsesBisnis:   web.ProsesBisnisResponse{ID: kebutuhanSPBE.IdProsesbisnis, NamaProsesBisnis: petarencana.NamaProsesBisnis},
+						JenisKebutuhan: jenisKebutuhanResponses,
+						IndikatorPj:    kebutuhanSPBE.IndikatorPj.String,
+						PenanggungJawab: web.OpdRespons{
+							KodeOpd: opdPetarencana.KodeOpd,
+							NamaOpd: opdPetarencana.NamaOpd},
+						RencanaPelaksanaan: rencanaPelaksanaanResponses,
+					}
+
+					kebutuhanMap[idKeterangan] = kebutuhanSpbeRespons
+					petarencanaResponse.Keterangan = append(petarencanaResponse.Keterangan, kebutuhanSpbeRespons)
+				}
 			}
 		}
 
@@ -215,8 +227,6 @@ func (service *PetarencanaServiceImpl) FindAll(ctx context.Context, kodeOpd stri
 				}
 			}
 		}
-
-		petarencanaResponse.Keterangan = append(petarencanaResponse.Keterangan, keteranganResponse)
 
 		petarencanaMap[petarencana.ID] = petarencanaResponse
 	}

@@ -1,6 +1,7 @@
 package web
 
 type PetarencanaRespons struct {
+	GeneratedID      string                    `json:"generated_id"`
 	ID               int                       `json:"id"`
 	KodeOpd          string                    `json:"kode_opd"`
 	Tahun            int                       `json:"tahun"`
