@@ -2,7 +2,7 @@ package web
 
 type KebutuhanSPBEUpdateRequest struct {
 	ID              int                    `validate:"required" json:"id"`
-	KeteranganGap   string                 `validate:"required" json:"keterangan_gap"`
+	KeteranganGap   string                 `validate:"required" json:"keterangan_kebutuhan"`
 	KodeOpd         string                 `validate:"required" json:"kode_opd"`
 	Tahun           int                    `validate:"required" json:"tahun"`
 	NamaDomain      string                 `validate:"required" json:"nama_domain"`
