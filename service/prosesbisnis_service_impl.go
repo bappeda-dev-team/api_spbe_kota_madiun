@@ -505,6 +505,7 @@ func (service *ProsesBisnisServiceImpl) GetProsesBisnisGrouped(ctx context.Conte
 				Layanans:         []web.GapLayanan{},
 				DataDanInformasi: []web.GapDataDanInformasi{},
 				Aplikasi:         []web.GapAplikasi{},
+				KeteranganGap:    []web.GapKeteranganGap{},
 				Keterangan:       []web.GapKeterangan{},
 			}
 		}
@@ -555,6 +556,31 @@ func (service *ProsesBisnisServiceImpl) GetProsesBisnisGrouped(ctx context.Conte
 				temAplikasi := web.GapAplikasi{NamaAplikasi: webNullString}
 				if !helper.ContainAplikasi(webPb.Aplikasi, temAplikasi) {
 					webPb.Aplikasi = append(webPb.Aplikasi, temAplikasi)
+				}
+			}
+		}
+
+		if pb.KeteranganGap != nil {
+			for _, kg := range pb.KeteranganGap {
+				var webNullInt32 web.NullInt32
+				var webNullString web.NullString
+
+				if kg.IdKeteranganGap.Valid {
+					webNullInt32.Int32 = kg.IdKeteranganGap.Int32
+					webNullInt32.Valid = true
+				}
+
+				if kg.KeteranganGap.Valid {
+					webNullString.String = kg.KeteranganGap.String
+					webNullString.Valid = true
+				}
+
+				tempKeteranganGap := web.GapKeteranganGap{
+					IdKeteranganGap: webNullInt32,
+					KeteranganGap:   webNullString,
+				}
+				if !helper.ContainKeteranganGap(webPb.KeteranganGap, tempKeteranganGap) {
+					webPb.KeteranganGap = append(webPb.KeteranganGap, tempKeteranganGap)
 				}
 			}
 		}

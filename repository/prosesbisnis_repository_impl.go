@@ -119,6 +119,8 @@ func (repository *ProsesBisnisRepositoryImpl) GapProsesBisnis(ctx context.Contex
 		l.nama_layanan,
 		d.nama_data,
 		a.nama_aplikasi,
+		kg.keterangan_gap AS keterangangap,
+		kg.id AS id_keterangangap,
 		ks.keterangan AS keterangan,
 		ks.id AS id_keterangan
 		FROM
@@ -135,6 +137,8 @@ func (repository *ProsesBisnisRepositoryImpl) GapProsesBisnis(ctx context.Contex
 		aplikasi a ON (a.strategic_id = pb.strategic_id AND a.tactical_id = pb.tactical_id AND a.operational_id = pb.operational_id AND a.kode_opd = pb.kode_opd)
 		OR (a.strategic_id = pb.strategic_id AND a.tactical_id = pb.tactical_id AND a.kode_opd = pb.kode_opd)
 		OR (a.strategic_id = pb.strategic_id AND a.kode_opd = pb.kode_opd)
+		LEFT JOIN 
+		keterangan_gap kg ON kg.id_prosesbisnis = pb.id
 		LEFT JOIN
 		kebutuhan_spbe ks ON ks.id_prosesbisnis = pb.id
 		WHERE 1=1
@@ -165,8 +169,8 @@ func (repository *ProsesBisnisRepositoryImpl) GapProsesBisnis(ctx context.Contex
 		var kodeOpd string
 		var tahun int
 		var namaProsesBisnis, kodeProsesBisnis string
-		var idKeterangan sql.NullInt32
-		var namaLayanan, namaData, namaAplikasi, keterangan sql.NullString
+		var idKeteranganGap, idKeterangan sql.NullInt32
+		var namaLayanan, namaData, namaAplikasi, keteranganGap, keterangan sql.NullString
 
 		if err := rows.Scan(
 			&id,
@@ -177,6 +181,8 @@ func (repository *ProsesBisnisRepositoryImpl) GapProsesBisnis(ctx context.Contex
 			&namaLayanan,
 			&namaData,
 			&namaAplikasi,
+			&keteranganGap,
+			&idKeteranganGap,
 			&keterangan,
 			&idKeterangan,
 		); err != nil {
@@ -232,6 +238,23 @@ func (repository *ProsesBisnisRepositoryImpl) GapProsesBisnis(ctx context.Contex
 			pb.Aplikasi = append(pb.Aplikasi, domain.GapAplikasi{
 				NamaAplikasi: sql.NullString{},
 			})
+		}
+
+		if idKeteranganGap.Valid {
+			pb.KeteranganGap = append(
+				pb.KeteranganGap, domain.GapKeteranganGap{
+					IdKeteranganGap: idKeteranganGap,
+					KeteranganGap:   keteranganGap,
+				})
+		} else if keteranganGap.Valid {
+			pb.KeteranganGap = append(
+				pb.KeteranganGap, domain.GapKeteranganGap{
+					IdKeteranganGap: sql.NullInt32{},
+					KeteranganGap: sql.NullString{
+						String: keteranganGap.String,
+						Valid:  true,
+					},
+				})
 		}
 
 		if idKeterangan.Valid {

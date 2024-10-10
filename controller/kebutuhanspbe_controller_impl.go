@@ -303,6 +303,37 @@ func (controller *KebutuhanSPBEControllerImpl) Delete(writer http.ResponseWriter
 	helper.WriteToResponseBody(writer, webResponse)
 }
 
+func (controller *KebutuhanSPBEControllerImpl) DeleteKeteranganKebutuhan(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	kebutuhanSPBEId := params.ByName("kebutuhanSPBEId")
+	id, err := strconv.Atoi(kebutuhanSPBEId)
+	helper.PanicIfError(err)
+
+	kodeOPD, _ := request.Context().Value("kode_opd").(string)
+	role, _ := request.Context().Value("roles").(string)
+
+	err = controller.KebutuhanSPBEService.DeleteKeteranganKebutuhan(request.Context(), id, kodeOPD, role)
+	if err != nil {
+		if err.Error() == "kebutuhan spbe tidak ditemukan untuk OPD ini" {
+			webResponse := web.WebResponse{
+				Code:   http.StatusForbidden,
+				Status: "FORBIDDEN",
+				Data:   "Anda tidak memiliki akses untuk menghapus kebutuhan spbe ini",
+			}
+			helper.WriteToResponseBody(writer, webResponse)
+			return
+		}
+		panic(err)
+	}
+
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "Success delete kebutuhan spbe",
+		Data:   nil,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+
 func (controller *KebutuhanSPBEControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	kebutuhanSPBEId := params.ByName("kebutuhanSPBEId")
 	id, err := strconv.Atoi(kebutuhanSPBEId)

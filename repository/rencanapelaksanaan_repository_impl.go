@@ -15,8 +15,8 @@ func NewRencanaPelaksanaanRepositoryImpl() *RencanaPelaksanaanRepositoryImpl {
 }
 
 func (repository *RencanaPelaksanaanRepositoryImpl) Insert(ctx context.Context, tx *sql.Tx, rencanaPelaksanaan domain.RencanaPelaksanaanPegawai) (domain.RencanaPelaksanaanPegawai, error) {
-	query := "INSERT INTO rencana_pelaksanaan (kode_opd, id_kebutuhan, id_sasarankinerja, indikator_perangkatdaerah, perangkat_daerah) VALUES (?, ?, ?, ?, ?)"
-	result, err := tx.ExecContext(ctx, query, rencanaPelaksanaan.KodeOpd, rencanaPelaksanaan.IdKebutuhan, rencanaPelaksanaan.IdSasaranKinerja, rencanaPelaksanaan.IndikatorPD, rencanaPelaksanaan.PerangkatDaerah)
+	query := "INSERT INTO rencana_pelaksanaan (kode_opd, id_kebutuhan, id_sasarankinerja) VALUES (?, ?, ?)"
+	result, err := tx.ExecContext(ctx, query, rencanaPelaksanaan.KodeOpd, rencanaPelaksanaan.IdKebutuhan, rencanaPelaksanaan.IdSasaranKinerja)
 	if err != nil {
 		return rencanaPelaksanaan, err
 	}
@@ -39,8 +39,8 @@ func (repository *RencanaPelaksanaanRepositoryImpl) Insert(ctx context.Context, 
 }
 
 func (repository *RencanaPelaksanaanRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, rencanaPelaksanaan domain.RencanaPelaksanaanPegawai) (domain.RencanaPelaksanaanPegawai, error) {
-	query := "UPDATE rencana_pelaksanaan SET kode_opd = ?, id_kebutuhan = ?, id_sasarankinerja = ?, indikator_perangkatdaerah = ?, perangkat_daerah = ? WHERE id = ?"
-	_, err := tx.ExecContext(ctx, query, rencanaPelaksanaan.KodeOpd, rencanaPelaksanaan.IdKebutuhan, rencanaPelaksanaan.IdSasaranKinerja, rencanaPelaksanaan.IndikatorPD, rencanaPelaksanaan.PerangkatDaerah, rencanaPelaksanaan.Id)
+	query := "UPDATE rencana_pelaksanaan SET kode_opd = ?, id_kebutuhan = ?, id_sasarankinerja = ? WHERE id = ?"
+	_, err := tx.ExecContext(ctx, query, rencanaPelaksanaan.KodeOpd, rencanaPelaksanaan.IdKebutuhan, rencanaPelaksanaan.IdSasaranKinerja, rencanaPelaksanaan.Id)
 	if err != nil {
 		return rencanaPelaksanaan, err
 	}
@@ -80,7 +80,7 @@ func (repository *RencanaPelaksanaanRepositoryImpl) Delete(ctx context.Context, 
 }
 
 func (repository *RencanaPelaksanaanRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, kodeOpd string, kebutuhanId int) ([]domain.RencanaPelaksanaanPegawai, error) {
-	query := "SELECT id, kode_opd, id_kebutuhan, id_sasarankinerja, indikator_perangkatdaerah, perangkat_daerah FROM rencana_pelaksanaan WHERE 1=1"
+	query := "SELECT id, kode_opd, id_kebutuhan, id_sasarankinerja FROM rencana_pelaksanaan WHERE 1=1"
 	var args []interface{}
 
 	if kodeOpd != "" {
@@ -102,7 +102,7 @@ func (repository *RencanaPelaksanaanRepositoryImpl) FindAll(ctx context.Context,
 	var rencana []domain.RencanaPelaksanaanPegawai
 	for rows.Next() {
 		var rencanaPelaksanaan domain.RencanaPelaksanaanPegawai
-		if err := rows.Scan(&rencanaPelaksanaan.Id, &rencanaPelaksanaan.KodeOpd, &rencanaPelaksanaan.IdKebutuhan, &rencanaPelaksanaan.IdSasaranKinerja, &rencanaPelaksanaan.IndikatorPD, &rencanaPelaksanaan.PerangkatDaerah); err != nil {
+		if err := rows.Scan(&rencanaPelaksanaan.Id, &rencanaPelaksanaan.KodeOpd, &rencanaPelaksanaan.IdKebutuhan, &rencanaPelaksanaan.IdSasaranKinerja); err != nil {
 			return nil, err
 		}
 		rencana = append(rencana, rencanaPelaksanaan)
@@ -111,12 +111,12 @@ func (repository *RencanaPelaksanaanRepositoryImpl) FindAll(ctx context.Context,
 }
 
 func (repository *RencanaPelaksanaanRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, rencanaId int) (domain.RencanaPelaksanaanPegawai, error) {
-	query := "SELECT id, kode_opd, id_kebutuhan, id_sasarankinerja, indikator_perangkatdaerah, perangkat_daerah FROM rencana_pelaksanaan WHERE id = ?"
+	query := "SELECT id, kode_opd, id_kebutuhan, id_sasarankinerja FROM rencana_pelaksanaan WHERE id = ?"
 	args := []interface{}{rencanaId}
 
 	row := tx.QueryRowContext(ctx, query, args...)
 	var rencanaPelaksanaan domain.RencanaPelaksanaanPegawai
-	err := row.Scan(&rencanaPelaksanaan.Id, &rencanaPelaksanaan.KodeOpd, &rencanaPelaksanaan.IdKebutuhan, &rencanaPelaksanaan.IdSasaranKinerja, &rencanaPelaksanaan.IndikatorPD, &rencanaPelaksanaan.PerangkatDaerah)
+	err := row.Scan(&rencanaPelaksanaan.Id, &rencanaPelaksanaan.KodeOpd, &rencanaPelaksanaan.IdKebutuhan, &rencanaPelaksanaan.IdSasaranKinerja)
 	if err != nil {
 		return rencanaPelaksanaan, err
 	}
@@ -141,7 +141,7 @@ func (repository *RencanaPelaksanaanRepositoryImpl) FindIdTahunPelaksanaan(ctx c
 }
 
 func (repository *RencanaPelaksanaanRepositoryImpl) FindByKebutuhanId(ctx context.Context, tx *sql.Tx, kebutuhanId int) ([]domain.RencanaPelaksanaanPegawai, error) {
-	query := "SELECT id, kode_opd, id_kebutuhan, id_sasarankinerja, indikator_perangkatdaerah, perangkat_daerah FROM rencana_pelaksanaan WHERE id_kebutuhan = ?"
+	query := "SELECT id, kode_opd, id_kebutuhan, id_sasarankinerja FROM rencana_pelaksanaan WHERE id_kebutuhan = ?"
 	rows, err := tx.QueryContext(ctx, query, kebutuhanId)
 	helper.PanicIfError(err)
 	defer rows.Close()
@@ -149,7 +149,7 @@ func (repository *RencanaPelaksanaanRepositoryImpl) FindByKebutuhanId(ctx contex
 	var rencana []domain.RencanaPelaksanaanPegawai
 	for rows.Next() {
 		var rencanaPelaksanaan domain.RencanaPelaksanaanPegawai
-		if err := rows.Scan(&rencanaPelaksanaan.Id, &rencanaPelaksanaan.KodeOpd, &rencanaPelaksanaan.IdKebutuhan, &rencanaPelaksanaan.IdSasaranKinerja, &rencanaPelaksanaan.IndikatorPD, &rencanaPelaksanaan.PerangkatDaerah); err != nil {
+		if err := rows.Scan(&rencanaPelaksanaan.Id, &rencanaPelaksanaan.KodeOpd, &rencanaPelaksanaan.IdKebutuhan, &rencanaPelaksanaan.IdSasaranKinerja); err != nil {
 			return nil, err
 		}
 		rencana = append(rencana, rencanaPelaksanaan)

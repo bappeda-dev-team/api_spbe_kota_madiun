@@ -151,6 +151,24 @@ var rencanaPelaksanaanSet = wire.NewSet(
 	wire.Bind(new(controller.RencanaPelaksanaanController), new(*controller.RencanaPelaksanaanControllerImpl)),
 )
 
+var petarencanaSet = wire.NewSet(
+	repository.NewPetarencanaRepositoryImpl,
+	wire.Bind(new(repository.PetarencanaRepository), new(*repository.PetarencanaRepositoryImpl)),
+	service.NewPetarencanaServiceImpl,
+	wire.Bind(new(service.PetarencanaService), new(*service.PetarencanaServiceImpl)),
+	controller.NewPetarencanaControllerImpl,
+	wire.Bind(new(controller.PetarencanaController), new(*controller.PetarencanaControllerImpl)),
+)
+
+var keterangangapSet = wire.NewSet(
+	repository.NewKeteranganGapRepositoryImpl,
+	wire.Bind(new(repository.KeteranganGapRepository), new(*repository.KeteranganGapRepositoryImpl)),
+	service.NewKeteranganGapServiceImpl,
+	wire.Bind(new(service.KeteranganGapService), new(*service.KeteranganGapServiceImpl)),
+	controller.NewKeteranganGapControllerImpl,
+	wire.Bind(new(controller.KeteranganGapController), new(*controller.KeteranganGapControllerImpl)),
+)
+
 func InitializeServer() *http.Server {
 	wire.Build(
 		app.GetConnection,
@@ -171,6 +189,8 @@ func InitializeServer() *http.Server {
 		sasarankinerjaSet,
 		userSet,
 		rencanaPelaksanaanSet,
+		petarencanaSet,
+		keterangangapSet,
 		app.NewRouter,
 		wire.Bind(new(http.Handler), new(*httprouter.Router)),
 		middleware.NewAuthMiddleware,

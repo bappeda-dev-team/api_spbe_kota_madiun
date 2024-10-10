@@ -329,9 +329,15 @@ func (service *LayananSpbeServiceImpl) Insert(ctx context.Context, request web.L
 		},
 	}
 
-	if request.TujuanLayananId != nil {
+	if request.TacticalId != nil {
+		tacticalId := int32(*request.TacticalId)
+		layananspbe.TacticalId = sql.NullInt32{
+			Int32: tacticalId,
+			Valid: true,
+		}
+		// Mengisi TujuanLayananId dengan nilai yang sama seperti TacticalId
 		layananspbe.TujuanLayananId = sql.NullInt32{
-			Int32: int32(*request.TujuanLayananId),
+			Int32: tacticalId,
 			Valid: true,
 		}
 	}
@@ -371,13 +377,6 @@ func (service *LayananSpbeServiceImpl) Insert(ctx context.Context, request web.L
 		}
 	}
 
-	if request.TacticalId != nil {
-		layananspbe.TacticalId = sql.NullInt32{
-			Int32: int32(*request.TacticalId),
-			Valid: true,
-		}
-	}
-
 	if request.OperationalId != nil {
 		layananspbe.OperationalId = sql.NullInt32{
 			Int32: int32(*request.OperationalId),
@@ -405,7 +404,6 @@ func (service *LayananSpbeServiceImpl) Update(ctx context.Context, request web.L
 	if layananSpbe.KodeLayanan == "" {
 		layananSpbe.KodeLayanan = helper.GenerateRandomKodeLayananSPBE()
 	}
-	layananSpbe.TujuanLayananId = sql.NullInt32{Int32: int32(request.TujuanLayananId), Valid: request.TujuanLayananId != 0}
 	layananSpbe.FungsiLayanan = request.FungsiLayanan
 	layananSpbe.Tahun = request.Tahun
 	layananSpbe.KodeOPD = request.KodeOPD
@@ -416,7 +414,16 @@ func (service *LayananSpbeServiceImpl) Update(ctx context.Context, request web.L
 	layananSpbe.RalLevel3id = sql.NullInt32{Int32: int32(request.RalLevel3id), Valid: request.RalLevel3id != 0}
 	layananSpbe.RalLevel4id = sql.NullInt32{Int32: int32(request.RalLevel4id), Valid: request.RalLevel4id != 0}
 	layananSpbe.StrategicId = sql.NullInt32{Int32: int32(request.StrategicId), Valid: request.StrategicId != 0}
-	layananSpbe.TacticalId = sql.NullInt32{Int32: int32(request.TacticalId), Valid: request.TacticalId != 0}
+
+	// Mengisi TacticalId dan TujuanLayananId dengan nilai yang sama
+	if request.TacticalId != 0 {
+		layananSpbe.TacticalId = sql.NullInt32{Int32: int32(request.TacticalId), Valid: true}
+		layananSpbe.TujuanLayananId = sql.NullInt32{Int32: int32(request.TacticalId), Valid: true}
+	} else {
+		layananSpbe.TacticalId = sql.NullInt32{Valid: false}
+		layananSpbe.TujuanLayananId = sql.NullInt32{Valid: false}
+	}
+
 	layananSpbe.OperationalId = sql.NullInt32{Int32: int32(request.OperationalId), Valid: request.OperationalId != 0}
 
 	layananSpbe = service.LayananspbeRepository.Update(ctx, tx, layananSpbe)

@@ -50,8 +50,6 @@ func (service *RencanaPelaksanaanServiceImpl) Create(ctx context.Context, reques
 		IdKebutuhan:      request.IdKebutuhan,
 		KodeOpd:          request.KodeOpd,
 		IdSasaranKinerja: request.IdSasaranKinerja,
-		IndikatorPD:      request.IndikatorPD,
-		PerangkatDaerah:  request.PerangkatDaerah,
 		TahunPelaksanaan: make([]domain.TahunPelaksanaan, len(request.TahunPelaksanaan)),
 	}
 
@@ -95,8 +93,6 @@ func (service *RencanaPelaksanaanServiceImpl) Update(ctx context.Context, reques
 	rencanaPelaksanaan.KodeOpd = request.KodeOpd
 	rencanaPelaksanaan.IdKebutuhan = request.IdKebutuhan
 	rencanaPelaksanaan.IdSasaranKinerja = request.IdSasaranKinerja
-	rencanaPelaksanaan.IndikatorPD = request.IndikatorPD
-	rencanaPelaksanaan.PerangkatDaerah = request.PerangkatDaerah
 
 	rencanaPelaksanaan.TahunPelaksanaan = []domain.TahunPelaksanaan{}
 	for _, tp := range request.TahunPelaksanaan {
@@ -174,9 +170,6 @@ func (service *RencanaPelaksanaanServiceImpl) FindById(ctx context.Context, renc
 	sasaranKinerja, err := service.sasaranKinerjaRepository.FindById(ctx, tx, rencanaPelaksanaan.IdSasaranKinerja)
 	helper.PanicIfError(err)
 
-	opd, err := service.opdRepository.FindById(ctx, tx, rencanaPelaksanaan.KodeOpd)
-	helper.PanicIfError(err)
-
 	return web.RencanaPelaksanaanResponse{
 		Id:          rencanaPelaksanaan.Id,
 		KodeOpd:     rencanaPelaksanaan.KodeOpd,
@@ -187,11 +180,6 @@ func (service *RencanaPelaksanaanServiceImpl) FindById(ctx context.Context, renc
 			AnggaranSasaran:       sasaranKinerja.AnggaranSasaran,
 			KodeSubKegiatan:       sasaranKinerja.KodeSubKegiatan,
 			SubKegiatan:           sasaranKinerja.SubKegiatan,
-		},
-		IndikatorPD: rencanaPelaksanaan.IndikatorPD,
-		PerangkatDaerah: web.OpdRespons{
-			KodeOpd: opd.KodeOpd,
-			NamaOpd: opd.NamaOpd,
 		},
 		TahunPelaksanaan: tahunPelaksanaanResponses,
 	}, nil
@@ -212,11 +200,9 @@ func (service *RencanaPelaksanaanServiceImpl) FindAll(ctx context.Context, kodeO
 	var responses []web.RencanaPelaksanaanResponse
 	for _, rencana := range rencanaPelaksanaanList {
 
-		// Mengambil data tahun pelaksanaan
 		tahunPelaksanaan, err := service.rencanaPelaksanaanRepository.FindIdTahunPelaksanaan(ctx, tx, rencana.Id)
 		helper.PanicIfError(err)
 
-		// Mengonversi domain.TahunPelaksanaan ke web.TahunPelaksanaanResponse
 		var tahunPelaksanaanResponses []web.TahunPelaksanaanResponse
 		for _, tahun := range tahunPelaksanaan {
 			tahunPelaksanaanResponses = append(tahunPelaksanaanResponses, web.TahunPelaksanaanResponse{
@@ -226,9 +212,6 @@ func (service *RencanaPelaksanaanServiceImpl) FindAll(ctx context.Context, kodeO
 		}
 
 		sasaranKinerja, err := service.sasaranKinerjaRepository.FindById(ctx, tx, rencana.IdSasaranKinerja)
-		helper.PanicIfError(err)
-
-		opd, err := service.opdRepository.FindById(ctx, tx, rencana.PerangkatDaerah)
 		helper.PanicIfError(err)
 
 		responses = append(responses, web.RencanaPelaksanaanResponse{
@@ -242,11 +225,6 @@ func (service *RencanaPelaksanaanServiceImpl) FindAll(ctx context.Context, kodeO
 				AnggaranSasaran:       sasaranKinerja.AnggaranSasaran,
 				KodeSubKegiatan:       sasaranKinerja.KodeSubKegiatan,
 				SubKegiatan:           sasaranKinerja.SubKegiatan,
-			},
-			IndikatorPD: rencana.IndikatorPD,
-			PerangkatDaerah: web.OpdRespons{
-				KodeOpd: opd.KodeOpd,
-				NamaOpd: opd.NamaOpd,
 			},
 			TahunPelaksanaan: tahunPelaksanaanResponses,
 		})

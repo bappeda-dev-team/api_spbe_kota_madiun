@@ -1,7 +1,7 @@
 package web
 
 type KebutuhanSPBECreateRequest struct {
-	KeteranganGap  string                 `json:"keterangan_gap"`
+	KeteranganGap  string                 `json:"keterangan_kebutuhan"`
 	KodeOpd        string                 `json:"kode_opd"`
 	Tahun          int                    `json:"tahun"`
 	NamaDomain     string                 `json:"nama_domain"`

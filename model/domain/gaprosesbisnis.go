@@ -11,6 +11,7 @@ type GapProsesBisnis struct {
 	Layanan          []GapLayanan          `json:"layanans"`
 	DataDanInformasi []GapDataDanInformasi `json:"data_dan_informasi"`
 	Aplikasi         []GapAplikasi         `json:"aplikasi"`
+	KeteranganGap    []GapKeteranganGap    `json:"keterangan_gap"`
 	Keterangan       []GapKeterangan       `json:"keterangan"`
 }
 
@@ -29,4 +30,9 @@ type GapAplikasi struct {
 type GapKeterangan struct {
 	IdKeterangan sql.NullInt32  `json:"id_keterangan"`
 	Keterangan   sql.NullString `json:"keterangan"`
+}
+
+type GapKeteranganGap struct {
+	IdKeteranganGap sql.NullInt32  `json:"id_keterangan_gap"`
+	KeteranganGap   sql.NullString `json:"keterangan_gap"`
 }

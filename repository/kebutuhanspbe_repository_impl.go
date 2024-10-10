@@ -236,8 +236,20 @@ func (repository *KebutuhanSPBERepositoryImpl) UpdatePenanggungJawab(ctx context
 }
 
 func (repository *KebutuhanSPBERepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, kebutuhanSPBEId int) error {
+	// Hapus tahun_pelaksanaan yang terhubung dengan rencana_pelaksanaan
+	_, err := tx.ExecContext(ctx, "DELETE FROM tahun_pelaksanaan WHERE id_rencana_pelaksana IN (SELECT id FROM rencana_pelaksanaan WHERE id_kebutuhan = ?)", kebutuhanSPBEId)
+	if err != nil {
+		return err
+	}
+
+	// Hapus rencana_pelaksanaan
+	_, err = tx.ExecContext(ctx, "DELETE FROM rencana_pelaksanaan WHERE id_kebutuhan = ?", kebutuhanSPBEId)
+	if err != nil {
+		return err
+	}
+
 	// Hapus kondisi_awal yang terhubung
-	_, err := tx.ExecContext(ctx, "DELETE FROM kondisi_awal WHERE jenis_kebutuhan_id IN (SELECT id FROM jenis_kebutuhan WHERE kebutuhan_id = ?)", kebutuhanSPBEId)
+	_, err = tx.ExecContext(ctx, "DELETE FROM kondisi_awal WHERE jenis_kebutuhan_id IN (SELECT id FROM jenis_kebutuhan WHERE kebutuhan_id = ?)", kebutuhanSPBEId)
 	if err != nil {
 		return err
 	}
@@ -252,6 +264,40 @@ func (repository *KebutuhanSPBERepositoryImpl) Delete(ctx context.Context, tx *s
 	script := "DELETE FROM kebutuhan_spbe WHERE id = ?"
 	_, err = tx.ExecContext(ctx, script, kebutuhanSPBEId)
 	return err
+}
+
+func (repository *KebutuhanSPBERepositoryImpl) DeleteKeteranganKebutuhan(ctx context.Context, tx *sql.Tx, kebutuhanSPBEId int) error {
+	log.Printf("Mulai menghapus keterangan kebutuhan untuk ID: %d", kebutuhanSPBEId)
+
+	// Hapus tahun_pelaksanaan
+	result, err := tx.ExecContext(ctx, "DELETE FROM tahun_pelaksanaan WHERE id_rencana_pelaksana IN (SELECT id FROM rencana_pelaksanaan WHERE id_kebutuhan = ?)", kebutuhanSPBEId)
+	if err != nil {
+		log.Printf("Error saat menghapus tahun_pelaksanaan: %v", err)
+		return err
+	}
+	rowsAffected, _ := result.RowsAffected()
+	log.Printf("Jumlah baris tahun_pelaksanaan yang dihapus: %d", rowsAffected)
+
+	// Lanjutkan dengan operasi lainnya dengan logging serupa...
+
+	// Update kebutuhan_spbe
+	script := `
+        UPDATE kebutuhan_spbe 
+        SET
+            nama_domain = NULL, 
+            indikator_pj = NULL, 
+            pj = NULL
+        WHERE id = ?`
+	result, err = tx.ExecContext(ctx, script, kebutuhanSPBEId)
+	if err != nil {
+		log.Printf("Error saat mengupdate kebutuhan_spbe: %v", err)
+		return err
+	}
+	rowsAffected, _ = result.RowsAffected()
+	log.Printf("Jumlah baris kebutuhan_spbe yang diupdate: %d", rowsAffected)
+
+	log.Printf("Berhasil menghapus keterangan kebutuhan untuk ID: %d", kebutuhanSPBEId)
+	return nil
 }
 
 func (repository *KebutuhanSPBERepositoryImpl) FindPenanggungJawab(ctx context.Context, tx *sql.Tx, pj string, tahun int) ([]domain.KebutuhanSPBE, error) {
@@ -326,4 +372,49 @@ func (repository *KebutuhanSPBERepositoryImpl) FindIdPenanggungJawab(ctx context
 
 	log.Printf("Hasil query: %+v", kebutuhanSPBE)
 	return kebutuhanSPBE, nil
+}
+
+func (repository *KebutuhanSPBERepositoryImpl) FindIdForPetarencana(ctx context.Context, tx *sql.Tx, kebutuhanId int, pj string, kodeOPD string) (domain.KebutuhanSPBE, error) {
+	log.Printf("Mencari kebutuhan SPBE dengan ID: %d dan Kode OPD: %s", kebutuhanId, kodeOPD)
+
+	script := "SELECT id, keterangan, kode_opd, tahun, nama_domain, id_prosesbisnis, indikator_pj, pj FROM kebutuhan_spbe WHERE 1=1"
+	var args []interface{}
+
+	if kebutuhanId != 0 {
+		script += " AND id = ?"
+		args = append(args, kebutuhanId)
+	}
+
+	if kodeOPD != "" {
+		script += " AND (kode_opd = ? OR pj = ?)"
+		args = append(args, kodeOPD, kodeOPD)
+	}
+
+	log.Println("Menjalankan query:", script, "dengan args:", args)
+
+	rows, err := tx.QueryContext(ctx, script, args...)
+	if err != nil {
+		log.Printf("Error saat menjalankan query: %v", err)
+		return domain.KebutuhanSPBE{}, err
+	}
+	defer rows.Close()
+
+	var kebutuhanSPBEs []domain.KebutuhanSPBE
+	for rows.Next() {
+		var kebutuhanSPBE domain.KebutuhanSPBE
+		err := rows.Scan(&kebutuhanSPBE.ID, &kebutuhanSPBE.Keterangan, &kebutuhanSPBE.KodeOpd, &kebutuhanSPBE.Tahun, &kebutuhanSPBE.NamaDomain, &kebutuhanSPBE.IdProsesbisnis, &kebutuhanSPBE.IndikatorPj, &kebutuhanSPBE.PenanggungJawab)
+		if err != nil {
+			log.Printf("Error saat memindai baris: %v", err)
+			return domain.KebutuhanSPBE{}, err
+		}
+		kebutuhanSPBEs = append(kebutuhanSPBEs, kebutuhanSPBE)
+	}
+
+	if len(kebutuhanSPBEs) == 0 {
+		log.Printf("Tidak ada kebutuhan SPBE yang ditemukan untuk ID: %d, Kode OPD: %s", kebutuhanId, kodeOPD)
+		return domain.KebutuhanSPBE{}, nil
+	}
+
+	log.Printf("Ditemukan %d kebutuhan SPBE", len(kebutuhanSPBEs))
+	return kebutuhanSPBEs[0], nil
 }

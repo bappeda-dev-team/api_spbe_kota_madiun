@@ -41,3 +41,43 @@ func ContainKeterangan(keterangan []web.GapKeterangan, ket web.GapKeterangan) bo
 	}
 	return false
 }
+
+func ContainKeteranganGap(keteranganGap []web.GapKeteranganGap, ket web.GapKeteranganGap) bool {
+	for _, k := range keteranganGap {
+		if k.KeteranganGap.Valid == ket.KeteranganGap.Valid &&
+			(k.KeteranganGap.Valid && k.KeteranganGap.String == ket.KeteranganGap.String || !k.KeteranganGap.Valid) {
+			return true
+		}
+	}
+	return false
+}
+
+func ContainsLayananPetarencana(layanans []web.RencanaLayanan, layanan web.RencanaLayanan) bool {
+	for _, l := range layanans {
+		if l.NamaLayanan.Valid == layanan.NamaLayanan.Valid &&
+			(l.NamaLayanan.Valid && l.NamaLayanan.String == layanan.NamaLayanan.String || !l.NamaLayanan.Valid) {
+			return true
+		}
+	}
+	return false
+}
+
+func ContainDataPetarencana(data []web.RencanaDataDanInformasi, datainfor web.RencanaDataDanInformasi) bool {
+	for _, i := range data {
+		if i.NamaData.Valid == datainfor.NamaData.Valid &&
+			(i.NamaData.Valid && i.NamaData.String == datainfor.NamaData.String || !i.NamaData.Valid) {
+			return true
+		}
+	}
+	return false
+}
+
+func ContainAplikasiPetarencana(aplikasi []web.RencanaAplikasi, app web.RencanaAplikasi) bool {
+	for _, a := range aplikasi {
+		if a.NamaAplikasi.Valid == app.NamaAplikasi.Valid &&
+			(a.NamaAplikasi.Valid && a.NamaAplikasi.String == app.NamaAplikasi.String || !a.NamaAplikasi.Valid) {
+			return true
+		}
+	}
+	return false
+}

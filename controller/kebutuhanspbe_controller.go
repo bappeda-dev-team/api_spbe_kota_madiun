@@ -12,6 +12,7 @@ type KebutuhanSPBEController interface {
 	UpdateKeterangan(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	UpdatePenanggungJawab(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
+	DeleteKeteranganKebutuhan(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	FindByKodeOpdAndTahun(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	FindDataPemenuhanKebutuhan(writer http.ResponseWriter, request *http.Request, params httprouter.Params)

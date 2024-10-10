@@ -5,8 +5,6 @@ type RencanaPelaksanaanResponse struct {
 	KodeOpd          string                        `json:"kode_opd"`
 	IdKebutuhan      int                           `json:"id_kebutuhan"`
 	SasaranKinerja   SasaranKinerjaPegawaiResponse `json:"sasaran_kinerja"`
-	IndikatorPD      string                        `json:"indikator_pd"`
-	PerangkatDaerah  OpdRespons                    `json:"perangkat_daerah"`
 	TahunPelaksanaan []TahunPelaksanaanResponse    `json:"tahun_pelaksanaan"`
 }
 
